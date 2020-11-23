@@ -1,0 +1,87 @@
+'use strict'
+
+import * as sls from '../../akkasls'
+import * as base from './baseTreeItem'
+import * as invite from './inviteTreeItem'
+import * as member from './memberTreeItem'
+import * as service from './serviceTreeItem'
+import * as project from './projectTreeItem'
+import * as vscode from 'vscode';
+
+export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<base.TreeItem | undefined | void> = new vscode.EventEmitter<base.TreeItem | undefined | void>();
+    readonly onDidChangeTreeData: vscode.Event<base.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
+    private akkaServerless: sls.AkkaServerless
+
+    constructor(akkaServerless: sls.AkkaServerless) {
+        this.akkaServerless = akkaServerless
+    }
+
+    refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
+
+    getTreeItem(element: base.TreeItem): vscode.TreeItem {
+        return element;
+    }
+
+    getChildren(element?: base.TreeItem): Thenable<base.TreeItem[]> {
+        if (element) {
+            switch (element.type) {
+                case project.ITEM_TYPE:
+                    return Promise.resolve(this.getDefaultProjectItems(element.id!));
+                case service.ITEM_TYPE:
+                    return Promise.resolve(service.Get(element.parentProjectID, this.akkaServerless));
+                case member.ITEM_TYPE:
+                    return Promise.resolve(member.Get(element.parentProjectID, this.akkaServerless));
+                case invite.ITEM_TYPE:
+                    return Promise.resolve(invite.Get(element.parentProjectID, this.akkaServerless));
+                default:
+                    break;
+            }
+            return Promise.resolve([]);
+        }
+
+        // if there is no element present, get all projects and populate a new tree
+        return Promise.resolve(project.Get(this.akkaServerless));
+    }
+
+    getDefaultProjectItems(parentProjectID: string): Promise<base.TreeItem[]> {
+        let defaultTreeItems: base.TreeItem[] = []
+        defaultTreeItems.push(service.DefaultItem(parentProjectID))
+        defaultTreeItems.push(member.DefaultItem(parentProjectID))
+        defaultTreeItems.push(invite.DefaultItem(parentProjectID))
+        return Promise.resolve(defaultTreeItems);
+    }
+}
+
+export function printDetails(base: base.TreeItem) {
+    base.printDetails()
+}
+
+export function openInBrowser(base: base.TreeItem) {
+    let url: string = ''
+
+    switch (base.type) {
+        case project.ITEM_TYPE:
+            url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+            break;
+        case service.ITEM_TYPE:
+            if (base.id?.includes('-Services')) {
+                url = `${sls.CONSOLE_URL}/project/${base.id.substring(0,base.id.length-9)}/services`;
+            } else {
+                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+            }
+            break;
+        case member.ITEM_TYPE:
+            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+            break;
+        case invite.ITEM_TYPE:
+            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+            break;
+        default:
+            break;
+    }
+    
+    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+}

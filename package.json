@@ -1,0 +1,240 @@
+{
+	"name": "vscode-akkasls-tools",
+	"displayName": "Akka Serverless Tools for VSCode",
+	"description": "Develop, deploy, and manage Akka Serverless apps",
+	"version": "0.0.1",
+	"publisher": "retgits",
+	"repository": {
+		"url": "https://github.com/retgits/vscode-akkasls-tools"
+	},
+	"engines": {
+		"vscode": "^1.51.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
+		"watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/node-extension.webpack.config.js",
+		"package": "webpack --mode production --config ./build/node-extension.webpack.config.js",
+		"test-compile": "tsc -p ./",
+		"test-watch": "tsc -watch -p ./",
+		"pretest": "npm run test-compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js",
+		"build": "vsce package"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.51.0",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.0",
+		"@types/node": "^12.11.7",
+		"eslint": "^7.9.0",
+		"@typescript-eslint/eslint-plugin": "^4.1.1",
+		"@typescript-eslint/parser": "^4.1.1",
+		"glob": "^7.1.6",
+		"mocha": "^8.1.3",
+		"typescript": "^4.0.2",
+		"vscode-test": "^1.4.0",
+		"ts-loader": "^8.0.3",
+		"webpack": "^4.44.1",
+		"webpack-cli": "^3.3.12"
+	},
+	"main": "./dist/extension.js",
+	"activationEvents": [
+		"onView:asexplorer.projects"
+	],
+	"contributes": {
+		"configuration": {
+			"title": "Akka Serverless",
+			"properties": {
+				"akkaserverless.dryrun": {
+					"type": "boolean",
+					"default": false,
+					"description": "DryRun prints the commands in the log and does not execute them"
+				}
+			}
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "asexplorer",
+					"title": "Akka Serverless",
+					"icon": "resources/akka-icon-reverse.svg"
+				}
+			]
+		},
+		"views": {
+			"asexplorer": [
+				{
+					"id": "asexplorer.projects",
+					"name": "Projects"
+				},
+				{
+					"id": "asexplorer.status",
+					"name": "Status"
+				},
+				{
+					"id": "asexplorer.tools",
+					"name": "Tools"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "asexplorer.projects.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "asexplorer.status.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "asexplorer.tools.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "as.services.deploy",
+				"title": "Deploy a service to Akka Serverless",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.services.undeploy",
+				"title": "Remove a service from Akka Serverless",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.services.expose",
+				"title": "Expose a service for inbound traffic",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.services.unexpose",
+				"title": "Removes a service route from a service",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "asexplorer.projects.services.deploy",
+				"title": "Deploy service"
+			},
+			{
+				"command": "asexplorer.projects.services.undeploy",
+				"title": "Undeploy service"
+			},
+			{
+				"command": "asexplorer.projects.services.expose",
+				"title": "Expose service"
+			},
+			{
+				"command": "asexplorer.projects.services.unexpose",
+				"title": "Unexpose service"
+			},
+			{
+				"command": "asexplorer.projects.openbrowser",
+				"title": "View in browser"
+			},
+			{
+				"command": "asexplorer.projects.details.projects",
+				"title": "View project details"
+			},
+			{
+				"command": "asexplorer.projects.details.services",
+				"title": "View service details"
+			},
+			{
+				"command": "asexplorer.projects.details.members",
+				"title": "View member details"
+			},
+			{
+				"command": "asexplorer.projects.details.invites",
+				"title": "View invite details"
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "asexplorer.projects.refresh",
+					"when": "view == asexplorer.projects",
+					"group": "navigation"
+				},
+				{
+					"command": "asexplorer.status.refresh",
+					"when": "view == asexplorer.status",
+					"group": "navigation"
+				},
+				{
+					"command": "asexplorer.tools.refresh",
+					"when": "view == asexplorer.tools",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "asexplorer.projects.services.deploy",
+					"when": "view == asexplorer.projects && viewItem == Services",
+					"group": "0"
+				},
+				{
+					"command": "asexplorer.projects.services.undeploy",
+					"when": "view == asexplorer.projects && viewItem == Services",
+					"group": "0"
+				},
+				{
+					"command": "asexplorer.projects.services.expose",
+					"when": "view == asexplorer.projects && viewItem == Services",
+					"group": "0"
+				},
+				{
+					"command": "asexplorer.projects.services.unexpose",
+					"when": "view == asexplorer.projects && viewItem == Services",
+					"group": "0"
+				},
+				{
+					"command": "asexplorer.projects.details.projects",
+					"when": "view == asexplorer.projects && viewItem == Projects",
+					"group": "1"
+				},
+				{
+					"command": "asexplorer.projects.details.services",
+					"when": "view == asexplorer.projects && viewItem == Services",
+					"group": "1"
+				},
+				{
+					"command": "asexplorer.projects.details.members",
+					"when": "view == asexplorer.projects && viewItem == Members",
+					"group": "1"
+				},
+				{
+					"command": "asexplorer.projects.details.invites",
+					"when": "view == asexplorer.projects && viewItem == Invites",
+					"group": "1"
+				},
+				{
+					"command": "asexplorer.projects.openbrowser",
+					"when": "view == asexplorer.projects",
+					"group": "99"
+				}
+			]
+		}
+	},
+	"dependencies": {
+		"@types/cli-table": "^0.3.0",
+		"@types/shelljs": "^0.8.8",
+		"axios": "^0.21.0",
+		"cli-table": "^0.3.1",
+		"shelljs": "^0.8.4"
+	}
+}
