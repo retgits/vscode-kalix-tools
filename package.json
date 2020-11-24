@@ -2,7 +2,7 @@
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "retgits",
 	"repository": {
 		"url": "https://github.com/retgits/vscode-akkasls-tools"
@@ -53,6 +53,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "DryRun prints the commands in the log and does not execute them"
+				},
+				"akkaserverless.logOutput": {
+					"type": "boolean",
+					"default": false,
+					"description": "Log output from the Akka Serverless CLI"
 				}
 			}
 		},
@@ -161,10 +166,43 @@
 			{
 				"command": "asexplorer.projects.details.invites",
 				"title": "View invite details"
+			},
+			{
+				"command": "asexplorer.projects.invites.inviteuser",
+				"title": "Invite user"
+			},
+			{
+				"command": "asexplorer.projects.new",
+				"title": "Add new project",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "asexplorer.status.view",
+				"title": "View Akka Serverless status page",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "asexplorer.tools.info",
+				"title": "Get tool info"
+			},
+			{
+				"command": "as.invites.inviteuser",
+				"title": "Invite user to project",
+				"category": "Akka Serverless"
 			}
 		],
 		"menus": {
 			"view/title": [
+				{
+					"command": "asexplorer.projects.new",
+					"when": "view == asexplorer.projects",
+					"group": "0"
+				},
+				{
+					"command": "asexplorer.status.view",
+					"when": "view == asexplorer.status",
+					"group": "0"
+				},
 				{
 					"command": "asexplorer.projects.refresh",
 					"when": "view == asexplorer.projects",
@@ -221,6 +259,15 @@
 					"command": "asexplorer.projects.details.invites",
 					"when": "view == asexplorer.projects && viewItem == Invites",
 					"group": "1"
+				},
+				{
+					"command": "asexplorer.projects.invites.inviteuser",
+					"when": "view == asexplorer.projects && viewItem == Invites",
+					"group": "1"
+				},
+				{
+					"command": "asexplorer.tools.info",
+					"when": "view == asexplorer.tools && viewItem == Tools"
 				},
 				{
 					"command": "asexplorer.projects.openbrowser",

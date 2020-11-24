@@ -5,10 +5,6 @@ import * as base from './baseTreeItem';
 import * as service from '../../datatypes/service';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
-import * as deployService from '../../cliwrapper/services/deploy'
-import * as exposeService from '../../cliwrapper/services/expose'
-import * as undeployService from '../../cliwrapper/services/undeploy'
-import * as unexposeService from '../../cliwrapper/services/unexpose'
 
 const Table = require('cli-table');
 
@@ -76,26 +72,4 @@ export async function Get(parentProjectID: string, akkasls: sls.AkkaServerless):
 
 export function DefaultItem(parentProjectID: string): ServiceTreeItem {
     return new ServiceTreeItem(ITEM_TYPE, parentProjectID, {metadata:{name:'', uid:`${parentProjectID}-${ITEM_TYPE}`}}, vscode.TreeItemCollapsibleState.Collapsed)
-}
-
-export function deploy(item: base.TreeItem) {
-    deployService.fromUI(item.parentProjectID)
-}
-
-export function undeploy(item: ServiceTreeItem) {
-    if (item.label != ITEM_TYPE) {
-        undeployService.fromUI(item.parentProjectID, item.label)
-    }
-}
-
-export function expose(item: ServiceTreeItem) {
-    if (item.label != ITEM_TYPE) {
-        exposeService.fromUI(item.parentProjectID, item.label)
-    }
-}
-
-export function unexpose(item: ServiceTreeItem) {
-    if (item.label != ITEM_TYPE) {
-        unexposeService.fromUI(item.parentProjectID, item.label)
-    }
 }

@@ -13,13 +13,13 @@ const toolsJSON: string = `
     {
         "name": "akkasls",
         "versionCmd": "version",
-        "url": "https://docs.cloudstate.com/getting-started/set-up-development-env.html#_cloudstate_cli",
-        "updateUrl": "https://downloads.lbcs.io/stable/version.txt"
+        "infoURL": "https://docs.cloudstate.com/getting-started/set-up-development-env.html#_cloudstate_cli",
+        "updateURL": "https://downloads.lbcs.io/stable/version.txt"
     },
     {
         "name": "docker",
         "versionCmd": "version --format '{{.Client.Version}}'",
-        "url": "https://docs.docker.com/desktop/"
+        "infoURL": "https://docs.docker.com/desktop/"
     }
 ]
 `
@@ -36,6 +36,8 @@ export class ToolTreeItem extends vscode.TreeItem {
     description = this.tool.currentVersion
 
     iconPath = getStatus(this.label)
+
+    contextValue = 'Tools'
 }
 
 export async function Get(): Promise<ToolTreeItem[]> {
@@ -74,4 +76,12 @@ function checkUpdatesAvailable(tool: tool.Tool, version: string) {
             vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`)
         }
     });
+}
+
+export function openToolPage(tool: tool.Tool) {
+    if (tool.infoURL) {
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tool.infoURL))
+    } else {
+        vscode.window.showInformationMessage(`No information URL specified for ${tool.name}`)
+    }
 }

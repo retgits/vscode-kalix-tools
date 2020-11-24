@@ -6,6 +6,12 @@ import * as invite from './inviteTreeItem'
 import * as member from './memberTreeItem'
 import * as service from './serviceTreeItem'
 import * as project from './projectTreeItem'
+import * as createProject from '../../cliwrapper/projects/new';
+import * as userInvite from '../../cliwrapper/roles/invitations/inviteuser'
+import * as deployService from '../../cliwrapper/services/deploy'
+import * as exposeService from '../../cliwrapper/services/expose'
+import * as undeployService from '../../cliwrapper/services/undeploy'
+import * as unexposeService from '../../cliwrapper/services/unexpose'
 import * as vscode from 'vscode';
 
 export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
@@ -84,4 +90,34 @@ export function openInBrowser(base: base.TreeItem) {
     }
     
     vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+}
+
+export async function newProject(projectExplorer: ProjectExplorer) {
+    createProject.fromUI(projectExplorer)
+}
+
+export async function inviteUser(base: base.TreeItem, projectExplorer: ProjectExplorer) {
+    userInvite.fromUI(base.parentProjectID, projectExplorer)
+}
+
+export async function deploy(item: base.TreeItem, projectExplorer: ProjectExplorer) {
+    deployService.fromUI(item.parentProjectID, projectExplorer)
+}
+
+export async function undeploy(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
+    if (item.label != service.ITEM_TYPE) {
+        undeployService.fromUI(item.parentProjectID, item.label, projectExplorer)
+    }
+}
+
+export async function expose(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
+    if (item.label != service.ITEM_TYPE) {
+        exposeService.fromUI(item.parentProjectID, item.label, projectExplorer)
+    }
+}
+
+export async function unexpose(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
+    if (item.label != service.ITEM_TYPE) {
+        unexposeService.fromUI(item.parentProjectID, item.label, projectExplorer)
+    }
 }

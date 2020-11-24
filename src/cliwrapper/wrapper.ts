@@ -127,7 +127,12 @@ export class Command {
             return null
         }
 
-        shell.exec(`${tool} ${params.join('')}`)
+        let res = await shell.exec(`${tool} ${params.join('')}`)
+
+        if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
+            aslogger.log(res.stderr)
+            aslogger.log(res.stdout)
+        }
 
         return null
     }

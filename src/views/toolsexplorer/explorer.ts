@@ -20,4 +20,8 @@ export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeIt
     getChildren(): Thenable<tool.ToolTreeItem[]> {
         return Promise.resolve(tool.Get());
     }
+
+    openPage(item: tool.ToolTreeItem) {
+        tool.openToolPage(item.tool)
+    }
 }

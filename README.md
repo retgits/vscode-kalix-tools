@@ -7,6 +7,8 @@ Features include:
 * View your projects, services, members, and invites
 * Deploy and undeploy services
 * Expose and unexpose services
+* Create new projects
+* Invite users to your project
 
 **What's new in this version?**  See the [change log](CHANGELOG.md) to find out!
 
