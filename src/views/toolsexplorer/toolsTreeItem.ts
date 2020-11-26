@@ -1,12 +1,12 @@
-'use strict'
+'use strict';
 
 import axios from 'axios';
 import { shell } from '../../utils/shell';
 import * as tool from '../../datatypes/tool';
 import * as vscode from 'vscode';
 
-const EXISTS_CODICON = 'pass'
-const NOT_EXISTS_CODICON = 'error'
+const EXISTS_CODICON = 'pass';
+const NOT_EXISTS_CODICON = 'error';
 
 const toolsJSON: string = `
 [
@@ -22,7 +22,7 @@ const toolsJSON: string = `
         "infoURL": "https://docs.docker.com/desktop/"
     }
 ]
-`
+`;
 
 export class ToolTreeItem extends vscode.TreeItem {
     constructor(
@@ -33,55 +33,53 @@ export class ToolTreeItem extends vscode.TreeItem {
         super(label, collapsibleState);
     }
 
-    description = this.tool.currentVersion
+    description = this.tool.currentVersion;
 
-    iconPath = getStatus(this.label)
+    iconPath = getStatus(this.label);
 
-    contextValue = 'Tools'
+    contextValue = 'Tools';
 }
 
-export async function Get(): Promise<ToolTreeItem[]> {
-    let tools: ToolTreeItem[] = []
+export async function getToolTreeItems(): Promise<ToolTreeItem[]> {
+    let tools: ToolTreeItem[] = [];
 
-    let toolsList = tool.Convert.toToolArray(toolsJSON)
+    let toolsList = tool.Convert.toToolArray(toolsJSON);
 
     for (let tool of toolsList) {
-        tool.currentVersion = await getVersion(tool)
-        tools.push(new ToolTreeItem(tool.name, tool, vscode.TreeItemCollapsibleState.None))
+        tool.currentVersion = await getVersion(tool);
+        tools.push(new ToolTreeItem(tool.name, tool, vscode.TreeItemCollapsibleState.None));
     }
 
     return tools;
 }
 
 async function getVersion(tool: tool.Tool): Promise<string> {
-    let shellResult = await shell.exec(`${tool.name} ${tool.versionCmd}`)
-    let version = shellResult.stdout
+    let shellResult = await shell.exec(`${tool.name} ${tool.versionCmd}`);
+    let version = shellResult.stdout;
     if (tool.updateURL) {
-        checkUpdatesAvailable(tool, version)
+        checkUpdatesAvailable(tool, version);
     }
-    return version
+    return version;
 }
 
 function getStatus(cmd: string): vscode.ThemeIcon {
     if (shell.existsInPath(cmd)) {
-        return new vscode.ThemeIcon(EXISTS_CODICON)
+        return new vscode.ThemeIcon(EXISTS_CODICON);
     }
     vscode.window.showErrorMessage(`Unable to find ${cmd} in PATH`);
-    return new vscode.ThemeIcon(NOT_EXISTS_CODICON)
+    return new vscode.ThemeIcon(NOT_EXISTS_CODICON);
 }
 
 function checkUpdatesAvailable(tool: tool.Tool, version: string) {
     axios.get(tool.updateURL!).then((response) => {
-        if (response.data != version) {
-            vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`)
+        if (response.data !== version) {
+            vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`);
         }
     });
 }
 
 export function openToolPage(tool: tool.Tool) {
     if (tool.infoURL) {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tool.infoURL))
-    } else {
-        vscode.window.showInformationMessage(`No information URL specified for ${tool.name}`)
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tool.infoURL));
     }
 }

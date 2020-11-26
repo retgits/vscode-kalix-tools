@@ -13366,7 +13366,7 @@ class TreeDataProvider {
         return element;
     }
     getChildren() {
-        return Promise.resolve(tool.Get());
+        return Promise.resolve(tool.getToolTreeItems());
     }
     openPage(item) {
         tool.openToolPage(item.tool);
@@ -13391,7 +13391,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.openToolPage = exports.Get = exports.ToolTreeItem = void 0;
+exports.openToolPage = exports.getToolTreeItems = exports.ToolTreeItem = void 0;
 const axios_1 = __webpack_require__(96);
 const shell_1 = __webpack_require__(5);
 const tool = __webpack_require__(140);
@@ -13425,7 +13425,7 @@ class ToolTreeItem extends vscode.TreeItem {
     }
 }
 exports.ToolTreeItem = ToolTreeItem;
-function Get() {
+function getToolTreeItems() {
     return __awaiter(this, void 0, void 0, function* () {
         let tools = [];
         let toolsList = tool.Convert.toToolArray(toolsJSON);
@@ -13436,7 +13436,7 @@ function Get() {
         return tools;
     });
 }
-exports.Get = Get;
+exports.getToolTreeItems = getToolTreeItems;
 function getVersion(tool) {
     return __awaiter(this, void 0, void 0, function* () {
         let shellResult = yield shell_1.shell.exec(`${tool.name} ${tool.versionCmd}`);
@@ -13456,7 +13456,7 @@ function getStatus(cmd) {
 }
 function checkUpdatesAvailable(tool, version) {
     axios_1.default.get(tool.updateURL).then((response) => {
-        if (response.data != version) {
+        if (response.data !== version) {
             vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`);
         }
     });
@@ -13464,9 +13464,6 @@ function checkUpdatesAvailable(tool, version) {
 function openToolPage(tool) {
     if (tool.infoURL) {
         vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tool.infoURL));
-    }
-    else {
-        vscode.window.showInformationMessage(`No information URL specified for ${tool.name}`);
     }
 }
 exports.openToolPage = openToolPage;

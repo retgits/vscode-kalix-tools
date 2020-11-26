@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 
 import * as vscode from 'vscode';
-import * as tool from './toolsTreeItem'
+import * as tool from './toolsTreeItem';
 
 export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<tool.ToolTreeItem | undefined | void> = new vscode.EventEmitter<tool.ToolTreeItem | undefined | void>();
@@ -18,10 +18,10 @@ export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeIt
     }
 
     getChildren(): Thenable<tool.ToolTreeItem[]> {
-        return Promise.resolve(tool.Get());
+        return Promise.resolve(tool.getToolTreeItems());
     }
 
     openPage(item: tool.ToolTreeItem) {
-        tool.openToolPage(item.tool)
+        tool.openToolPage(item.tool);
     }
 }
