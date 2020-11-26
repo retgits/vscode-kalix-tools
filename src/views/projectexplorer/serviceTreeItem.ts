@@ -2,7 +2,7 @@
 
 import * as sls from '../../akkasls';
 import * as base from './baseTreeItem';
-import * as service from '../../datatypes/service';
+import * as service from '../../datatypes/services/service';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
 
@@ -61,7 +61,7 @@ export class ServiceTreeItem extends base.TreeItem {
 export async function Get(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<ServiceTreeItem[]> {
     let services: ServiceTreeItem[] = []
 
-    let servicesList = await akkasls.getServicesByProject(parentProjectID)
+    let servicesList = await akkasls.getServices(parentProjectID)
 
     for (let service of servicesList) {
         services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, vscode.TreeItemCollapsibleState.None))

@@ -253,7 +253,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Command = void 0;
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const shell_1 = __webpack_require__(5);
+const shell = __webpack_require__(5);
 class Command {
     constructor(cmd, args, flags) {
         this.cmd = cmd;
@@ -328,12 +328,12 @@ class Command {
                 logger_1.aslogger.log(`${tool} ${params.join('')}`);
                 return null;
             }
-            let res = yield shell_1.shell.exec(`${tool} ${params.join('')}`);
+            let res = yield shell.shell.exec(`${tool} ${params.join('')}`);
             if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
                 logger_1.aslogger.log(res.stderr);
                 logger_1.aslogger.log(res.stdout);
             }
-            return null;
+            return res;
         });
     }
 }
@@ -8007,42 +8007,79 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AkkaServerless = exports.CONSOLE_URL = void 0;
-// Imports
-const invite = __webpack_require__(70);
-const member = __webpack_require__(71);
-const project = __webpack_require__(72);
-const service = __webpack_require__(73);
-const shell_1 = __webpack_require__(5);
+const listProjects = __webpack_require__(141);
+const listMembers = __webpack_require__(142);
+const listInvites = __webpack_require__(143);
+const listServices = __webpack_require__(144);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
     constructor() {
-        this.binaryName = 'akkasls';
+        this.projects = [];
+        this.members = new Map();
+        this.invites = new Map();
+        this.services = new Map();
     }
     getProjects() {
         return __awaiter(this, void 0, void 0, function* () {
-            let shellResult = yield shell_1.shell.exec(`${this.binaryName} projects list -o json`);
-            return project.Convert.toProjectArray(shellResult.stdout);
-        });
-    }
-    getMembersByProject(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let shellResult = yield shell_1.shell.exec(`${this.binaryName} roles list-bindings --project ${projectID} -o json`);
-            return member.Convert.toMemberArray(shellResult.stdout);
-        });
-    }
-    getInvitesByProject(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let shellResult = yield shell_1.shell.exec(`${this.binaryName} roles invitations list --project ${projectID} -o json`);
-            return invite.Convert.toInviteArray(shellResult.stdout);
-        });
-    }
-    getServicesByProject(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let shellResult = yield shell_1.shell.exec(`${this.binaryName} svc list --project ${projectID} -o json`);
-            if (shellResult.code == 1) {
-                return service.Convert.toServiceArray('[]');
+            if (this.projects.length === 0) {
+                this.projects = yield this.refreshProjects();
             }
-            return service.Convert.toServiceArray(shellResult.stdout);
+            return this.projects;
+        });
+    }
+    refreshProjects() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let projects = yield listProjects.run();
+            this.projects = projects;
+            return projects;
+        });
+    }
+    getMembers(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.members.has(projectID)) {
+                return this.members.get(projectID);
+            }
+            let members = yield this.refreshMembers(projectID);
+            return members;
+        });
+    }
+    refreshMembers(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let members = yield listMembers.run(projectID);
+            this.members.set(projectID, members);
+            return members;
+        });
+    }
+    getInvites(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.invites.has(projectID)) {
+                return this.invites.get(projectID);
+            }
+            let invites = yield this.refreshInvites(projectID);
+            return invites;
+        });
+    }
+    refreshInvites(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let invites = yield listInvites.run(projectID);
+            this.invites.set(projectID, invites);
+            return invites;
+        });
+    }
+    getServices(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.services.has(projectID)) {
+                return this.services.get(projectID);
+            }
+            let services = yield this.refreshServices(projectID);
+            return services;
+        });
+    }
+    refreshServices(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let services = yield listServices.run(projectID);
+            this.services.set(projectID, services);
+            return services;
         });
     }
 }
@@ -8193,7 +8230,7 @@ exports.InviteTreeItem = InviteTreeItem;
 function Get(parentProjectID, akkasls) {
     return __awaiter(this, void 0, void 0, function* () {
         let invites = [];
-        let invitesList = yield akkasls.getInvitesByProject(parentProjectID);
+        let invitesList = yield akkasls.getInvites(parentProjectID);
         for (let invite of invitesList) {
             invites.push(new InviteTreeItem(invite.email, parentProjectID, invite, vscode.TreeItemCollapsibleState.None));
         }
@@ -9265,7 +9302,7 @@ exports.MemberTreeItem = MemberTreeItem;
 function Get(parentProjectID, akkasls) {
     return __awaiter(this, void 0, void 0, function* () {
         let members = [];
-        let membersList = yield akkasls.getMembersByProject(parentProjectID);
+        let membersList = yield akkasls.getMembers(parentProjectID);
         for (let member of membersList) {
             members.push(new MemberTreeItem(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None));
         }
@@ -9346,7 +9383,7 @@ exports.ServiceTreeItem = ServiceTreeItem;
 function Get(parentProjectID, akkasls) {
     return __awaiter(this, void 0, void 0, function* () {
         let services = [];
-        let servicesList = yield akkasls.getServicesByProject(parentProjectID);
+        let servicesList = yield akkasls.getServices(parentProjectID);
         for (let service of servicesList) {
             services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, vscode.TreeItemCollapsibleState.None));
         }
@@ -13453,6 +13490,122 @@ class Convert {
     }
 }
 exports.Convert = Convert;
+
+
+/***/ }),
+/* 141 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(4);
+const project = __webpack_require__(72);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('projects list -o json');
+        let result = yield command.runCommand();
+        return project.Convert.toProjectArray(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(4);
+const member = __webpack_require__(71);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`roles list-bindings --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return member.Convert.toMemberArray(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 143 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(4);
+const invite = __webpack_require__(70);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`roles invitations list --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return invite.Convert.toInviteArray(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 144 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(4);
+const services = __webpack_require__(73);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`svc list --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return services.Convert.toServiceArray(result.stdout);
+    });
+}
+exports.run = run;
 
 
 /***/ })

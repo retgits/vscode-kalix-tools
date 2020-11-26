@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import { aslogger } from '../utils/logger';
-import { shell } from '../utils/shell';
+import  * as shell from '../utils/shell';
 
 export type flag = {
     name: string
@@ -64,7 +64,7 @@ export class Command {
         })
     }
 
-    async runCommand() {
+    async runCommand(): Promise<shell.ShellResult | null> {
         let params: string[] = [this.cmd]
 
         for (let index = 0; index < this.args.length; index++) {
@@ -127,13 +127,13 @@ export class Command {
             return null
         }
 
-        let res = await shell.exec(`${tool} ${params.join('')}`)
+        let res = await shell.shell.exec(`${tool} ${params.join('')}`)
 
         if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
             aslogger.log(res.stderr)
             aslogger.log(res.stdout)
         }
 
-        return null
+        return res
     }
 }

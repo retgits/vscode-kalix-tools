@@ -2,7 +2,7 @@
 
 import * as sls from '../../akkasls';
 import * as base from './baseTreeItem';
-import * as member from '../../datatypes/member';
+import * as member from '../../datatypes/roles/member';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
 
@@ -66,7 +66,7 @@ export class MemberTreeItem extends base.TreeItem {
 export async function Get(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<MemberTreeItem[]> {
     let members: MemberTreeItem[] = []
 
-    let membersList = await akkasls.getMembersByProject(parentProjectID)
+    let membersList = await akkasls.getMembers(parentProjectID);
 
     for (let member of membersList) {
         members.push(new MemberTreeItem(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None))

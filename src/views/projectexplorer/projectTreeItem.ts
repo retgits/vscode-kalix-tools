@@ -2,7 +2,7 @@
 
 import * as sls from '../../akkasls';
 import * as base from './baseTreeItem';
-import * as project from '../../datatypes/project';
+import * as project from '../../datatypes/projects/project';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
 

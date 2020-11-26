@@ -2,7 +2,7 @@
 
 import * as sls from '../../akkasls';
 import * as base from './baseTreeItem';
-import * as invite from '../../datatypes/invite';
+import * as invite from '../../datatypes/roles/invitations/invite';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
 
@@ -63,7 +63,7 @@ export class InviteTreeItem extends base.TreeItem {
 export async function Get(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<InviteTreeItem[]> {
     let invites: InviteTreeItem[] = []
 
-    let invitesList = await akkasls.getInvitesByProject(parentProjectID)
+    let invitesList = await akkasls.getInvites(parentProjectID)
 
     for (let invite of invitesList) {
         invites.push(new InviteTreeItem(invite.email, parentProjectID, invite, vscode.TreeItemCollapsibleState.None))
