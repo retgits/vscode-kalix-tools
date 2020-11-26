@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 
 import * as vscode from 'vscode';
 
-import * as status from './statusTreeItem'
+import * as status from './statusTreeItem';
 
 export class StatusExplorer implements vscode.TreeDataProvider<status.StatusTreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<status.StatusTreeItem | undefined | void> = new vscode.EventEmitter<status.StatusTreeItem | undefined | void>();

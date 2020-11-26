@@ -9637,7 +9637,7 @@ function getServiceStatus() {
 }
 exports.getServiceStatus = getServiceStatus;
 function getStatusIcon(status) {
-    if (status == null) {
+    if (status === null) {
         return new vscode.ThemeIcon(CHECK_CODICON);
     }
     return new vscode.ThemeIcon(ERROR_CODICON);
