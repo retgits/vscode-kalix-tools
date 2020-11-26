@@ -102,49 +102,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = __webpack_require__(1);
 // Internal dependencies
 const logger_1 = __webpack_require__(2);
-const deployServices = __webpack_require__(3);
-const exposeServices = __webpack_require__(65);
-const undeployServices = __webpack_require__(66);
-const unexposeServices = __webpack_require__(67);
 const projects = __webpack_require__(68);
 const status = __webpack_require__(107);
 const tools = __webpack_require__(151);
-const inviteUser = __webpack_require__(106);
 const AkkaServerless = __webpack_require__(69);
 function activate(context) {
     const akkasls = new AkkaServerless.AkkaServerless();
-    const projectsTreeDataProvider = new projects.ProjectExplorer(akkasls);
-    const toolsTreeDataProvider = new tools.TreeDataProvider();
-    const statusTreeDataProvider = new status.StatusExplorer();
-    context.subscriptions.push(vscode.commands.registerCommand('as.services.deploy', () => __awaiter(this, void 0, void 0, function* () { deployServices.fromCLI(projectsTreeDataProvider); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.services.expose', () => __awaiter(this, void 0, void 0, function* () { exposeServices.fromCLI(projectsTreeDataProvider); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.services.undeploy', () => __awaiter(this, void 0, void 0, function* () { undeployServices.fromCLI(projectsTreeDataProvider); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.services.unexpose', () => __awaiter(this, void 0, void 0, function* () { unexposeServices.fromCLI(projectsTreeDataProvider); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.invites.inviteuser', () => __awaiter(this, void 0, void 0, function* () { inviteUser.fromCLI(projectsTreeDataProvider); })));
-    context.subscriptions.push(vscode.commands.registerCommand('asexplorer.status.view', () => __awaiter(this, void 0, void 0, function* () { status.openStatusPage(); })));
-    vscode.window.registerTreeDataProvider('asexplorer.projects', projectsTreeDataProvider);
-    vscode.commands.registerCommand('asexplorer.projects.refresh', () => projectsTreeDataProvider.refresh());
-    vscode.commands.registerCommand('asexplorer.projects.services.deploy', (item) => __awaiter(this, void 0, void 0, function* () { return projects.deploy(item, projectsTreeDataProvider); }));
-    vscode.commands.registerCommand('asexplorer.projects.services.undeploy', (item) => __awaiter(this, void 0, void 0, function* () { return projects.undeploy(item, projectsTreeDataProvider); }));
-    vscode.commands.registerCommand('asexplorer.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projects.expose(item, projectsTreeDataProvider); }));
-    vscode.commands.registerCommand('asexplorer.projects.services.unexpose', (item) => __awaiter(this, void 0, void 0, function* () { return projects.unexpose(item, projectsTreeDataProvider); }));
-    vscode.commands.registerCommand('asexplorer.projects.openbrowser', (item) => __awaiter(this, void 0, void 0, function* () { return projects.openInBrowser(item); }));
-    vscode.commands.registerCommand('asexplorer.projects.details.projects', (item) => __awaiter(this, void 0, void 0, function* () { return projects.printDetails(item); }));
-    vscode.commands.registerCommand('asexplorer.projects.details.services', (item) => __awaiter(this, void 0, void 0, function* () { return projects.printDetails(item); }));
-    vscode.commands.registerCommand('asexplorer.projects.details.members', (item) => __awaiter(this, void 0, void 0, function* () { return projects.printDetails(item); }));
-    vscode.commands.registerCommand('asexplorer.projects.details.invites', (item) => __awaiter(this, void 0, void 0, function* () { return projects.printDetails(item); }));
-    vscode.commands.registerCommand('asexplorer.projects.new', () => __awaiter(this, void 0, void 0, function* () { return projects.newProject(projectsTreeDataProvider); }));
-    vscode.commands.registerCommand('asexplorer.projects.invites.inviteuser', (item) => __awaiter(this, void 0, void 0, function* () { return projects.inviteUser(item, projectsTreeDataProvider); }));
-    vscode.window.registerTreeDataProvider('asexplorer.tools', toolsTreeDataProvider);
-    vscode.commands.registerCommand('asexplorer.tools.refresh', () => toolsTreeDataProvider.refresh());
-    vscode.commands.registerCommand('asexplorer.tools.info', (item) => __awaiter(this, void 0, void 0, function* () { return toolsTreeDataProvider.openPage(item); }));
-    vscode.window.registerTreeDataProvider('asexplorer.status', statusTreeDataProvider);
-    vscode.commands.registerCommand('asexplorer.status.refresh', () => statusTreeDataProvider.refresh());
+    // Projects Tree
+    const projectExplorer = new projects.ProjectExplorer(akkasls);
+    vscode.window.registerTreeDataProvider('as.views.projects', projectExplorer);
+    vscode.commands.registerCommand('as.views.projects.refresh', () => projectExplorer.refresh());
+    vscode.commands.registerCommand('as.views.projects.services.deploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deployService(item); }));
+    vscode.commands.registerCommand('as.views.projects.services.undeploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.undeployService(item); }));
+    vscode.commands.registerCommand('as.views.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.exposeService(item); }));
+    vscode.commands.registerCommand('as.views.projects.services.unexpose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.unexposeService(item); }));
+    vscode.commands.registerCommand('as.views.projects.invites.inviteuser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.inviteUser(item); }));
+    vscode.commands.registerCommand('as.views.projects.new', () => __awaiter(this, void 0, void 0, function* () { return projectExplorer.newProject(); }));
+    vscode.commands.registerCommand('as.views.projects.openbrowser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.openTreeItemInBrowser(item); }));
+    vscode.commands.registerCommand('as.views.projects.details.projects', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode.commands.registerCommand('as.views.projects.details.services', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode.commands.registerCommand('as.views.projects.details.members', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode.commands.registerCommand('as.views.projects.details.invites', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    // Tools tree
+    const toolsExplorer = new tools.TreeDataProvider();
+    vscode.window.registerTreeDataProvider('as.views.tools', toolsExplorer);
+    vscode.commands.registerCommand('as.views.tools.refresh', () => toolsExplorer.refresh());
+    vscode.commands.registerCommand('as.views.tools.info', (item) => __awaiter(this, void 0, void 0, function* () { return toolsExplorer.openTreeItemInBrowser(item); }));
+    // Status tree	
+    const statusExplorer = new status.StatusExplorer();
+    vscode.window.registerTreeDataProvider('as.views.status', statusExplorer);
+    vscode.commands.registerCommand('as.views.status.refresh', () => statusExplorer.refresh());
+    vscode.commands.registerCommand('as.views.status.info', () => statusExplorer.openTreeItemInBrowser());
+    context.subscriptions.push(vscode.commands.registerCommand('as.views.status.view', () => __awaiter(this, void 0, void 0, function* () { statusExplorer.openTreeItemInBrowser(); })));
+    // Menu Items
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.deploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.deployService(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.undeploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.undeployService(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', () => __awaiter(this, void 0, void 0, function* () { akkasls.exposeService(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.unexpose', () => __awaiter(this, void 0, void 0, function* () { akkasls.unexposeService(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.inviteuser', () => __awaiter(this, void 0, void 0, function* () { akkasls.inviteUser(); })));
 }
 exports.activate = activate;
 function deactivate() {
@@ -208,30 +206,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run(projectID) {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('services deploy');
         command.addArgument({ name: 'service', description: 'name of the service' });
         command.addArgument({ name: 'image', description: 'container image url' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectID, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services deploy');
-        command.addArgument({ name: 'service', description: 'name of the service' });
-        command.addArgument({ name: 'image', description: 'container image url' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -7738,30 +7729,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run(projectID, serviceName) {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('services expose');
-        command.addArgument({ name: 'service', description: 'name of the service' });
+        if (serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+        }
         command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
-        command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true });
+        }
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectID, serviceName, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services expose');
-        command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-        command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -7780,28 +7769,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run(projectID, serviceName) {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('services undeploy');
-        command.addArgument({ name: 'service', description: 'name of the service' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        if (projectID && serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectID, serviceName, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services undeploy');
-        command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -7820,30 +7804,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run(projectID, serviceName) {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services unexpose');
-        command.addArgument({ name: 'service', description: 'name of the service' });
+        let command = new wrapper.Command('services expose');
+        if (serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+        }
         command.addArgument({ name: 'hostname', description: 'hostname to remove' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true });
+        }
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectID, serviceName, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services unexpose');
-        command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-        command.addArgument({ name: 'hostname', description: 'hostname to remove' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -7862,18 +7844,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unexpose = exports.expose = exports.undeploy = exports.deploy = exports.inviteUser = exports.newProject = exports.openInBrowser = exports.printDetails = exports.ProjectExplorer = void 0;
+exports.ProjectExplorer = void 0;
 const sls = __webpack_require__(69);
 const invite = __webpack_require__(78);
 const member = __webpack_require__(80);
 const service = __webpack_require__(81);
 const project = __webpack_require__(104);
-const createProject = __webpack_require__(105);
-const userInvite = __webpack_require__(106);
-const deployService = __webpack_require__(3);
-const exposeService = __webpack_require__(65);
-const undeployService = __webpack_require__(66);
-const unexposeService = __webpack_require__(67);
 const vscode = __webpack_require__(1);
 class ProjectExplorer {
     constructor(akkaServerless) {
@@ -7913,81 +7889,83 @@ class ProjectExplorer {
         defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
         return Promise.resolve(defaultTreeItems);
     }
+    deployService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.deployService(item.parentProjectID);
+            this.refresh();
+        });
+    }
+    undeployService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.undeployService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    exposeService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.exposeService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    unexposeService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.unexposeService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    inviteUser(base) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.inviteUser(base.parentProjectID);
+            this.refresh();
+        });
+    }
+    newProject() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.createNewProject();
+            this.refresh();
+        });
+    }
+    printTreeItemDetails(base) {
+        return __awaiter(this, void 0, void 0, function* () {
+            base.printDetails();
+        });
+    }
+    openTreeItemInBrowser(base) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = '';
+            switch (base.type) {
+                case project.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+                    break;
+                case service.ITEM_TYPE:
+                    if ((_a = base.id) === null || _a === void 0 ? void 0 : _a.includes('-Services')) {
+                        url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
+                    }
+                    else {
+                        url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+                    }
+                    break;
+                case member.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    break;
+                case invite.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    break;
+                default:
+                    break;
+            }
+            vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+        });
+    }
 }
 exports.ProjectExplorer = ProjectExplorer;
-function printDetails(base) {
-    base.printDetails();
-}
-exports.printDetails = printDetails;
-function openInBrowser(base) {
-    var _a;
-    let url = '';
-    switch (base.type) {
-        case project.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
-            break;
-        case service.ITEM_TYPE:
-            if ((_a = base.id) === null || _a === void 0 ? void 0 : _a.includes('-Services')) {
-                url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
-            }
-            else {
-                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
-            }
-            break;
-        case member.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-            break;
-        case invite.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-            break;
-        default:
-            break;
-    }
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
-}
-exports.openInBrowser = openInBrowser;
-function newProject(projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        createProject.fromUI(projectExplorer);
-    });
-}
-exports.newProject = newProject;
-function inviteUser(base, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        userInvite.fromUI(base.parentProjectID, projectExplorer);
-    });
-}
-exports.inviteUser = inviteUser;
-function deploy(item, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        deployService.fromUI(item.parentProjectID, projectExplorer);
-    });
-}
-exports.deploy = deploy;
-function undeploy(item, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (item.label !== service.ITEM_TYPE) {
-            undeployService.fromUI(item.parentProjectID, item.label, projectExplorer);
-        }
-    });
-}
-exports.undeploy = undeploy;
-function expose(item, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (item.label !== service.ITEM_TYPE) {
-            exposeService.fromUI(item.parentProjectID, item.label, projectExplorer);
-        }
-    });
-}
-exports.expose = expose;
-function unexpose(item, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (item.label !== service.ITEM_TYPE) {
-            unexposeService.fromUI(item.parentProjectID, item.label, projectExplorer);
-        }
-    });
-}
-exports.unexpose = unexpose;
 
 
 /***/ }),
@@ -8011,6 +7989,12 @@ const listProjects = __webpack_require__(70);
 const listMembers = __webpack_require__(72);
 const listInvites = __webpack_require__(74);
 const listServices = __webpack_require__(76);
+const deployService = __webpack_require__(3);
+const undeployService = __webpack_require__(66);
+const exposeService = __webpack_require__(65);
+const unexposeService = __webpack_require__(67);
+const inviteUser = __webpack_require__(106);
+const createProject = __webpack_require__(105);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
     constructor() {
@@ -8032,6 +8016,11 @@ class AkkaServerless {
             let projects = yield listProjects.run();
             this.projects = projects;
             return projects;
+        });
+    }
+    createNewProject() {
+        return __awaiter(this, void 0, void 0, function* () {
+            createProject.run();
         });
     }
     getMembers(projectID) {
@@ -8066,6 +8055,11 @@ class AkkaServerless {
             return invites;
         });
     }
+    inviteUser(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            inviteUser.run(projectID);
+        });
+    }
     getServices(projectID) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.services.has(projectID)) {
@@ -8080,6 +8074,26 @@ class AkkaServerless {
             let services = yield listServices.run(projectID);
             this.services.set(projectID, services);
             return services;
+        });
+    }
+    deployService(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            deployService.run(projectID);
+        });
+    }
+    undeployService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            undeployService.run(projectID, serviceName);
+        });
+    }
+    exposeService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            exposeService.run(projectID, serviceName);
+        });
+    }
+    unexposeService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            unexposeService.run(projectID, serviceName);
         });
     }
 }
@@ -10657,28 +10671,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run() {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('projects new');
         command.addArgument({ name: 'name', description: 'name of the project' });
         command.addArgument({ name: 'description', description: 'a description to show in the UI' });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('projects new');
-        command.addArgument({ name: 'name', description: 'name of the project' });
-        command.addArgument({ name: 'description', description: 'a description to show in the UI' });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -10697,28 +10700,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromUI = exports.fromCLI = void 0;
+exports.run = void 0;
 const wrapper = __webpack_require__(4);
-function fromCLI(projectExplorer) {
+function run(projectID) {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('roles invitations invite-user');
         command.addArgument({ name: 'email', description: 'email address of the user to invite' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        yield command.runCommand();
-        projectExplorer.refresh();
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to invite to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to invite to', required: true });
+        }
+        return command.runCommand();
     });
 }
-exports.fromCLI = fromCLI;
-function fromUI(projectID, projectExplorer) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('roles invitations invite-user');
-        command.addArgument({ name: 'email', description: 'email address of the user to invite' });
-        command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        yield command.runCommand();
-        projectExplorer.refresh();
-    });
-}
-exports.fromUI = fromUI;
+exports.run = run;
 
 
 /***/ }),
@@ -10727,17 +10724,8 @@ exports.fromUI = fromUI;
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.openStatusPage = exports.StatusExplorer = void 0;
+exports.StatusExplorer = void 0;
 const vscode = __webpack_require__(1);
 const status = __webpack_require__(108);
 class StatusExplorer {
@@ -10754,14 +10742,11 @@ class StatusExplorer {
     getChildren() {
         return Promise.resolve(status.getServiceStatus());
     }
+    openTreeItemInBrowser() {
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://status.cloudstate.com/'));
+    }
 }
 exports.StatusExplorer = StatusExplorer;
-function openStatusPage() {
-    return __awaiter(this, void 0, void 0, function* () {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://status.cloudstate.com/'));
-    });
-}
-exports.openStatusPage = openStatusPage;
 
 
 /***/ }),
@@ -14538,7 +14523,7 @@ class TreeDataProvider {
     getChildren() {
         return Promise.resolve(tool.getToolTreeItems());
     }
-    openPage(item) {
+    openTreeItemInBrowser(item) {
         tool.openToolPage(item.tool);
     }
 }

@@ -21,7 +21,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeIt
         return Promise.resolve(tool.getToolTreeItems());
     }
 
-    openPage(item: tool.ToolTreeItem) {
+    openTreeItemInBrowser(item: tool.ToolTreeItem) {
         tool.openToolPage(item.tool);
     }
 }

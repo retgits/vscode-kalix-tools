@@ -21,8 +21,8 @@ export class StatusExplorer implements vscode.TreeDataProvider<status.StatusTree
     getChildren(): Thenable<status.StatusTreeItem[]> {
         return Promise.resolve(status.getServiceStatus());
     }
-}
 
-export async function openStatusPage() {
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://status.cloudstate.com/'));
+    openTreeItemInBrowser() {
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://status.cloudstate.com/'));
+    }
 }

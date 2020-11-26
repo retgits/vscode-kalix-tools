@@ -43,7 +43,7 @@
 	},
 	"main": "./dist/extension.js",
 	"activationEvents": [
-		"onView:asexplorer.projects"
+		"onView:as.views.projects"
 	],
 	"contributes": {
 		"configuration": {
@@ -73,22 +73,22 @@
 		"views": {
 			"asexplorer": [
 				{
-					"id": "asexplorer.projects",
+					"id": "as.views.projects",
 					"name": "Projects"
 				},
 				{
-					"id": "asexplorer.status",
+					"id": "as.views.status",
 					"name": "Status"
 				},
 				{
-					"id": "asexplorer.tools",
+					"id": "as.views.tools",
 					"name": "Tools"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "asexplorer.projects.refresh",
+				"command": "as.views.projects.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -96,7 +96,7 @@
 				}
 			},
 			{
-				"command": "asexplorer.status.refresh",
+				"command": "as.views.status.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -104,7 +104,7 @@
 				}
 			},
 			{
-				"command": "asexplorer.tools.refresh",
+				"command": "as.views.tools.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -112,81 +112,85 @@
 				}
 			},
 			{
-				"command": "as.services.deploy",
+				"command": "as.commandpalette.deploy",
 				"title": "Deploy a service to Akka Serverless",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "as.services.undeploy",
+				"command": "as.commandpalette.undeploy",
 				"title": "Remove a service from Akka Serverless",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "as.services.expose",
+				"command": "as.commandpalette.expose",
 				"title": "Expose a service for inbound traffic",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "as.services.unexpose",
+				"command": "as.commandpalette.unexpose",
 				"title": "Removes a service route from a service",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "asexplorer.projects.services.deploy",
+				"command": "as.views.projects.services.deploy",
 				"title": "Deploy service"
 			},
 			{
-				"command": "asexplorer.projects.services.undeploy",
+				"command": "as.views.projects.services.undeploy",
 				"title": "Undeploy service"
 			},
 			{
-				"command": "asexplorer.projects.services.expose",
+				"command": "as.views.projects.services.expose",
 				"title": "Expose service"
 			},
 			{
-				"command": "asexplorer.projects.services.unexpose",
+				"command": "as.views.projects.services.unexpose",
 				"title": "Unexpose service"
 			},
 			{
-				"command": "asexplorer.projects.openbrowser",
+				"command": "as.views.projects.openbrowser",
 				"title": "View in browser"
 			},
 			{
-				"command": "asexplorer.projects.details.projects",
+				"command": "as.views.projects.details.projects",
 				"title": "View project details"
 			},
 			{
-				"command": "asexplorer.projects.details.services",
+				"command": "as.views.projects.details.services",
 				"title": "View service details"
 			},
 			{
-				"command": "asexplorer.projects.details.members",
+				"command": "as.views.projects.details.members",
 				"title": "View member details"
 			},
 			{
-				"command": "asexplorer.projects.details.invites",
+				"command": "as.views.projects.details.invites",
 				"title": "View invite details"
 			},
 			{
-				"command": "asexplorer.projects.invites.inviteuser",
+				"command": "as.views.projects.invites.inviteuser",
 				"title": "Invite user"
 			},
 			{
-				"command": "asexplorer.projects.new",
+				"command": "as.views.projects.new",
 				"title": "Add new project",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "asexplorer.status.view",
+				"command": "as.views.status.view",
 				"title": "View Akka Serverless status page",
 				"category": "Akka Serverless"
 			},
 			{
-				"command": "asexplorer.tools.info",
+				"command": "as.views.tools.info",
 				"title": "Get tool info"
 			},
 			{
-				"command": "as.invites.inviteuser",
+				"command": "as.views.status.info",
+				"title": "Get status info"
+			},
+			{
+				"command": "as.commandpalette.invites.inviteuser",
 				"title": "Invite user to project",
 				"category": "Akka Serverless"
 			}
@@ -194,84 +198,83 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "asexplorer.projects.new",
-					"when": "view == asexplorer.projects",
+					"command": "as.views.projects.new",
+					"when": "view == as.views.projects",
 					"group": "0"
 				},
 				{
-					"command": "asexplorer.status.view",
-					"when": "view == asexplorer.status",
-					"group": "0"
-				},
-				{
-					"command": "asexplorer.projects.refresh",
-					"when": "view == asexplorer.projects",
+					"command": "as.views.projects.refresh",
+					"when": "view == as.views.projects",
 					"group": "navigation"
 				},
 				{
-					"command": "asexplorer.status.refresh",
-					"when": "view == asexplorer.status",
+					"command": "as.views.status.refresh",
+					"when": "view == as.views.status",
 					"group": "navigation"
 				},
 				{
-					"command": "asexplorer.tools.refresh",
-					"when": "view == asexplorer.tools",
+					"command": "as.views.tools.refresh",
+					"when": "view == as.views.tools",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "asexplorer.projects.services.deploy",
-					"when": "view == asexplorer.projects && viewItem == Services",
+					"command": "as.views.projects.services.deploy",
+					"when": "view == as.views.projects && viewItem == Services",
 					"group": "0"
 				},
 				{
-					"command": "asexplorer.projects.services.undeploy",
-					"when": "view == asexplorer.projects && viewItem == Services",
+					"command": "as.views.projects.services.undeploy",
+					"when": "view == as.views.projects && viewItem == Services",
 					"group": "0"
 				},
 				{
-					"command": "asexplorer.projects.services.expose",
-					"when": "view == asexplorer.projects && viewItem == Services",
+					"command": "as.views.projects.services.expose",
+					"when": "view == as.views.projects && viewItem == Services",
 					"group": "0"
 				},
 				{
-					"command": "asexplorer.projects.services.unexpose",
-					"when": "view == asexplorer.projects && viewItem == Services",
+					"command": "as.views.projects.services.unexpose",
+					"when": "view == as.views.projects && viewItem == Services",
 					"group": "0"
 				},
 				{
-					"command": "asexplorer.projects.details.projects",
-					"when": "view == asexplorer.projects && viewItem == Projects",
+					"command": "as.views.projects.details.projects",
+					"when": "view == as.views.projects && viewItem == Projects",
 					"group": "1"
 				},
 				{
-					"command": "asexplorer.projects.details.services",
-					"when": "view == asexplorer.projects && viewItem == Services",
+					"command": "as.views.projects.details.services",
+					"when": "view == as.views.projects && viewItem == Services",
 					"group": "1"
 				},
 				{
-					"command": "asexplorer.projects.details.members",
-					"when": "view == asexplorer.projects && viewItem == Members",
+					"command": "as.views.projects.details.members",
+					"when": "view == as.views.projects && viewItem == Members",
 					"group": "1"
 				},
 				{
-					"command": "asexplorer.projects.details.invites",
-					"when": "view == asexplorer.projects && viewItem == Invites",
+					"command": "as.views.projects.details.invites",
+					"when": "view == as.views.projects && viewItem == Invites",
 					"group": "1"
 				},
 				{
-					"command": "asexplorer.projects.invites.inviteuser",
-					"when": "view == asexplorer.projects && viewItem == Invites",
+					"command": "as.views.projects.invites.inviteuser",
+					"when": "view == as.views.projects && viewItem == Invites",
 					"group": "1"
 				},
 				{
-					"command": "asexplorer.tools.info",
-					"when": "view == asexplorer.tools && viewItem == Tools"
+					"command": "as.views.tools.info",
+					"when": "view == as.views.tools && viewItem == Tools"
 				},
 				{
-					"command": "asexplorer.projects.openbrowser",
-					"when": "view == asexplorer.projects",
+					"command": "as.views.status.info",
+					"when": "view == as.views.status"
+				},
+				{
+					"command": "as.views.projects.openbrowser",
+					"when": "view == as.views.projects",
 					"group": "99"
 				}
 			]

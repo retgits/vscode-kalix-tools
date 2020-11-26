@@ -5,10 +5,18 @@ import * as invite from './datatypes/roles/invitations/invite';
 import * as member from './datatypes/roles/member';
 import * as project from './datatypes/projects/project';
 import * as service from './datatypes/services/service';
+
 import * as listProjects from './cliwrapper/projects/list';
 import * as listMembers from './cliwrapper/roles/listbindings';
 import * as listInvites from './cliwrapper/roles/invitations/listinvites';
 import * as listServices from './cliwrapper/services/list';
+
+import * as deployService from './cliwrapper/services/deploy';
+import * as undeployService from './cliwrapper/services/undeploy';
+import * as exposeService from './cliwrapper/services/expose';
+import * as unexposeService from './cliwrapper/services/unexpose';
+import * as inviteUser from './cliwrapper/roles/invitations/inviteuser';
+import * as createProject from './cliwrapper/projects/new';
 
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
 
@@ -31,6 +39,10 @@ export class AkkaServerless {
         let projects = await listProjects.run();
         this.projects = projects;
         return projects;
+    }
+
+    async createNewProject() {
+        createProject.run();
     }
 
     async getMembers(projectID: string): Promise<member.Member[]> {
@@ -61,6 +73,10 @@ export class AkkaServerless {
         return invites;
     }
 
+    async inviteUser(projectID?: string) {
+        inviteUser.run(projectID);
+    }
+
     async getServices(projectID: string): Promise<service.Service[]> {
         if(this.services.has(projectID)) {
             return this.services.get(projectID)!;
@@ -73,5 +89,21 @@ export class AkkaServerless {
         let services = await listServices.run(projectID);
         this.services.set(projectID, services);
         return services;
+    }
+
+    async deployService(projectID?: string) {
+        deployService.run(projectID);
+    }
+
+    async undeployService(projectID?: string, serviceName?: string) {
+        undeployService.run(projectID, serviceName);
+    }
+
+    async exposeService(projectID?: string, serviceName?: string) {
+        exposeService.run(projectID, serviceName);
+    }
+
+    async unexposeService(projectID?: string, serviceName?: string) {
+        unexposeService.run(projectID, serviceName);
     }
 }

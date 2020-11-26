@@ -6,12 +6,6 @@ import * as invite from './inviteTreeItem';
 import * as member from './memberTreeItem';
 import * as service from './serviceTreeItem';
 import * as project from './projectTreeItem';
-import * as createProject from '../../cliwrapper/projects/new';
-import * as userInvite from '../../cliwrapper/roles/invitations/inviteuser';
-import * as deployService from '../../cliwrapper/services/deploy';
-import * as exposeService from '../../cliwrapper/services/expose';
-import * as undeployService from '../../cliwrapper/services/undeploy';
-import * as unexposeService from '../../cliwrapper/services/unexpose';
 import * as vscode from 'vscode';
 
 export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
@@ -59,65 +53,71 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
         defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
         return Promise.resolve(defaultTreeItems);
     }
-}
 
-export function printDetails(base: base.TreeItem) {
-    base.printDetails();
-}
-
-export function openInBrowser(base: base.TreeItem) {
-    let url: string = '';
-
-    switch (base.type) {
-        case project.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
-            break;
-        case service.ITEM_TYPE:
-            if (base.id?.includes('-Services')) {
-                url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
-            } else {
-                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
-            }
-            break;
-        case member.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-            break;
-        case invite.ITEM_TYPE:
-            url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-            break;
-        default:
-            break;
+    async deployService(item: base.TreeItem) {
+        this.akkaServerless.deployService(item.parentProjectID);
+        this.refresh();
     }
 
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
-}
-
-export async function newProject(projectExplorer: ProjectExplorer) {
-    createProject.fromUI(projectExplorer);
-}
-
-export async function inviteUser(base: base.TreeItem, projectExplorer: ProjectExplorer) {
-    userInvite.fromUI(base.parentProjectID, projectExplorer);
-}
-
-export async function deploy(item: base.TreeItem, projectExplorer: ProjectExplorer) {
-    deployService.fromUI(item.parentProjectID, projectExplorer);
-}
-
-export async function undeploy(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
-    if (item.label !== service.ITEM_TYPE) {
-        undeployService.fromUI(item.parentProjectID, item.label, projectExplorer);
+    async undeployService(item: service.ServiceTreeItem) {
+        if (item.label !== service.ITEM_TYPE) {
+            this.akkaServerless.undeployService(item.parentProjectID, item.label);
+            this.refresh();
+        }
     }
-}
 
-export async function expose(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
-    if (item.label !== service.ITEM_TYPE) {
-        exposeService.fromUI(item.parentProjectID, item.label, projectExplorer);
+    async exposeService(item: service.ServiceTreeItem) {
+        if (item.label !== service.ITEM_TYPE) {
+            this.akkaServerless.exposeService(item.parentProjectID, item.label);
+            this.refresh();
+        }
     }
-}
 
-export async function unexpose(item: service.ServiceTreeItem, projectExplorer: ProjectExplorer) {
-    if (item.label !== service.ITEM_TYPE) {
-        unexposeService.fromUI(item.parentProjectID, item.label, projectExplorer);
+    async unexposeService(item: service.ServiceTreeItem) {
+        if (item.label !== service.ITEM_TYPE) {
+            this.akkaServerless.unexposeService(item.parentProjectID, item.label);
+            this.refresh();
+        }
+    }
+
+    async inviteUser(base: base.TreeItem) {
+        this.akkaServerless.inviteUser(base.parentProjectID);
+        this.refresh();
+    }
+
+    async newProject() {
+        this.akkaServerless.createNewProject();
+        this.refresh();
+    }
+
+    async printTreeItemDetails(base: base.TreeItem) {
+        base.printDetails();
+    }
+
+    async openTreeItemInBrowser(base: base.TreeItem) {
+        let url: string = '';
+    
+        switch (base.type) {
+            case project.ITEM_TYPE:
+                url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+                break;
+            case service.ITEM_TYPE:
+                if (base.id?.includes('-Services')) {
+                    url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
+                } else {
+                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+                }
+                break;
+            case member.ITEM_TYPE:
+                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                break;
+            case invite.ITEM_TYPE:
+                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                break;
+            default:
+                break;
+        }
+    
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
     }
 }

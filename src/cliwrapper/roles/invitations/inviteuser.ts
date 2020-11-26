@@ -1,20 +1,17 @@
-'use strict'
+'use strict';
 
+import { ShellResult } from '../../../utils/shell';
 import * as wrapper from '../../wrapper';
-import * as projects from '../../../views/projectexplorer/explorer';
 
-export async function fromCLI(projectExplorer: projects.ProjectExplorer) {
-    let command = new wrapper.Command('roles invitations invite-user')
-    command.addArgument({name: 'email', description: 'email address of the user to invite'})
-    command.addFlag({name: 'project', description: 'the project to deploy to', required: true})
-    await command.runCommand()
-    projectExplorer.refresh()
-}
+export async function run(projectID?: string): Promise<ShellResult | null> {
+    let command = new wrapper.Command('roles invitations invite-user');
+    command.addArgument({name: 'email', description: 'email address of the user to invite'});
 
-export async function fromUI(projectID: string, projectExplorer: projects.ProjectExplorer) {
-    let command = new wrapper.Command('roles invitations invite-user')
-    command.addArgument({name: 'email', description: 'email address of the user to invite'})
-    command.addFlag({name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false})
-    await command.runCommand()
-    projectExplorer.refresh()
+    if(projectID) {
+        command.addFlag({name: 'project', description: 'the project to invite to', required: true, defaultValue: projectID, show: false});
+    } else {
+        command.addFlag({name: 'project', description: 'the project to invite to', required: true});
+    }
+
+    return command.runCommand();
 }
