@@ -120,6 +120,7 @@ function activate(context) {
     vscode.commands.registerCommand('as.views.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.exposeService(item); }));
     vscode.commands.registerCommand('as.views.projects.services.unexpose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.unexposeService(item); }));
     vscode.commands.registerCommand('as.views.projects.invites.inviteuser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.inviteUser(item); }));
+    vscode.commands.registerCommand('as.views.projects.invites.deleteinvite', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteInvite(item); }));
     vscode.commands.registerCommand('as.views.projects.new', () => __awaiter(this, void 0, void 0, function* () { return projectExplorer.newProject(); }));
     vscode.commands.registerCommand('as.views.projects.openbrowser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.openTreeItemInBrowser(item); }));
     vscode.commands.registerCommand('as.views.projects.details.projects', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
@@ -145,6 +146,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', () => __awaiter(this, void 0, void 0, function* () { akkasls.exposeService(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.unexpose', () => __awaiter(this, void 0, void 0, function* () { akkasls.unexposeService(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.inviteuser', () => __awaiter(this, void 0, void 0, function* () { akkasls.inviteUser(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.deleteinvite', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteInvite(); })));
 }
 exports.activate = activate;
 function deactivate() {
@@ -289,6 +291,12 @@ class ProjectExplorer {
             this.refresh();
         });
     }
+    deleteInvite(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email);
+            this.refresh();
+        });
+    }
     newProject() {
         return __awaiter(this, void 0, void 0, function* () {
             this.akkaServerless.createNewProject();
@@ -360,6 +368,7 @@ const undeployService = __webpack_require__(77);
 const exposeService = __webpack_require__(78);
 const unexposeService = __webpack_require__(79);
 const inviteUser = __webpack_require__(80);
+const deleteInvite = __webpack_require__(156);
 const createProject = __webpack_require__(81);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
@@ -424,6 +433,11 @@ class AkkaServerless {
     inviteUser(projectID) {
         return __awaiter(this, void 0, void 0, function* () {
             inviteUser.run(projectID);
+        });
+    }
+    deleteInvite(projectID, emailAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            deleteInvite.run(projectID, emailAddress);
         });
     }
     getServices(projectID) {
@@ -8393,6 +8407,7 @@ function run(projectID) {
         else {
             command.addFlag({ name: 'project', description: 'the project to invite to', required: true });
         }
+        command.addFlag({ name: 'role', description: 'role to give to the user', required: true, defaultValue: 'admin', show: false });
         return command.runCommand();
     });
 }
@@ -14712,6 +14727,41 @@ class Convert {
     }
 }
 exports.Convert = Convert;
+
+
+/***/ }),
+/* 156 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, emailAddress) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('roles invitations delete');
+        if (projectID && emailAddress) {
+            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for', defaultValue: emailAddress, show: false });
+            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for' });
+            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
 
 
 /***/ })

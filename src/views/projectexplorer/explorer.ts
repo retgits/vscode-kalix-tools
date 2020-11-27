@@ -85,6 +85,11 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
         this.refresh();
     }
 
+    async deleteInvite(item: invite.InviteTreeItem) {
+        this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email);
+        this.refresh();
+    }
+
     async newProject() {
         this.akkaServerless.createNewProject();
         this.refresh();

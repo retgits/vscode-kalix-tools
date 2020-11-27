@@ -13,5 +13,7 @@ export async function run(projectID?: string): Promise<ShellResult | null> {
         command.addFlag({name: 'project', description: 'the project to invite to', required: true});
     }
 
+    command.addFlag({name: 'role', description: 'role to give to the user', required: true, defaultValue: 'admin', show: false});
+
     return command.runCommand();
 }

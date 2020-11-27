@@ -12,6 +12,7 @@ import * as tools from './views/toolsexplorer/explorer';
 import * as base from './views/projectexplorer/baseTreeItem';
 import * as toolitem from './views/toolsexplorer/toolsTreeItem';
 import * as service from './views/projectexplorer/serviceTreeItem';
+import * as invite from './views/projectexplorer/inviteTreeItem';
 
 import * as AkkaServerless from './akkasls';
 
@@ -27,6 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('as.views.projects.services.expose', async (item: service.ServiceTreeItem) => projectExplorer.exposeService(item));
 	vscode.commands.registerCommand('as.views.projects.services.unexpose', async (item: service.ServiceTreeItem) => projectExplorer.unexposeService(item));
 	vscode.commands.registerCommand('as.views.projects.invites.inviteuser', async (item: base.TreeItem) => projectExplorer.inviteUser(item));
+	vscode.commands.registerCommand('as.views.projects.invites.deleteinvite', async (item: invite.InviteTreeItem) => projectExplorer.deleteInvite(item));
 	vscode.commands.registerCommand('as.views.projects.new', async () => projectExplorer.newProject());
 	vscode.commands.registerCommand('as.views.projects.openbrowser', async (item: base.TreeItem) => projectExplorer.openTreeItemInBrowser(item));
 	vscode.commands.registerCommand('as.views.projects.details.projects', async (item: base.TreeItem) => projectExplorer.printTreeItemDetails(item));
@@ -55,6 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', async () => { akkasls.exposeService(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.unexpose', async () => { akkasls.unexposeService(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.inviteuser', async () => { akkasls.inviteUser(); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.deleteinvite', async () => { akkasls.deleteInvite(); }));
 }
 
 export function deactivate() {

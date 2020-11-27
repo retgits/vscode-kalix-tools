@@ -181,6 +181,10 @@
 				"title": "Invite user"
 			},
 			{
+				"command": "as.views.projects.invites.deleteinvite",
+				"title": "Delete invitation for user"
+			},
+			{
 				"command": "as.views.projects.new",
 				"title": "Add new project",
 				"category": "Akka Serverless"
@@ -201,6 +205,11 @@
 			{
 				"command": "as.commandpalette.invites.inviteuser",
 				"title": "Invite user to project",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.invites.deleteinvite",
+				"title": "Delete invitation for user from project",
 				"category": "Akka Serverless"
 			},
 			{
@@ -280,6 +289,11 @@
 				},
 				{
 					"command": "as.views.projects.invites.inviteuser",
+					"when": "view == as.views.projects && viewItem == Invites",
+					"group": "1"
+				},
+				{
+					"command": "as.views.projects.invites.deleteinvite",
 					"when": "view == as.views.projects && viewItem == Invites",
 					"group": "1"
 				},

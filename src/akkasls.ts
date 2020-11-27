@@ -18,6 +18,7 @@ import * as undeployService from './cliwrapper/services/undeploy';
 import * as exposeService from './cliwrapper/services/expose';
 import * as unexposeService from './cliwrapper/services/unexpose';
 import * as inviteUser from './cliwrapper/roles/invitations/inviteuser';
+import * as deleteInvite from './cliwrapper/roles/invitations/delete';
 import * as createProject from './cliwrapper/projects/new';
 
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
@@ -77,6 +78,10 @@ export class AkkaServerless {
 
     async inviteUser(projectID?: string) {
         inviteUser.run(projectID);
+    }
+
+    async deleteInvite(projectID?: string, emailAddress?: string) {
+        deleteInvite.run(projectID, emailAddress);
     }
 
     async getServices(projectID: string): Promise<service.Service[]> {
