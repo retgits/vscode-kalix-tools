@@ -21,6 +21,8 @@ import * as inviteUser from './cliwrapper/roles/invitations/inviteuser';
 import * as deleteInvite from './cliwrapper/roles/invitations/delete';
 import * as createProject from './cliwrapper/projects/new';
 
+import * as projectExplorer from './views/projectexplorer/explorer';
+
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
 
 export class AkkaServerless {
@@ -44,8 +46,12 @@ export class AkkaServerless {
         return projects;
     }
 
-    async createNewProject() {
-        createProject.run();
+    async createNewProject(pe?: projectExplorer.ProjectExplorer) {
+        createProject.run().then(() => {
+            this.refreshProjects().then(() => {
+                pe?.refresh();
+            });
+        });
     }
 
     async getMembers(projectID: string): Promise<member.Member[]> {
@@ -76,12 +82,24 @@ export class AkkaServerless {
         return invites;
     }
 
-    async inviteUser(projectID?: string) {
-        inviteUser.run(projectID);
+    async inviteUser(projectID?: string, pe?:projectExplorer.ProjectExplorer) {
+        inviteUser.run(projectID).then(() => {
+            if(projectID) {
+                this.refreshInvites(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
-    async deleteInvite(projectID?: string, emailAddress?: string) {
-        deleteInvite.run(projectID, emailAddress);
+    async deleteInvite(projectID?: string, emailAddress?: string, pe?:projectExplorer.ProjectExplorer) {
+        deleteInvite.run(projectID, emailAddress).then(() => {
+            if(projectID) {
+                this.refreshInvites(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
     async getServices(projectID: string): Promise<service.Service[]> {
@@ -98,20 +116,44 @@ export class AkkaServerless {
         return services;
     }
 
-    async deployService(projectID?: string) {
-        deployService.run(projectID);
+    async deployService(projectID?: string, pe?:projectExplorer.ProjectExplorer) {
+        deployService.run(projectID).then(() => {
+            if(projectID) {
+                this.refreshServices(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
-    async undeployService(projectID?: string, serviceName?: string) {
-        undeployService.run(projectID, serviceName);
+    async undeployService(projectID?: string, serviceName?: string, pe?:projectExplorer.ProjectExplorer) {
+        undeployService.run(projectID, serviceName).then(() => {
+            if(projectID) {
+                this.refreshServices(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
-    async exposeService(projectID?: string, serviceName?: string) {
-        exposeService.run(projectID, serviceName);
+    async exposeService(projectID?: string, serviceName?: string, pe?:projectExplorer.ProjectExplorer) {
+        exposeService.run(projectID, serviceName).then(() => {
+            if(projectID) {
+                this.refreshServices(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
-    async unexposeService(projectID?: string, serviceName?: string) {
-        unexposeService.run(projectID, serviceName);
+    async unexposeService(projectID?: string, serviceName?: string, pe?:projectExplorer.ProjectExplorer) {
+        unexposeService.run(projectID, serviceName).then(() => {
+            if(projectID) {
+                this.refreshServices(projectID!).then(() => {
+                    pe?.refresh();
+                });
+            }
+        });
     }
 
     async login() {

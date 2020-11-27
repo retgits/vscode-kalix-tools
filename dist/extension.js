@@ -106,8 +106,8 @@ const vscode = __webpack_require__(1);
 // Internal dependencies
 const logger_1 = __webpack_require__(2);
 const projects = __webpack_require__(3);
-const status = __webpack_require__(109);
-const tools = __webpack_require__(153);
+const status = __webpack_require__(110);
+const tools = __webpack_require__(154);
 const AkkaServerless = __webpack_require__(4);
 function activate(context) {
     const akkasls = new AkkaServerless.AkkaServerless();
@@ -212,10 +212,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectExplorer = void 0;
 const sls = __webpack_require__(4);
-const invite = __webpack_require__(82);
-const member = __webpack_require__(106);
-const service = __webpack_require__(107);
-const project = __webpack_require__(108);
+const invite = __webpack_require__(83);
+const member = __webpack_require__(107);
+const service = __webpack_require__(108);
+const project = __webpack_require__(109);
 const vscode = __webpack_require__(1);
 class ProjectExplorer {
     constructor(akkaServerless) {
@@ -257,50 +257,43 @@ class ProjectExplorer {
     }
     deployService(item) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.deployService(item.parentProjectID);
-            this.refresh();
+            this.akkaServerless.deployService(item.parentProjectID, this);
         });
     }
     undeployService(item) {
         return __awaiter(this, void 0, void 0, function* () {
             if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.undeployService(item.parentProjectID, item.label);
-                this.refresh();
+                this.akkaServerless.undeployService(item.parentProjectID, item.label, this);
             }
         });
     }
     exposeService(item) {
         return __awaiter(this, void 0, void 0, function* () {
             if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.exposeService(item.parentProjectID, item.label);
-                this.refresh();
+                this.akkaServerless.exposeService(item.parentProjectID, item.label, this);
             }
         });
     }
     unexposeService(item) {
         return __awaiter(this, void 0, void 0, function* () {
             if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.unexposeService(item.parentProjectID, item.label);
-                this.refresh();
+                this.akkaServerless.unexposeService(item.parentProjectID, item.label, this);
             }
         });
     }
     inviteUser(base) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.inviteUser(base.parentProjectID);
-            this.refresh();
+            this.akkaServerless.inviteUser(base.parentProjectID, this);
         });
     }
     deleteInvite(item) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email);
-            this.refresh();
+            this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email, this);
         });
     }
     newProject() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.createNewProject();
-            this.refresh();
+            this.akkaServerless.createNewProject(this);
         });
     }
     printTreeItemDetails(base) {
@@ -368,8 +361,8 @@ const undeployService = __webpack_require__(77);
 const exposeService = __webpack_require__(78);
 const unexposeService = __webpack_require__(79);
 const inviteUser = __webpack_require__(80);
-const deleteInvite = __webpack_require__(156);
-const createProject = __webpack_require__(81);
+const deleteInvite = __webpack_require__(81);
+const createProject = __webpack_require__(82);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
     constructor() {
@@ -393,9 +386,13 @@ class AkkaServerless {
             return projects;
         });
     }
-    createNewProject() {
+    createNewProject(pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            createProject.run();
+            createProject.run().then(() => {
+                this.refreshProjects().then(() => {
+                    pe === null || pe === void 0 ? void 0 : pe.refresh();
+                });
+            });
         });
     }
     getMembers(projectID) {
@@ -430,14 +427,26 @@ class AkkaServerless {
             return invites;
         });
     }
-    inviteUser(projectID) {
+    inviteUser(projectID, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            inviteUser.run(projectID);
+            inviteUser.run(projectID).then(() => {
+                if (projectID) {
+                    this.refreshInvites(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
-    deleteInvite(projectID, emailAddress) {
+    deleteInvite(projectID, emailAddress, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            deleteInvite.run(projectID, emailAddress);
+            deleteInvite.run(projectID, emailAddress).then(() => {
+                if (projectID) {
+                    this.refreshInvites(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
     getServices(projectID) {
@@ -456,24 +465,48 @@ class AkkaServerless {
             return services;
         });
     }
-    deployService(projectID) {
+    deployService(projectID, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            deployService.run(projectID);
+            deployService.run(projectID).then(() => {
+                if (projectID) {
+                    this.refreshServices(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
-    undeployService(projectID, serviceName) {
+    undeployService(projectID, serviceName, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            undeployService.run(projectID, serviceName);
+            undeployService.run(projectID, serviceName).then(() => {
+                if (projectID) {
+                    this.refreshServices(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
-    exposeService(projectID, serviceName) {
+    exposeService(projectID, serviceName, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            exposeService.run(projectID, serviceName);
+            exposeService.run(projectID, serviceName).then(() => {
+                if (projectID) {
+                    this.refreshServices(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
-    unexposeService(projectID, serviceName) {
+    unexposeService(projectID, serviceName, pe) {
         return __awaiter(this, void 0, void 0, function* () {
-            unexposeService.run(projectID, serviceName);
+            unexposeService.run(projectID, serviceName).then(() => {
+                if (projectID) {
+                    this.refreshServices(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
     login() {
@@ -8432,11 +8465,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
 const wrapper = __webpack_require__(6);
-function run() {
+function run(projectID, emailAddress) {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('projects new');
-        command.addArgument({ name: 'name', description: 'name of the project' });
-        command.addArgument({ name: 'description', description: 'a description to show in the UI' });
+        let command = new wrapper.Command('roles invitations delete');
+        if (projectID && emailAddress) {
+            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for', defaultValue: emailAddress, show: false });
+            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for' });
+            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true });
+        }
         return command.runCommand();
     });
 }
@@ -8459,11 +8498,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('projects new');
+        command.addArgument({ name: 'name', description: 'name of the project' });
+        command.addArgument({ name: 'description', description: 'a description to show in the UI' });
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultInviteTreeItem = exports.getInviteTreeItems = exports.InviteTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(83);
+const base = __webpack_require__(84);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(84);
+const table = __webpack_require__(85);
 exports.ITEM_TYPE = 'Invites';
 class InviteTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, invite, collapsibleState) {
@@ -8524,7 +8592,7 @@ exports.getDefaultInviteTreeItem = getDefaultInviteTreeItem;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8544,17 +8612,17 @@ exports.TreeItem = TreeItem;
 
 
 /***/ }),
-/* 84 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(85);
-
-/***/ }),
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const utils = __webpack_require__(86);
-const tableLayout = __webpack_require__(93);
+module.exports = __webpack_require__(86);
+
+/***/ }),
+/* 86 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const utils = __webpack_require__(87);
+const tableLayout = __webpack_require__(94);
 
 class Table extends Array {
   constructor(options) {
@@ -8633,11 +8701,11 @@ module.exports = Table;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(87);
-const stringWidth = __webpack_require__(88);
+const objectAssign = __webpack_require__(88);
+const stringWidth = __webpack_require__(89);
 
 function codeRegex(capture) {
   return capture ? /\u001b\[((?:\d*;){0,5}\d*)m/g : /\u001b\[(?:\d*;){0,5}\d*m/g;
@@ -8942,7 +9010,7 @@ module.exports = {
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9039,14 +9107,14 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const stripAnsi = __webpack_require__(89);
-const isFullwidthCodePoint = __webpack_require__(91);
-const emojiRegex = __webpack_require__(92);
+const stripAnsi = __webpack_require__(90);
+const isFullwidthCodePoint = __webpack_require__(92);
+const emojiRegex = __webpack_require__(93);
 
 const stringWidth = string => {
 	string = string.replace(emojiRegex(), '  ');
@@ -9089,18 +9157,18 @@ module.exports.default = stringWidth;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const ansiRegex = __webpack_require__(90);
+const ansiRegex = __webpack_require__(91);
 
 module.exports = string => typeof string === 'string' ? string.replace(ansiRegex(), '') : string;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9117,7 +9185,7 @@ module.exports = ({onlyFirst = false} = {}) => {
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9174,7 +9242,7 @@ module.exports.default = isFullwidthCodePoint;
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9187,11 +9255,11 @@ module.exports = function () {
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(87);
-const Cell = __webpack_require__(94);
+const objectAssign = __webpack_require__(88);
+const Cell = __webpack_require__(95);
 const { ColSpanCell, RowSpanCell } = Cell;
 
 (function () {
@@ -9425,10 +9493,10 @@ function makeComputeWidths(colSpan, desiredWidth, x, forcedMin) {
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const utils = __webpack_require__(86);
+const utils = __webpack_require__(87);
 
 class Cell {
   /**
@@ -9616,7 +9684,7 @@ class Cell {
   wrapWithStyleColors(styleProperty, content) {
     if (this[styleProperty] && this[styleProperty].length) {
       try {
-        let colors = __webpack_require__(95);
+        let colors = __webpack_require__(96);
         for (let i = this[styleProperty].length - 1; i >= 0; i--) {
           colors = colors[this[styleProperty][i]];
         }
@@ -9802,7 +9870,7 @@ module.exports.RowSpanCell = RowSpanCell;
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //
@@ -9813,12 +9881,12 @@ module.exports.RowSpanCell = RowSpanCell;
 //   colors.red("foo")
 //
 //
-var colors = __webpack_require__(96);
+var colors = __webpack_require__(97);
 module['exports'] = colors;
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -9857,11 +9925,11 @@ module['exports'] = colors;
 colors.themes = {};
 
 var util = __webpack_require__(22);
-var ansiStyles = colors.styles = __webpack_require__(97);
+var ansiStyles = colors.styles = __webpack_require__(98);
 var defineProps = Object.defineProperties;
 var newLineRegex = new RegExp(/[\r\n]+/g);
 
-colors.supportsColor = __webpack_require__(98).supportsColor;
+colors.supportsColor = __webpack_require__(99).supportsColor;
 
 if (typeof colors.enabled === 'undefined') {
   colors.enabled = colors.supportsColor() !== false;
@@ -10013,15 +10081,15 @@ var sequencer = function sequencer(map, str) {
 };
 
 // custom formatter methods
-colors.trap = __webpack_require__(100);
-colors.zalgo = __webpack_require__(101);
+colors.trap = __webpack_require__(101);
+colors.zalgo = __webpack_require__(102);
 
 // maps
 colors.maps = {};
-colors.maps.america = __webpack_require__(102)(colors);
-colors.maps.zebra = __webpack_require__(103)(colors);
-colors.maps.rainbow = __webpack_require__(104)(colors);
-colors.maps.random = __webpack_require__(105)(colors);
+colors.maps.america = __webpack_require__(103)(colors);
+colors.maps.zebra = __webpack_require__(104)(colors);
+colors.maps.rainbow = __webpack_require__(105)(colors);
+colors.maps.random = __webpack_require__(106)(colors);
 
 for (var map in colors.maps) {
   (function(map) {
@@ -10035,7 +10103,7 @@ defineProps(colors, init());
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports) {
 
 /*
@@ -10136,7 +10204,7 @@ Object.keys(codes).forEach(function(key) {
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10168,7 +10236,7 @@ THE SOFTWARE.
 
 
 var os = __webpack_require__(11);
-var hasFlag = __webpack_require__(99);
+var hasFlag = __webpack_require__(100);
 
 var env = process.env;
 
@@ -10294,7 +10362,7 @@ module.exports = {
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10336,7 +10404,7 @@ module.exports = function(flag, argv) {
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports) {
 
 module['exports'] = function runTheTrap(text, options) {
@@ -10388,7 +10456,7 @@ module['exports'] = function runTheTrap(text, options) {
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports) {
 
 // please no
@@ -10504,7 +10572,7 @@ module['exports'] = function zalgo(text, options) {
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10520,7 +10588,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10531,7 +10599,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10549,7 +10617,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10566,7 +10634,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10582,10 +10650,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultMemberTreeItem = exports.getMemberTreeItems = exports.MemberTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(83);
+const base = __webpack_require__(84);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(84);
+const table = __webpack_require__(85);
 exports.ITEM_TYPE = 'Members';
 class MemberTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, member, collapsibleState) {
@@ -10648,7 +10716,7 @@ exports.getDefaultMemberTreeItem = getDefaultMemberTreeItem;
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10664,10 +10732,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultServiceTreeItem = exports.getServiceTreeItems = exports.ServiceTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(83);
+const base = __webpack_require__(84);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(84);
+const table = __webpack_require__(85);
 exports.ITEM_TYPE = 'Services';
 class ServiceTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, service, collapsibleState) {
@@ -10730,7 +10798,7 @@ exports.getDefaultServiceTreeItem = getDefaultServiceTreeItem;
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10746,10 +10814,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProjectTreeItems = exports.ProjectTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(83);
+const base = __webpack_require__(84);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(84);
+const table = __webpack_require__(85);
 exports.ITEM_TYPE = 'Projects';
 class ProjectTreeItem extends base.TreeItem {
     constructor(label, project, collapsibleState) {
@@ -10804,7 +10872,7 @@ exports.getProjectTreeItems = getProjectTreeItems;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10812,7 +10880,7 @@ exports.getProjectTreeItems = getProjectTreeItems;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusExplorer = void 0;
 const vscode = __webpack_require__(1);
-const status = __webpack_require__(110);
+const status = __webpack_require__(111);
 class StatusExplorer {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -10835,7 +10903,7 @@ exports.StatusExplorer = StatusExplorer;
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10851,7 +10919,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getServiceStatus = exports.StatusTreeItem = void 0;
-const axios_1 = __webpack_require__(111);
+const axios_1 = __webpack_require__(112);
 const vscode = __webpack_require__(1);
 const CHECK_CODICON = 'check';
 const ERROR_CODICON = 'error';
@@ -10885,23 +10953,23 @@ function getStatusIcon(status) {
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(112);
+module.exports = __webpack_require__(113);
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var bind = __webpack_require__(114);
-var Axios = __webpack_require__(115);
-var mergeConfig = __webpack_require__(149);
-var defaults = __webpack_require__(121);
+var utils = __webpack_require__(114);
+var bind = __webpack_require__(115);
+var Axios = __webpack_require__(116);
+var mergeConfig = __webpack_require__(150);
+var defaults = __webpack_require__(122);
 
 /**
  * Create an instance of Axios
@@ -10934,15 +11002,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(150);
-axios.CancelToken = __webpack_require__(151);
-axios.isCancel = __webpack_require__(120);
+axios.Cancel = __webpack_require__(151);
+axios.CancelToken = __webpack_require__(152);
+axios.isCancel = __webpack_require__(121);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(152);
+axios.spread = __webpack_require__(153);
 
 module.exports = axios;
 
@@ -10951,13 +11019,13 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bind = __webpack_require__(114);
+var bind = __webpack_require__(115);
 
 /*global toString:true*/
 
@@ -11309,7 +11377,7 @@ module.exports = {
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11327,17 +11395,17 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var buildURL = __webpack_require__(116);
-var InterceptorManager = __webpack_require__(117);
-var dispatchRequest = __webpack_require__(118);
-var mergeConfig = __webpack_require__(149);
+var utils = __webpack_require__(114);
+var buildURL = __webpack_require__(117);
+var InterceptorManager = __webpack_require__(118);
+var dispatchRequest = __webpack_require__(119);
+var mergeConfig = __webpack_require__(150);
 
 /**
  * Create a new instance of Axios
@@ -11429,13 +11497,13 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -11506,13 +11574,13 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -11565,16 +11633,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var transformData = __webpack_require__(119);
-var isCancel = __webpack_require__(120);
-var defaults = __webpack_require__(121);
+var utils = __webpack_require__(114);
+var transformData = __webpack_require__(120);
+var isCancel = __webpack_require__(121);
+var defaults = __webpack_require__(122);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -11651,13 +11719,13 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 /**
  * Transform the data for a request or a response
@@ -11678,7 +11746,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11690,14 +11758,14 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var normalizeHeaderName = __webpack_require__(122);
+var utils = __webpack_require__(114);
+var normalizeHeaderName = __webpack_require__(123);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -11713,10 +11781,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(123);
+    adapter = __webpack_require__(124);
   } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(133);
+    adapter = __webpack_require__(134);
   }
   return adapter;
 }
@@ -11795,13 +11863,13 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -11814,20 +11882,20 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var settle = __webpack_require__(124);
-var cookies = __webpack_require__(127);
-var buildURL = __webpack_require__(116);
-var buildFullPath = __webpack_require__(128);
-var parseHeaders = __webpack_require__(131);
-var isURLSameOrigin = __webpack_require__(132);
-var createError = __webpack_require__(125);
+var utils = __webpack_require__(114);
+var settle = __webpack_require__(125);
+var cookies = __webpack_require__(128);
+var buildURL = __webpack_require__(117);
+var buildFullPath = __webpack_require__(129);
+var parseHeaders = __webpack_require__(132);
+var isURLSameOrigin = __webpack_require__(133);
+var createError = __webpack_require__(126);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -12000,13 +12068,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(125);
+var createError = __webpack_require__(126);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -12032,13 +12100,13 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(126);
+var enhanceError = __webpack_require__(127);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -12057,7 +12125,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12106,13 +12174,13 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12166,14 +12234,14 @@ module.exports = (
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var isAbsoluteURL = __webpack_require__(129);
-var combineURLs = __webpack_require__(130);
+var isAbsoluteURL = __webpack_require__(130);
+var combineURLs = __webpack_require__(131);
 
 /**
  * Creates a new URL by combining the baseURL with the requestedURL,
@@ -12193,7 +12261,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
 
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12214,7 +12282,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12235,13 +12303,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -12295,13 +12363,13 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12370,25 +12438,25 @@ module.exports = (
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
-var settle = __webpack_require__(124);
-var buildFullPath = __webpack_require__(128);
-var buildURL = __webpack_require__(116);
-var http = __webpack_require__(134);
-var https = __webpack_require__(135);
-var httpFollow = __webpack_require__(136).http;
-var httpsFollow = __webpack_require__(136).https;
+var utils = __webpack_require__(114);
+var settle = __webpack_require__(125);
+var buildFullPath = __webpack_require__(129);
+var buildURL = __webpack_require__(117);
+var http = __webpack_require__(135);
+var https = __webpack_require__(136);
+var httpFollow = __webpack_require__(137).http;
+var httpsFollow = __webpack_require__(137).https;
 var url = __webpack_require__(8);
-var zlib = __webpack_require__(147);
-var pkg = __webpack_require__(148);
-var createError = __webpack_require__(125);
-var enhanceError = __webpack_require__(126);
+var zlib = __webpack_require__(148);
+var pkg = __webpack_require__(149);
+var createError = __webpack_require__(126);
+var enhanceError = __webpack_require__(127);
 
 var isHttps = /https:?/;
 
@@ -12664,28 +12732,28 @@ module.exports = function httpAdapter(config) {
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports) {
 
 module.exports = require("https");
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var url = __webpack_require__(8);
 var URL = url.URL;
-var http = __webpack_require__(134);
-var https = __webpack_require__(135);
-var Writable = __webpack_require__(137).Writable;
+var http = __webpack_require__(135);
+var https = __webpack_require__(136);
+var Writable = __webpack_require__(138).Writable;
 var assert = __webpack_require__(25);
-var debug = __webpack_require__(138);
+var debug = __webpack_require__(139);
 
 // Create handlers that pass events from native requests
 var eventHandlers = Object.create(null);
@@ -13180,19 +13248,19 @@ module.exports.wrap = wrap;
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports) {
 
 module.exports = require("stream");
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var debug;
 try {
   /* eslint global-require: off */
-  debug = __webpack_require__(139)("follow-redirects");
+  debug = __webpack_require__(140)("follow-redirects");
 }
 catch (error) {
   debug = function () { /* */ };
@@ -13201,7 +13269,7 @@ module.exports = debug;
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -13210,14 +13278,14 @@ module.exports = debug;
  */
 
 if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
-	module.exports = __webpack_require__(140);
+	module.exports = __webpack_require__(141);
 } else {
-	module.exports = __webpack_require__(143);
+	module.exports = __webpack_require__(144);
 }
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-env browser */
@@ -13474,7 +13542,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(141)(exports);
+module.exports = __webpack_require__(142)(exports);
 
 const {formatters} = module.exports;
 
@@ -13492,7 +13560,7 @@ formatters.j = function (v) {
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -13508,7 +13576,7 @@ function setup(env) {
 	createDebug.disable = disable;
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(142);
+	createDebug.humanize = __webpack_require__(143);
 	createDebug.destroy = destroy;
 
 	Object.keys(env).forEach(key => {
@@ -13759,7 +13827,7 @@ module.exports = setup;
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports) {
 
 /**
@@ -13927,14 +13995,14 @@ function plural(ms, msAbs, n, name) {
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-const tty = __webpack_require__(144);
+const tty = __webpack_require__(145);
 const util = __webpack_require__(22);
 
 /**
@@ -13961,7 +14029,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
 try {
 	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
 	// eslint-disable-next-line import/no-extraneous-dependencies
-	const supportsColor = __webpack_require__(145);
+	const supportsColor = __webpack_require__(146);
 
 	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
 		exports.colors = [
@@ -14169,7 +14237,7 @@ function init(debug) {
 	}
 }
 
-module.exports = __webpack_require__(141)(exports);
+module.exports = __webpack_require__(142)(exports);
 
 const {formatters} = module.exports;
 
@@ -14196,19 +14264,19 @@ formatters.O = function (v) {
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports) {
 
 module.exports = require("tty");
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 const os = __webpack_require__(11);
-const hasFlag = __webpack_require__(146);
+const hasFlag = __webpack_require__(147);
 
 const env = process.env;
 
@@ -14340,7 +14408,7 @@ module.exports = {
 
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14355,25 +14423,25 @@ module.exports = (flag, argv) => {
 
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports) {
 
 module.exports = require("zlib");
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module) {
 
 module.exports = JSON.parse("{\"_args\":[[\"axios@0.21.0\",\"/home/retgits/Downloads/vscode-akkasls-tools\"]],\"_from\":\"axios@0.21.0\",\"_id\":\"axios@0.21.0\",\"_inBundle\":false,\"_integrity\":\"sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==\",\"_location\":\"/axios\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"version\",\"registry\":true,\"raw\":\"axios@0.21.0\",\"name\":\"axios\",\"escapedName\":\"axios\",\"rawSpec\":\"0.21.0\",\"saveSpec\":null,\"fetchSpec\":\"0.21.0\"},\"_requiredBy\":[\"/\"],\"_resolved\":\"https://registry.npmjs.org/axios/-/axios-0.21.0.tgz\",\"_spec\":\"0.21.0\",\"_where\":\"/home/retgits/Downloads/vscode-akkasls-tools\",\"author\":{\"name\":\"Matt Zabriskie\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}],\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/axios/axios\",\"jsdelivr\":\"dist/axios.min.js\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/axios/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"fix\":\"eslint --fix lib/**/*.js\",\"postversion\":\"git push && git push --tags\",\"preversion\":\"npm test\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test && bundlesize\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"unpkg\":\"dist/axios.min.js\",\"version\":\"0.21.0\"}");
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(113);
+var utils = __webpack_require__(114);
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -14461,7 +14529,7 @@ module.exports = function mergeConfig(config1, config2) {
 
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14487,13 +14555,13 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(150);
+var Cancel = __webpack_require__(151);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -14551,7 +14619,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14585,7 +14653,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14593,7 +14661,7 @@ module.exports = function spread(callback) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TreeDataProvider = void 0;
 const vscode = __webpack_require__(1);
-const tool = __webpack_require__(154);
+const tool = __webpack_require__(155);
 class TreeDataProvider {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -14616,7 +14684,7 @@ exports.TreeDataProvider = TreeDataProvider;
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14632,9 +14700,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openToolPage = exports.getToolTreeItems = exports.ToolTreeItem = void 0;
-const axios_1 = __webpack_require__(111);
+const axios_1 = __webpack_require__(112);
 const shell_1 = __webpack_require__(7);
-const tool = __webpack_require__(155);
+const tool = __webpack_require__(156);
 const vscode = __webpack_require__(1);
 const EXISTS_CODICON = 'pass';
 const NOT_EXISTS_CODICON = 'error';
@@ -14710,7 +14778,7 @@ exports.openToolPage = openToolPage;
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14727,41 +14795,6 @@ class Convert {
     }
 }
 exports.Convert = Convert;
-
-
-/***/ }),
-/* 156 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-function run(projectID, emailAddress) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('roles invitations delete');
-        if (projectID && emailAddress) {
-            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for', defaultValue: emailAddress, show: false });
-            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addArgument({ name: 'email', description: 'email address of the user to remove the invite for' });
-            command.addFlag({ name: 'project', description: 'the project remove the invite from', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
 
 
 /***/ })

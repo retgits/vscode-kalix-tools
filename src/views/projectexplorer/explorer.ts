@@ -55,44 +55,37 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
     }
 
     async deployService(item: base.TreeItem) {
-        this.akkaServerless.deployService(item.parentProjectID);
-        this.refresh();
+        this.akkaServerless.deployService(item.parentProjectID, this);
     }
 
     async undeployService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.undeployService(item.parentProjectID, item.label);
-            this.refresh();
+            this.akkaServerless.undeployService(item.parentProjectID, item.label, this);
         }
     }
 
     async exposeService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.exposeService(item.parentProjectID, item.label);
-            this.refresh();
+            this.akkaServerless.exposeService(item.parentProjectID, item.label, this);
         }
     }
 
     async unexposeService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.unexposeService(item.parentProjectID, item.label);
-            this.refresh();
+            this.akkaServerless.unexposeService(item.parentProjectID, item.label, this);
         }
     }
 
     async inviteUser(base: base.TreeItem) {
-        this.akkaServerless.inviteUser(base.parentProjectID);
-        this.refresh();
+        this.akkaServerless.inviteUser(base.parentProjectID, this);
     }
 
     async deleteInvite(item: invite.InviteTreeItem) {
-        this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email);
-        this.refresh();
+        this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email, this);
     }
 
     async newProject() {
-        this.akkaServerless.createNewProject();
-        this.refresh();
+        this.akkaServerless.createNewProject(this);
     }
 
     async printTreeItemDetails(base: base.TreeItem) {
