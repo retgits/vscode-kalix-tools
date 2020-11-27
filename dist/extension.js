@@ -106,9 +106,9 @@ const vscode = __webpack_require__(1);
 // Internal dependencies
 const logger_1 = __webpack_require__(2);
 const projects = __webpack_require__(3);
-const status = __webpack_require__(110);
-const tools = __webpack_require__(154);
-const credentials = __webpack_require__(161);
+const status = __webpack_require__(118);
+const tools = __webpack_require__(162);
+const credentials = __webpack_require__(165);
 const AkkaServerless = __webpack_require__(4);
 function activate(context) {
     const akkasls = new AkkaServerless.AkkaServerless();
@@ -224,11 +224,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectExplorer = void 0;
 const sls = __webpack_require__(4);
-const invite = __webpack_require__(83);
-const member = __webpack_require__(107);
-const service = __webpack_require__(108);
-const project = __webpack_require__(109);
-const docker = __webpack_require__(164);
+const invite = __webpack_require__(90);
+const member = __webpack_require__(114);
+const service = __webpack_require__(115);
+const project = __webpack_require__(116);
+const docker = __webpack_require__(117);
 const vscode = __webpack_require__(1);
 class ProjectExplorer {
     constructor(akkaServerless) {
@@ -382,20 +382,20 @@ const listProjects = __webpack_require__(5);
 const listMembers = __webpack_require__(68);
 const listInvites = __webpack_require__(70);
 const listServices = __webpack_require__(72);
-const listTokens = __webpack_require__(84);
-const listCredentials = __webpack_require__(159);
-const authLogin = __webpack_require__(74);
-const authLogout = __webpack_require__(75);
-const addDockerCredentials = __webpack_require__(165);
-const deleteDockerCredentials = __webpack_require__(166);
-const deployService = __webpack_require__(76);
-const undeployService = __webpack_require__(77);
-const exposeService = __webpack_require__(78);
-const unexposeService = __webpack_require__(79);
-const inviteUser = __webpack_require__(80);
-const deleteInvite = __webpack_require__(81);
-const createProject = __webpack_require__(82);
-const revokeToken = __webpack_require__(167);
+const listTokens = __webpack_require__(74);
+const listCredentials = __webpack_require__(76);
+const authLogin = __webpack_require__(78);
+const authLogout = __webpack_require__(79);
+const addDockerCredentials = __webpack_require__(80);
+const deleteDockerCredentials = __webpack_require__(81);
+const deployService = __webpack_require__(82);
+const undeployService = __webpack_require__(83);
+const exposeService = __webpack_require__(84);
+const unexposeService = __webpack_require__(85);
+const inviteUser = __webpack_require__(86);
+const deleteInvite = __webpack_require__(87);
+const createProject = __webpack_require__(88);
+const revokeToken = __webpack_require__(89);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
     constructor() {
@@ -8310,6 +8310,104 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
 const wrapper = __webpack_require__(6);
+const tokenlist = __webpack_require__(75);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`auth tokens list -o json`);
+        let result = yield command.runCommand();
+        return tokenlist.Convert.toTokenList(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Convert = void 0;
+// Converts JSON strings to/from your types
+class Convert {
+    static toTokenList(json) {
+        return JSON.parse(json);
+    }
+    static tokenListToJson(value) {
+        return JSON.stringify(value);
+    }
+}
+exports.Convert = Convert;
+
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+const credentials = __webpack_require__(77);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`docker list-credentials --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return credentials.Convert.toListCredentials(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Convert = void 0;
+// Converts JSON strings to/from your types
+class Convert {
+    static toListCredentials(json) {
+        return JSON.parse(json);
+    }
+    static listCredentialsToJson(value) {
+        return JSON.stringify(value);
+    }
+}
+exports.Convert = Convert;
+
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         let command = new wrapper.Command('auth login');
@@ -8321,7 +8419,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 75 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8349,7 +8447,76 @@ exports.run = run;
 
 
 /***/ }),
-/* 76 */
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('docker add-credentials');
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        command.addArgument({ name: 'Credentials', description: 'Credentials string', defaultValue: '--docker-email <> --docker-password <> --docker-server <> --docker-username <>' });
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, credentialID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('docker delete-credentials');
+        if (projectID && credentialID) {
+            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true, defaultValue: projectID, show: false });
+            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true, defaultValue: credentialID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true });
+            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8384,7 +8551,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 77 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8419,7 +8586,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 78 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8459,7 +8626,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 79 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8499,7 +8666,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 80 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8534,7 +8701,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 81 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8569,7 +8736,7 @@ exports.run = run;
 
 
 /***/ }),
-/* 82 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8598,7 +8765,40 @@ exports.run = run;
 
 
 /***/ }),
-/* 83 */
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(tokenID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('auth token revoke');
+        if (tokenID) {
+            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true, defaultValue: tokenID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8614,10 +8814,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultInviteTreeItem = exports.getInviteTreeItems = exports.InviteTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(157);
+const base = __webpack_require__(91);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
+const table = __webpack_require__(92);
 exports.ITEM_TYPE = 'Invites';
 class InviteTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, invite, collapsibleState) {
@@ -8678,46 +8878,37 @@ exports.getDefaultInviteTreeItem = getDefaultInviteTreeItem;
 
 
 /***/ }),
-/* 84 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-const tokenlist = __webpack_require__(158);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command(`auth tokens list -o json`);
-        let result = yield command.runCommand();
-        return tokenlist.Convert.toTokenList(result.stdout);
-    });
+exports.TreeItem = void 0;
+const vscode = __webpack_require__(1);
+class TreeItem extends vscode.TreeItem {
+    constructor(label, collapsibleState, type, parentProjectID) {
+        super(label, collapsibleState);
+        this.type = type;
+        this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';
+    }
+    printDetails() { }
 }
-exports.run = run;
+exports.TreeItem = TreeItem;
 
 
 /***/ }),
-/* 85 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(86);
+module.exports = __webpack_require__(93);
 
 /***/ }),
-/* 86 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const utils = __webpack_require__(87);
-const tableLayout = __webpack_require__(94);
+const utils = __webpack_require__(94);
+const tableLayout = __webpack_require__(101);
 
 class Table extends Array {
   constructor(options) {
@@ -8796,11 +8987,11 @@ module.exports = Table;
 
 
 /***/ }),
-/* 87 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(88);
-const stringWidth = __webpack_require__(89);
+const objectAssign = __webpack_require__(95);
+const stringWidth = __webpack_require__(96);
 
 function codeRegex(capture) {
   return capture ? /\u001b\[((?:\d*;){0,5}\d*)m/g : /\u001b\[(?:\d*;){0,5}\d*m/g;
@@ -9105,7 +9296,7 @@ module.exports = {
 
 
 /***/ }),
-/* 88 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9202,14 +9393,14 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 89 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const stripAnsi = __webpack_require__(90);
-const isFullwidthCodePoint = __webpack_require__(92);
-const emojiRegex = __webpack_require__(93);
+const stripAnsi = __webpack_require__(97);
+const isFullwidthCodePoint = __webpack_require__(99);
+const emojiRegex = __webpack_require__(100);
 
 const stringWidth = string => {
 	string = string.replace(emojiRegex(), '  ');
@@ -9252,18 +9443,18 @@ module.exports.default = stringWidth;
 
 
 /***/ }),
-/* 90 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const ansiRegex = __webpack_require__(91);
+const ansiRegex = __webpack_require__(98);
 
 module.exports = string => typeof string === 'string' ? string.replace(ansiRegex(), '') : string;
 
 
 /***/ }),
-/* 91 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9280,7 +9471,7 @@ module.exports = ({onlyFirst = false} = {}) => {
 
 
 /***/ }),
-/* 92 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9337,7 +9528,7 @@ module.exports.default = isFullwidthCodePoint;
 
 
 /***/ }),
-/* 93 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9350,11 +9541,11 @@ module.exports = function () {
 
 
 /***/ }),
-/* 94 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(88);
-const Cell = __webpack_require__(95);
+const objectAssign = __webpack_require__(95);
+const Cell = __webpack_require__(102);
 const { ColSpanCell, RowSpanCell } = Cell;
 
 (function () {
@@ -9588,10 +9779,10 @@ function makeComputeWidths(colSpan, desiredWidth, x, forcedMin) {
 
 
 /***/ }),
-/* 95 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const utils = __webpack_require__(87);
+const utils = __webpack_require__(94);
 
 class Cell {
   /**
@@ -9779,7 +9970,7 @@ class Cell {
   wrapWithStyleColors(styleProperty, content) {
     if (this[styleProperty] && this[styleProperty].length) {
       try {
-        let colors = __webpack_require__(96);
+        let colors = __webpack_require__(103);
         for (let i = this[styleProperty].length - 1; i >= 0; i--) {
           colors = colors[this[styleProperty][i]];
         }
@@ -9965,7 +10156,7 @@ module.exports.RowSpanCell = RowSpanCell;
 
 
 /***/ }),
-/* 96 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //
@@ -9976,12 +10167,12 @@ module.exports.RowSpanCell = RowSpanCell;
 //   colors.red("foo")
 //
 //
-var colors = __webpack_require__(97);
+var colors = __webpack_require__(104);
 module['exports'] = colors;
 
 
 /***/ }),
-/* 97 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -10020,11 +10211,11 @@ module['exports'] = colors;
 colors.themes = {};
 
 var util = __webpack_require__(22);
-var ansiStyles = colors.styles = __webpack_require__(98);
+var ansiStyles = colors.styles = __webpack_require__(105);
 var defineProps = Object.defineProperties;
 var newLineRegex = new RegExp(/[\r\n]+/g);
 
-colors.supportsColor = __webpack_require__(99).supportsColor;
+colors.supportsColor = __webpack_require__(106).supportsColor;
 
 if (typeof colors.enabled === 'undefined') {
   colors.enabled = colors.supportsColor() !== false;
@@ -10176,15 +10367,15 @@ var sequencer = function sequencer(map, str) {
 };
 
 // custom formatter methods
-colors.trap = __webpack_require__(101);
-colors.zalgo = __webpack_require__(102);
+colors.trap = __webpack_require__(108);
+colors.zalgo = __webpack_require__(109);
 
 // maps
 colors.maps = {};
-colors.maps.america = __webpack_require__(103)(colors);
-colors.maps.zebra = __webpack_require__(104)(colors);
-colors.maps.rainbow = __webpack_require__(105)(colors);
-colors.maps.random = __webpack_require__(106)(colors);
+colors.maps.america = __webpack_require__(110)(colors);
+colors.maps.zebra = __webpack_require__(111)(colors);
+colors.maps.rainbow = __webpack_require__(112)(colors);
+colors.maps.random = __webpack_require__(113)(colors);
 
 for (var map in colors.maps) {
   (function(map) {
@@ -10198,7 +10389,7 @@ defineProps(colors, init());
 
 
 /***/ }),
-/* 98 */
+/* 105 */
 /***/ (function(module, exports) {
 
 /*
@@ -10299,7 +10490,7 @@ Object.keys(codes).forEach(function(key) {
 
 
 /***/ }),
-/* 99 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10331,7 +10522,7 @@ THE SOFTWARE.
 
 
 var os = __webpack_require__(11);
-var hasFlag = __webpack_require__(100);
+var hasFlag = __webpack_require__(107);
 
 var env = process.env;
 
@@ -10457,7 +10648,7 @@ module.exports = {
 
 
 /***/ }),
-/* 100 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10499,7 +10690,7 @@ module.exports = function(flag, argv) {
 
 
 /***/ }),
-/* 101 */
+/* 108 */
 /***/ (function(module, exports) {
 
 module['exports'] = function runTheTrap(text, options) {
@@ -10551,7 +10742,7 @@ module['exports'] = function runTheTrap(text, options) {
 
 
 /***/ }),
-/* 102 */
+/* 109 */
 /***/ (function(module, exports) {
 
 // please no
@@ -10667,7 +10858,7 @@ module['exports'] = function zalgo(text, options) {
 
 
 /***/ }),
-/* 103 */
+/* 110 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10683,7 +10874,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 104 */
+/* 111 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10694,7 +10885,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 105 */
+/* 112 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10712,7 +10903,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 106 */
+/* 113 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10729,7 +10920,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 107 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10745,10 +10936,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultMemberTreeItem = exports.getMemberTreeItems = exports.MemberTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(157);
+const base = __webpack_require__(91);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
+const table = __webpack_require__(92);
 exports.ITEM_TYPE = 'Members';
 class MemberTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, member, collapsibleState) {
@@ -10811,7 +11002,7 @@ exports.getDefaultMemberTreeItem = getDefaultMemberTreeItem;
 
 
 /***/ }),
-/* 108 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10827,10 +11018,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultServiceTreeItem = exports.getServiceTreeItems = exports.ServiceTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(157);
+const base = __webpack_require__(91);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
+const table = __webpack_require__(92);
 exports.ITEM_TYPE = 'Services';
 class ServiceTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, service, collapsibleState) {
@@ -10893,7 +11084,7 @@ exports.getDefaultServiceTreeItem = getDefaultServiceTreeItem;
 
 
 /***/ }),
-/* 109 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10909,10 +11100,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProjectTreeItems = exports.ProjectTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(157);
+const base = __webpack_require__(91);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
+const table = __webpack_require__(92);
 exports.ITEM_TYPE = 'Projects';
 class ProjectTreeItem extends base.TreeItem {
     constructor(label, project, collapsibleState) {
@@ -10967,7 +11158,77 @@ exports.getProjectTreeItems = getProjectTreeItems;
 
 
 /***/ }),
-/* 110 */
+/* 117 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDefaultDockerTreeItem = exports.getDockerTreeItems = exports.DockerTreeItem = exports.ITEM_TYPE = void 0;
+const base = __webpack_require__(91);
+const vscode = __webpack_require__(1);
+const logger_1 = __webpack_require__(2);
+const table = __webpack_require__(92);
+exports.ITEM_TYPE = 'Credentials';
+class DockerTreeItem extends base.TreeItem {
+    constructor(label, parentProjectID, credential, collapsibleState) {
+        super(label, collapsibleState, exports.ITEM_TYPE);
+        this.label = label;
+        this.parentProjectID = parentProjectID;
+        this.credential = credential;
+        this.collapsibleState = collapsibleState;
+        this.description = this.credential.server;
+        this.id = this.getName();
+        this.iconPath = this.getIcon();
+        this.contextValue = exports.ITEM_TYPE;
+    }
+    getName() {
+        let elems = this.credential.name.split('/');
+        return elems[elems.length - 1];
+    }
+    getIcon() {
+        return new vscode.ThemeIcon('lock');
+    }
+    printDetails() {
+        if (this.label !== exports.ITEM_TYPE) {
+            let printTable = new table({});
+            printTable.push(['Name', this.getName()]);
+            printTable.push(['Server', this.credential.server]);
+            printTable.push(['Username', this.credential.username]);
+            logger_1.aslogger.log(printTable.toString());
+        }
+    }
+}
+exports.DockerTreeItem = DockerTreeItem;
+function getDockerTreeItems(parentProjectID, akkasls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let items = [];
+        let credentialList = yield akkasls.getDockerCredentials(parentProjectID);
+        for (let credential of credentialList) {
+            items.push(new DockerTreeItem(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
+        }
+        return items;
+    });
+}
+exports.getDockerTreeItems = getDockerTreeItems;
+function getDefaultDockerTreeItem(parentProjectID) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return new DockerTreeItem(exports.ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${exports.ITEM_TYPE}`, server: '', username: '' }, vscode.TreeItemCollapsibleState.Collapsed);
+}
+exports.getDefaultDockerTreeItem = getDefaultDockerTreeItem;
+
+
+/***/ }),
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10975,7 +11236,7 @@ exports.getProjectTreeItems = getProjectTreeItems;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusExplorer = void 0;
 const vscode = __webpack_require__(1);
-const status = __webpack_require__(111);
+const status = __webpack_require__(119);
 class StatusExplorer {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -10998,7 +11259,7 @@ exports.StatusExplorer = StatusExplorer;
 
 
 /***/ }),
-/* 111 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11014,7 +11275,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getServiceStatus = exports.StatusTreeItem = void 0;
-const axios_1 = __webpack_require__(112);
+const axios_1 = __webpack_require__(120);
 const vscode = __webpack_require__(1);
 const CHECK_CODICON = 'check';
 const ERROR_CODICON = 'error';
@@ -11048,23 +11309,23 @@ function getStatusIcon(status) {
 
 
 /***/ }),
-/* 112 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(113);
+module.exports = __webpack_require__(121);
 
 /***/ }),
-/* 113 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var bind = __webpack_require__(115);
-var Axios = __webpack_require__(116);
-var mergeConfig = __webpack_require__(150);
-var defaults = __webpack_require__(122);
+var utils = __webpack_require__(122);
+var bind = __webpack_require__(123);
+var Axios = __webpack_require__(124);
+var mergeConfig = __webpack_require__(158);
+var defaults = __webpack_require__(130);
 
 /**
  * Create an instance of Axios
@@ -11097,15 +11358,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(151);
-axios.CancelToken = __webpack_require__(152);
-axios.isCancel = __webpack_require__(121);
+axios.Cancel = __webpack_require__(159);
+axios.CancelToken = __webpack_require__(160);
+axios.isCancel = __webpack_require__(129);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(153);
+axios.spread = __webpack_require__(161);
 
 module.exports = axios;
 
@@ -11114,13 +11375,13 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 114 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bind = __webpack_require__(115);
+var bind = __webpack_require__(123);
 
 /*global toString:true*/
 
@@ -11472,7 +11733,7 @@ module.exports = {
 
 
 /***/ }),
-/* 115 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11490,17 +11751,17 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 116 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var buildURL = __webpack_require__(117);
-var InterceptorManager = __webpack_require__(118);
-var dispatchRequest = __webpack_require__(119);
-var mergeConfig = __webpack_require__(150);
+var utils = __webpack_require__(122);
+var buildURL = __webpack_require__(125);
+var InterceptorManager = __webpack_require__(126);
+var dispatchRequest = __webpack_require__(127);
+var mergeConfig = __webpack_require__(158);
 
 /**
  * Create a new instance of Axios
@@ -11592,13 +11853,13 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 117 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -11669,13 +11930,13 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 118 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -11728,16 +11989,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 119 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var transformData = __webpack_require__(120);
-var isCancel = __webpack_require__(121);
-var defaults = __webpack_require__(122);
+var utils = __webpack_require__(122);
+var transformData = __webpack_require__(128);
+var isCancel = __webpack_require__(129);
+var defaults = __webpack_require__(130);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -11814,13 +12075,13 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 120 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 /**
  * Transform the data for a request or a response
@@ -11841,7 +12102,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 121 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11853,14 +12114,14 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 122 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var normalizeHeaderName = __webpack_require__(123);
+var utils = __webpack_require__(122);
+var normalizeHeaderName = __webpack_require__(131);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -11876,10 +12137,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(124);
+    adapter = __webpack_require__(132);
   } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(134);
+    adapter = __webpack_require__(142);
   }
   return adapter;
 }
@@ -11958,13 +12219,13 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 123 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -11977,20 +12238,20 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 124 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var settle = __webpack_require__(125);
-var cookies = __webpack_require__(128);
-var buildURL = __webpack_require__(117);
-var buildFullPath = __webpack_require__(129);
-var parseHeaders = __webpack_require__(132);
-var isURLSameOrigin = __webpack_require__(133);
-var createError = __webpack_require__(126);
+var utils = __webpack_require__(122);
+var settle = __webpack_require__(133);
+var cookies = __webpack_require__(136);
+var buildURL = __webpack_require__(125);
+var buildFullPath = __webpack_require__(137);
+var parseHeaders = __webpack_require__(140);
+var isURLSameOrigin = __webpack_require__(141);
+var createError = __webpack_require__(134);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -12163,13 +12424,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 125 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(126);
+var createError = __webpack_require__(134);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -12195,13 +12456,13 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 126 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(127);
+var enhanceError = __webpack_require__(135);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -12220,7 +12481,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 127 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12269,13 +12530,13 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 128 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12329,14 +12590,14 @@ module.exports = (
 
 
 /***/ }),
-/* 129 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var isAbsoluteURL = __webpack_require__(130);
-var combineURLs = __webpack_require__(131);
+var isAbsoluteURL = __webpack_require__(138);
+var combineURLs = __webpack_require__(139);
 
 /**
  * Creates a new URL by combining the baseURL with the requestedURL,
@@ -12356,7 +12617,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
 
 
 /***/ }),
-/* 130 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12377,7 +12638,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 131 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12398,13 +12659,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 132 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -12458,13 +12719,13 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 133 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12533,25 +12794,25 @@ module.exports = (
 
 
 /***/ }),
-/* 134 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
-var settle = __webpack_require__(125);
-var buildFullPath = __webpack_require__(129);
-var buildURL = __webpack_require__(117);
-var http = __webpack_require__(135);
-var https = __webpack_require__(136);
-var httpFollow = __webpack_require__(137).http;
-var httpsFollow = __webpack_require__(137).https;
+var utils = __webpack_require__(122);
+var settle = __webpack_require__(133);
+var buildFullPath = __webpack_require__(137);
+var buildURL = __webpack_require__(125);
+var http = __webpack_require__(143);
+var https = __webpack_require__(144);
+var httpFollow = __webpack_require__(145).http;
+var httpsFollow = __webpack_require__(145).https;
 var url = __webpack_require__(8);
-var zlib = __webpack_require__(148);
-var pkg = __webpack_require__(149);
-var createError = __webpack_require__(126);
-var enhanceError = __webpack_require__(127);
+var zlib = __webpack_require__(156);
+var pkg = __webpack_require__(157);
+var createError = __webpack_require__(134);
+var enhanceError = __webpack_require__(135);
 
 var isHttps = /https:?/;
 
@@ -12827,28 +13088,28 @@ module.exports = function httpAdapter(config) {
 
 
 /***/ }),
-/* 135 */
+/* 143 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 136 */
+/* 144 */
 /***/ (function(module, exports) {
 
 module.exports = require("https");
 
 /***/ }),
-/* 137 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var url = __webpack_require__(8);
 var URL = url.URL;
-var http = __webpack_require__(135);
-var https = __webpack_require__(136);
-var Writable = __webpack_require__(138).Writable;
+var http = __webpack_require__(143);
+var https = __webpack_require__(144);
+var Writable = __webpack_require__(146).Writable;
 var assert = __webpack_require__(25);
-var debug = __webpack_require__(139);
+var debug = __webpack_require__(147);
 
 // Create handlers that pass events from native requests
 var eventHandlers = Object.create(null);
@@ -13343,19 +13604,19 @@ module.exports.wrap = wrap;
 
 
 /***/ }),
-/* 138 */
+/* 146 */
 /***/ (function(module, exports) {
 
 module.exports = require("stream");
 
 /***/ }),
-/* 139 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var debug;
 try {
   /* eslint global-require: off */
-  debug = __webpack_require__(140)("follow-redirects");
+  debug = __webpack_require__(148)("follow-redirects");
 }
 catch (error) {
   debug = function () { /* */ };
@@ -13364,7 +13625,7 @@ module.exports = debug;
 
 
 /***/ }),
-/* 140 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -13373,14 +13634,14 @@ module.exports = debug;
  */
 
 if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
-	module.exports = __webpack_require__(141);
+	module.exports = __webpack_require__(149);
 } else {
-	module.exports = __webpack_require__(144);
+	module.exports = __webpack_require__(152);
 }
 
 
 /***/ }),
-/* 141 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-env browser */
@@ -13637,7 +13898,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(142)(exports);
+module.exports = __webpack_require__(150)(exports);
 
 const {formatters} = module.exports;
 
@@ -13655,7 +13916,7 @@ formatters.j = function (v) {
 
 
 /***/ }),
-/* 142 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -13671,7 +13932,7 @@ function setup(env) {
 	createDebug.disable = disable;
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(143);
+	createDebug.humanize = __webpack_require__(151);
 	createDebug.destroy = destroy;
 
 	Object.keys(env).forEach(key => {
@@ -13922,7 +14183,7 @@ module.exports = setup;
 
 
 /***/ }),
-/* 143 */
+/* 151 */
 /***/ (function(module, exports) {
 
 /**
@@ -14090,14 +14351,14 @@ function plural(ms, msAbs, n, name) {
 
 
 /***/ }),
-/* 144 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-const tty = __webpack_require__(145);
+const tty = __webpack_require__(153);
 const util = __webpack_require__(22);
 
 /**
@@ -14124,7 +14385,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
 try {
 	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
 	// eslint-disable-next-line import/no-extraneous-dependencies
-	const supportsColor = __webpack_require__(146);
+	const supportsColor = __webpack_require__(154);
 
 	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
 		exports.colors = [
@@ -14332,7 +14593,7 @@ function init(debug) {
 	}
 }
 
-module.exports = __webpack_require__(142)(exports);
+module.exports = __webpack_require__(150)(exports);
 
 const {formatters} = module.exports;
 
@@ -14359,19 +14620,19 @@ formatters.O = function (v) {
 
 
 /***/ }),
-/* 145 */
+/* 153 */
 /***/ (function(module, exports) {
 
 module.exports = require("tty");
 
 /***/ }),
-/* 146 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 const os = __webpack_require__(11);
-const hasFlag = __webpack_require__(147);
+const hasFlag = __webpack_require__(155);
 
 const env = process.env;
 
@@ -14503,7 +14764,7 @@ module.exports = {
 
 
 /***/ }),
-/* 147 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14518,25 +14779,25 @@ module.exports = (flag, argv) => {
 
 
 /***/ }),
-/* 148 */
+/* 156 */
 /***/ (function(module, exports) {
 
 module.exports = require("zlib");
 
 /***/ }),
-/* 149 */
+/* 157 */
 /***/ (function(module) {
 
 module.exports = JSON.parse("{\"_args\":[[\"axios@0.21.0\",\"/home/retgits/Downloads/vscode-akkasls-tools\"]],\"_from\":\"axios@0.21.0\",\"_id\":\"axios@0.21.0\",\"_inBundle\":false,\"_integrity\":\"sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==\",\"_location\":\"/axios\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"version\",\"registry\":true,\"raw\":\"axios@0.21.0\",\"name\":\"axios\",\"escapedName\":\"axios\",\"rawSpec\":\"0.21.0\",\"saveSpec\":null,\"fetchSpec\":\"0.21.0\"},\"_requiredBy\":[\"/\"],\"_resolved\":\"https://registry.npmjs.org/axios/-/axios-0.21.0.tgz\",\"_spec\":\"0.21.0\",\"_where\":\"/home/retgits/Downloads/vscode-akkasls-tools\",\"author\":{\"name\":\"Matt Zabriskie\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}],\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/axios/axios\",\"jsdelivr\":\"dist/axios.min.js\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/axios/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"fix\":\"eslint --fix lib/**/*.js\",\"postversion\":\"git push && git push --tags\",\"preversion\":\"npm test\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test && bundlesize\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"unpkg\":\"dist/axios.min.js\",\"version\":\"0.21.0\"}");
 
 /***/ }),
-/* 150 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(114);
+var utils = __webpack_require__(122);
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -14624,7 +14885,7 @@ module.exports = function mergeConfig(config1, config2) {
 
 
 /***/ }),
-/* 151 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14650,13 +14911,13 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 152 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(151);
+var Cancel = __webpack_require__(159);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -14714,7 +14975,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 153 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14748,7 +15009,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 154 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14756,7 +15017,7 @@ module.exports = function spread(callback) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TreeDataProvider = void 0;
 const vscode = __webpack_require__(1);
-const tool = __webpack_require__(155);
+const tool = __webpack_require__(163);
 class TreeDataProvider {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -14779,7 +15040,7 @@ exports.TreeDataProvider = TreeDataProvider;
 
 
 /***/ }),
-/* 155 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14795,9 +15056,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openToolPage = exports.getToolTreeItems = exports.ToolTreeItem = void 0;
-const axios_1 = __webpack_require__(112);
+const axios_1 = __webpack_require__(120);
 const shell_1 = __webpack_require__(7);
-const tool = __webpack_require__(156);
+const tool = __webpack_require__(164);
 const vscode = __webpack_require__(1);
 const EXISTS_CODICON = 'pass';
 const NOT_EXISTS_CODICON = 'error';
@@ -14873,7 +15134,7 @@ exports.openToolPage = openToolPage;
 
 
 /***/ }),
-/* 156 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14893,96 +15154,7 @@ exports.Convert = Convert;
 
 
 /***/ }),
-/* 157 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TreeItem = void 0;
-const vscode = __webpack_require__(1);
-class TreeItem extends vscode.TreeItem {
-    constructor(label, collapsibleState, type, parentProjectID) {
-        super(label, collapsibleState);
-        this.type = type;
-        this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';
-    }
-    printDetails() { }
-}
-exports.TreeItem = TreeItem;
-
-
-/***/ }),
-/* 158 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Convert = void 0;
-// Converts JSON strings to/from your types
-class Convert {
-    static toTokenList(json) {
-        return JSON.parse(json);
-    }
-    static tokenListToJson(value) {
-        return JSON.stringify(value);
-    }
-}
-exports.Convert = Convert;
-
-
-/***/ }),
-/* 159 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-const credentials = __webpack_require__(160);
-function run(projectID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command(`docker list-credentials --project ${projectID} -o json`);
-        let result = yield command.runCommand();
-        return credentials.Convert.toListCredentials(result.stdout);
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 160 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Convert = void 0;
-// Converts JSON strings to/from your types
-class Convert {
-    static toListCredentials(json) {
-        return JSON.parse(json);
-    }
-    static listCredentialsToJson(value) {
-        return JSON.stringify(value);
-    }
-}
-exports.Convert = Convert;
-
-
-/***/ }),
-/* 161 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14998,7 +15170,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CredentialsExplorer = void 0;
-const token = __webpack_require__(162);
+const token = __webpack_require__(166);
 const vscode = __webpack_require__(1);
 class CredentialsExplorer {
     constructor(akkaServerless) {
@@ -15045,7 +15217,7 @@ exports.CredentialsExplorer = CredentialsExplorer;
 
 
 /***/ }),
-/* 162 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15061,10 +15233,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultTokenTreeItem = exports.getTokenTreeItems = exports.TokenTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(163);
+const base = __webpack_require__(167);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
+const table = __webpack_require__(92);
 exports.ITEM_TYPE = 'Tokens';
 class TokenTreeItem extends base.TreeItem {
     constructor(label, token, collapsibleState) {
@@ -15120,7 +15292,7 @@ exports.getDefaultTokenTreeItem = getDefaultTokenTreeItem;
 
 
 /***/ }),
-/* 163 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15136,178 +15308,6 @@ class TreeItem extends vscode.TreeItem {
     printDetails() { }
 }
 exports.TreeItem = TreeItem;
-
-
-/***/ }),
-/* 164 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDefaultDockerTreeItem = exports.getDockerTreeItems = exports.DockerTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(157);
-const vscode = __webpack_require__(1);
-const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(85);
-exports.ITEM_TYPE = 'Credentials';
-class DockerTreeItem extends base.TreeItem {
-    constructor(label, parentProjectID, credential, collapsibleState) {
-        super(label, collapsibleState, exports.ITEM_TYPE);
-        this.label = label;
-        this.parentProjectID = parentProjectID;
-        this.credential = credential;
-        this.collapsibleState = collapsibleState;
-        this.description = this.credential.server;
-        this.id = this.getName();
-        this.iconPath = this.getIcon();
-        this.contextValue = exports.ITEM_TYPE;
-    }
-    getName() {
-        let elems = this.credential.name.split('/');
-        return elems[elems.length - 1];
-    }
-    getIcon() {
-        return new vscode.ThemeIcon('lock');
-    }
-    printDetails() {
-        if (this.label !== exports.ITEM_TYPE) {
-            let printTable = new table({});
-            printTable.push(['Name', this.getName()]);
-            printTable.push(['Server', this.credential.server]);
-            printTable.push(['Username', this.credential.username]);
-            logger_1.aslogger.log(printTable.toString());
-        }
-    }
-}
-exports.DockerTreeItem = DockerTreeItem;
-function getDockerTreeItems(parentProjectID, akkasls) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let items = [];
-        let credentialList = yield akkasls.getDockerCredentials(parentProjectID);
-        for (let credential of credentialList) {
-            items.push(new DockerTreeItem(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
-        }
-        return items;
-    });
-}
-exports.getDockerTreeItems = getDockerTreeItems;
-function getDefaultDockerTreeItem(parentProjectID) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new DockerTreeItem(exports.ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${exports.ITEM_TYPE}`, server: '', username: '' }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-exports.getDefaultDockerTreeItem = getDefaultDockerTreeItem;
-
-
-/***/ }),
-/* 165 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-function run(projectID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('docker add-credentials');
-        if (projectID) {
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        }
-        command.addArgument({ name: 'Credentials', description: 'Credentials string', defaultValue: '--docker-email <> --docker-password <> --docker-server <> --docker-username <>' });
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 166 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-function run(projectID, credentialID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('docker delete-credentials');
-        if (projectID && credentialID) {
-            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true, defaultValue: projectID, show: false });
-            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true, defaultValue: credentialID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true });
-            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 167 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(6);
-function run(tokenID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('auth token revoke');
-        if (tokenID) {
-            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true, defaultValue: tokenID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
 
 
 /***/ })

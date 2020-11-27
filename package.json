@@ -76,14 +76,14 @@
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "asexplorer",
+					"id": "as",
 					"title": "Akka Serverless",
 					"icon": "resources/akka-icon-reverse.svg"
 				}
 			]
 		},
 		"views": {
-			"asexplorer": [
+			"as": [
 				{
 					"id": "as.views.projects",
 					"name": "Projects"
@@ -157,7 +157,7 @@
 			},
 			{
 				"command": "as.views.projects.credentials.add",
-				"title": "Add credentials"
+				"title": "Add credentials (1)"
 			},
 			{
 				"command": "as.views.projects.credentials.delete",
@@ -384,6 +384,81 @@
 					"command": "as.views.projects.openbrowser",
 					"when": "view == as.views.projects",
 					"group": "99"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "as.views.projects.credentials.add",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.credentials.delete",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.services.deploy",
+					"when": "view == as.views.projects",
+					"group": "0"
+				},
+				{
+					"command": "as.views.projects.services.undeploy",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.services.expose",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.services.unexpose",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.details.projects",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.details.services",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.details.credentials",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.details.members",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.details.invites",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.invites.inviteuser",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.projects.invites.deleteinvite",
+					"when": "view == as.views.projects"
+				},
+				{
+					"command": "as.views.tools.info",
+					"when": "view == as.views.tools"
+				},
+				{
+					"command": "as.views.status.info",
+					"when": "view == as.views.status"
+				},
+				{
+					"command": "as.views.credentials.details.tokens",
+					"when": "view == as.views.credentials"
+				},
+				{
+					"command": "as.views.credentials.revoke",
+					"when": "view == as.views.credentials"
+				},
+				{
+					"command": "as.views.projects.openbrowser",
+					"when": "view == as.views.projects"
 				}
 			]
 		}
