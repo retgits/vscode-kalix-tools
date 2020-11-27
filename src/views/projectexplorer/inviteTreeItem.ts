@@ -1,7 +1,7 @@
 'use strict';
 
 import * as sls from '../../akkasls';
-import * as base from './baseTreeItem';
+import * as base from './projectBaseTreeItem';
 import * as invite from '../../datatypes/roles/invitations/invite';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';

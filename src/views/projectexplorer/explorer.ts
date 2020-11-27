@@ -1,11 +1,12 @@
 'use strict';
 
 import * as sls from '../../akkasls';
-import * as base from './baseTreeItem';
+import * as base from './projectBaseTreeItem';
 import * as invite from './inviteTreeItem';
 import * as member from './memberTreeItem';
 import * as service from './serviceTreeItem';
 import * as project from './projectTreeItem';
+import * as docker from './dockerTreeItem';
 import * as vscode from 'vscode';
 
 export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
@@ -36,6 +37,8 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
                     return Promise.resolve(member.getMemberTreeItems(element.parentProjectID, this.akkaServerless));
                 case invite.ITEM_TYPE:
                     return Promise.resolve(invite.getInviteTreeItems(element.parentProjectID, this.akkaServerless));
+                case docker.ITEM_TYPE:
+                    return Promise.resolve(docker.getDockerTreeItems(element.parentProjectID, this.akkaServerless));
                 default:
                     break;
             }
@@ -49,6 +52,7 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
     getDefaultProjectItems(parentProjectID: string): Promise<base.TreeItem[]> {
         let defaultTreeItems: base.TreeItem[] = [];
         defaultTreeItems.push(service.getDefaultServiceTreeItem(parentProjectID));
+        defaultTreeItems.push(docker.getDefaultDockerTreeItem(parentProjectID));
         defaultTreeItems.push(member.getDefaultMemberTreeItem(parentProjectID));
         defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
         return Promise.resolve(defaultTreeItems);
@@ -56,6 +60,16 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
 
     async deployService(item: base.TreeItem) {
         this.akkaServerless.deployService(item.parentProjectID, this);
+    }
+
+    async addDockerCredentials(item: base.TreeItem) {
+        this.akkaServerless.addDockerCredentials(item.parentProjectID, this);
+    }
+
+    async deleteDockerCredentials(item: docker.DockerTreeItem) {
+        if (item.label !== docker.ITEM_TYPE) {
+            this.akkaServerless.deleteDockerCredentials(item.parentProjectID, item.label, this);
+        }
     }
 
     async undeployService(item: service.ServiceTreeItem) {

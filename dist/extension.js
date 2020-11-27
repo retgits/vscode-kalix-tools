@@ -108,6 +108,7 @@ const logger_1 = __webpack_require__(2);
 const projects = __webpack_require__(3);
 const status = __webpack_require__(110);
 const tools = __webpack_require__(154);
+const credentials = __webpack_require__(161);
 const AkkaServerless = __webpack_require__(4);
 function activate(context) {
     const akkasls = new AkkaServerless.AkkaServerless();
@@ -115,6 +116,8 @@ function activate(context) {
     const projectExplorer = new projects.ProjectExplorer(akkasls);
     vscode.window.registerTreeDataProvider('as.views.projects', projectExplorer);
     vscode.commands.registerCommand('as.views.projects.refresh', () => projectExplorer.refresh());
+    vscode.commands.registerCommand('as.views.projects.credentials.add', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.addDockerCredentials(item); }));
+    vscode.commands.registerCommand('as.views.projects.credentials.delete', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteDockerCredentials(item); }));
     vscode.commands.registerCommand('as.views.projects.services.deploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deployService(item); }));
     vscode.commands.registerCommand('as.views.projects.services.undeploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.undeployService(item); }));
     vscode.commands.registerCommand('as.views.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.exposeService(item); }));
@@ -127,6 +130,7 @@ function activate(context) {
     vscode.commands.registerCommand('as.views.projects.details.services', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
     vscode.commands.registerCommand('as.views.projects.details.members', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
     vscode.commands.registerCommand('as.views.projects.details.invites', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode.commands.registerCommand('as.views.projects.details.credentials', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
     // Tools tree
     const toolsExplorer = new tools.TreeDataProvider();
     vscode.window.registerTreeDataProvider('as.views.tools', toolsExplorer);
@@ -138,7 +142,15 @@ function activate(context) {
     vscode.commands.registerCommand('as.views.status.refresh', () => statusExplorer.refresh());
     vscode.commands.registerCommand('as.views.status.info', () => statusExplorer.openTreeItemInBrowser());
     context.subscriptions.push(vscode.commands.registerCommand('as.views.status.view', () => __awaiter(this, void 0, void 0, function* () { statusExplorer.openTreeItemInBrowser(); })));
+    // Credentials Tree
+    const credentialsExplorer = new credentials.CredentialsExplorer(akkasls);
+    vscode.window.registerTreeDataProvider('as.views.credentials', credentialsExplorer);
+    vscode.commands.registerCommand('as.views.credentials.refresh', () => credentialsExplorer.refresh());
+    vscode.commands.registerCommand('as.views.credentials.revoke', (item) => credentialsExplorer.revokeCredential(item));
+    vscode.commands.registerCommand('as.views.credentials.details.tokens', (item) => __awaiter(this, void 0, void 0, function* () { return credentialsExplorer.printTreeItemDetails(item); }));
     // Menu Items
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.credentials.add', () => __awaiter(this, void 0, void 0, function* () { akkasls.addDockerCredentials(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.credentials.delete', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteDockerCredentials(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.login', () => __awaiter(this, void 0, void 0, function* () { akkasls.login(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.logout', () => __awaiter(this, void 0, void 0, function* () { akkasls.logout(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.deploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.deployService(); })));
@@ -216,6 +228,7 @@ const invite = __webpack_require__(83);
 const member = __webpack_require__(107);
 const service = __webpack_require__(108);
 const project = __webpack_require__(109);
+const docker = __webpack_require__(164);
 const vscode = __webpack_require__(1);
 class ProjectExplorer {
     constructor(akkaServerless) {
@@ -240,6 +253,8 @@ class ProjectExplorer {
                     return Promise.resolve(member.getMemberTreeItems(element.parentProjectID, this.akkaServerless));
                 case invite.ITEM_TYPE:
                     return Promise.resolve(invite.getInviteTreeItems(element.parentProjectID, this.akkaServerless));
+                case docker.ITEM_TYPE:
+                    return Promise.resolve(docker.getDockerTreeItems(element.parentProjectID, this.akkaServerless));
                 default:
                     break;
             }
@@ -251,6 +266,7 @@ class ProjectExplorer {
     getDefaultProjectItems(parentProjectID) {
         let defaultTreeItems = [];
         defaultTreeItems.push(service.getDefaultServiceTreeItem(parentProjectID));
+        defaultTreeItems.push(docker.getDefaultDockerTreeItem(parentProjectID));
         defaultTreeItems.push(member.getDefaultMemberTreeItem(parentProjectID));
         defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
         return Promise.resolve(defaultTreeItems);
@@ -258,6 +274,18 @@ class ProjectExplorer {
     deployService(item) {
         return __awaiter(this, void 0, void 0, function* () {
             this.akkaServerless.deployService(item.parentProjectID, this);
+        });
+    }
+    addDockerCredentials(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.addDockerCredentials(item.parentProjectID, this);
+        });
+    }
+    deleteDockerCredentials(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== docker.ITEM_TYPE) {
+                this.akkaServerless.deleteDockerCredentials(item.parentProjectID, item.label, this);
+            }
         });
     }
     undeployService(item) {
@@ -354,8 +382,12 @@ const listProjects = __webpack_require__(5);
 const listMembers = __webpack_require__(68);
 const listInvites = __webpack_require__(70);
 const listServices = __webpack_require__(72);
+const listTokens = __webpack_require__(84);
+const listCredentials = __webpack_require__(159);
 const authLogin = __webpack_require__(74);
 const authLogout = __webpack_require__(75);
+const addDockerCredentials = __webpack_require__(165);
+const deleteDockerCredentials = __webpack_require__(166);
 const deployService = __webpack_require__(76);
 const undeployService = __webpack_require__(77);
 const exposeService = __webpack_require__(78);
@@ -363,6 +395,7 @@ const unexposeService = __webpack_require__(79);
 const inviteUser = __webpack_require__(80);
 const deleteInvite = __webpack_require__(81);
 const createProject = __webpack_require__(82);
+const revokeToken = __webpack_require__(167);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
     constructor() {
@@ -370,6 +403,7 @@ class AkkaServerless {
         this.members = new Map();
         this.invites = new Map();
         this.services = new Map();
+        this.credentials = new Map();
     }
     getProjects() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -517,6 +551,58 @@ class AkkaServerless {
     logout() {
         return __awaiter(this, void 0, void 0, function* () {
             authLogout.run();
+        });
+    }
+    getTokens() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return listTokens.run();
+        });
+    }
+    revokeToken(tokenID, ce) {
+        return __awaiter(this, void 0, void 0, function* () {
+            revokeToken.run(tokenID).then(() => {
+                if (tokenID) {
+                    ce === null || ce === void 0 ? void 0 : ce.refresh();
+                }
+            });
+        });
+    }
+    refreshDockerCredentials(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let creds = yield listCredentials.run(projectID);
+            this.credentials.set(projectID, creds);
+            return creds;
+        });
+    }
+    getDockerCredentials(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.credentials.has(projectID)) {
+                return this.credentials.get(projectID);
+            }
+            let creds = yield this.refreshDockerCredentials(projectID);
+            return creds;
+        });
+    }
+    addDockerCredentials(projectID, pe) {
+        return __awaiter(this, void 0, void 0, function* () {
+            addDockerCredentials.run(projectID).then(() => {
+                if (projectID) {
+                    this.refreshDockerCredentials(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
+        });
+    }
+    deleteDockerCredentials(projectID, credentialID, pe) {
+        return __awaiter(this, void 0, void 0, function* () {
+            deleteDockerCredentials.run(projectID, credentialID).then(() => {
+                if (projectID) {
+                    this.refreshDockerCredentials(projectID).then(() => {
+                        pe === null || pe === void 0 ? void 0 : pe.refresh();
+                    });
+                }
+            });
         });
     }
 }
@@ -8528,7 +8614,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultInviteTreeItem = exports.getInviteTreeItems = exports.InviteTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(84);
+const base = __webpack_require__(157);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
 const table = __webpack_require__(85);
@@ -8597,18 +8683,27 @@ exports.getDefaultInviteTreeItem = getDefaultInviteTreeItem;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TreeItem = void 0;
-const vscode = __webpack_require__(1);
-class TreeItem extends vscode.TreeItem {
-    constructor(label, collapsibleState, type, parentProjectID) {
-        super(label, collapsibleState);
-        this.type = type;
-        this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';
-    }
-    printDetails() { }
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+const tokenlist = __webpack_require__(158);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`auth tokens list -o json`);
+        let result = yield command.runCommand();
+        return tokenlist.Convert.toTokenList(result.stdout);
+    });
 }
-exports.TreeItem = TreeItem;
+exports.run = run;
 
 
 /***/ }),
@@ -10650,7 +10745,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultMemberTreeItem = exports.getMemberTreeItems = exports.MemberTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(84);
+const base = __webpack_require__(157);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
 const table = __webpack_require__(85);
@@ -10732,7 +10827,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultServiceTreeItem = exports.getServiceTreeItems = exports.ServiceTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(84);
+const base = __webpack_require__(157);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
 const table = __webpack_require__(85);
@@ -10814,7 +10909,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProjectTreeItems = exports.ProjectTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(84);
+const base = __webpack_require__(157);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
 const table = __webpack_require__(85);
@@ -14795,6 +14890,424 @@ class Convert {
     }
 }
 exports.Convert = Convert;
+
+
+/***/ }),
+/* 157 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TreeItem = void 0;
+const vscode = __webpack_require__(1);
+class TreeItem extends vscode.TreeItem {
+    constructor(label, collapsibleState, type, parentProjectID) {
+        super(label, collapsibleState);
+        this.type = type;
+        this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';
+    }
+    printDetails() { }
+}
+exports.TreeItem = TreeItem;
+
+
+/***/ }),
+/* 158 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Convert = void 0;
+// Converts JSON strings to/from your types
+class Convert {
+    static toTokenList(json) {
+        return JSON.parse(json);
+    }
+    static tokenListToJson(value) {
+        return JSON.stringify(value);
+    }
+}
+exports.Convert = Convert;
+
+
+/***/ }),
+/* 159 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+const credentials = __webpack_require__(160);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`docker list-credentials --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return credentials.Convert.toListCredentials(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 160 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Convert = void 0;
+// Converts JSON strings to/from your types
+class Convert {
+    static toListCredentials(json) {
+        return JSON.parse(json);
+    }
+    static listCredentialsToJson(value) {
+        return JSON.stringify(value);
+    }
+}
+exports.Convert = Convert;
+
+
+/***/ }),
+/* 161 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CredentialsExplorer = void 0;
+const token = __webpack_require__(162);
+const vscode = __webpack_require__(1);
+class CredentialsExplorer {
+    constructor(akkaServerless) {
+        this._onDidChangeTreeData = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+        this.akkaServerless = akkaServerless;
+    }
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+    getTreeItem(element) {
+        return element;
+    }
+    getChildren(element) {
+        if (element) {
+            switch (element.type) {
+                case token.ITEM_TYPE:
+                    return Promise.resolve(token.getTokenTreeItems(this.akkaServerless));
+                default:
+                    break;
+            }
+            return Promise.resolve([]);
+        }
+        // if there is no element present, get all projects and populate a new tree
+        return Promise.resolve(this.getDefaultCredentialItems());
+    }
+    getDefaultCredentialItems() {
+        let defaultTreeItems = [];
+        defaultTreeItems.push(token.getDefaultTokenTreeItem());
+        return Promise.resolve(defaultTreeItems);
+    }
+    printTreeItemDetails(base) {
+        return __awaiter(this, void 0, void 0, function* () {
+            base.printDetails();
+        });
+    }
+    revokeCredential(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.revokeToken(token.id, this);
+        });
+    }
+}
+exports.CredentialsExplorer = CredentialsExplorer;
+
+
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDefaultTokenTreeItem = exports.getTokenTreeItems = exports.TokenTreeItem = exports.ITEM_TYPE = void 0;
+const base = __webpack_require__(163);
+const vscode = __webpack_require__(1);
+const logger_1 = __webpack_require__(2);
+const table = __webpack_require__(85);
+exports.ITEM_TYPE = 'Tokens';
+class TokenTreeItem extends base.TreeItem {
+    constructor(label, token, collapsibleState) {
+        super(label, collapsibleState, exports.ITEM_TYPE);
+        this.label = label;
+        this.token = token;
+        this.collapsibleState = collapsibleState;
+        this.tokenElements = [];
+        this.description = this.token.description;
+        this.id = this.getName();
+        this.iconPath = this.getIcon();
+        this.contextValue = exports.ITEM_TYPE;
+        this.tokenElements = this.token.name.split('/');
+    }
+    getName() {
+        return this.tokenElements[this.tokenElements.length - 1];
+    }
+    getType() {
+        return this.tokenElements[this.tokenElements.length - 2];
+    }
+    getIcon() {
+        return new vscode.ThemeIcon('link');
+    }
+    printDetails() {
+        if (this.label !== exports.ITEM_TYPE) {
+            let printTable = new table({});
+            printTable.push(['Name', this.getName()]);
+            printTable.push(['Description', this.token.description]);
+            printTable.push(['Created on', new Date(this.token.created_time.seconds * 1000).toLocaleDateString()]);
+            printTable.push(['Type', this.getType()]);
+            logger_1.aslogger.log(printTable.toString());
+        }
+    }
+}
+exports.TokenTreeItem = TokenTreeItem;
+function getTokenTreeItems(akkasls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let items = [];
+        let tokenList = yield akkasls.getTokens();
+        for (let token of tokenList) {
+            let nameElements = token.name.split('/');
+            items.push(new TokenTreeItem(nameElements[nameElements.length - 1], token, vscode.TreeItemCollapsibleState.None));
+        }
+        return items;
+    });
+}
+exports.getTokenTreeItems = getTokenTreeItems;
+function getDefaultTokenTreeItem() {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return new TokenTreeItem(exports.ITEM_TYPE, { name: exports.ITEM_TYPE, description: '', created_time: { seconds: 1 }, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
+}
+exports.getDefaultTokenTreeItem = getDefaultTokenTreeItem;
+
+
+/***/ }),
+/* 163 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TreeItem = void 0;
+const vscode = __webpack_require__(1);
+class TreeItem extends vscode.TreeItem {
+    constructor(label, collapsibleState, type) {
+        super(label, collapsibleState);
+        this.type = type;
+    }
+    printDetails() { }
+}
+exports.TreeItem = TreeItem;
+
+
+/***/ }),
+/* 164 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDefaultDockerTreeItem = exports.getDockerTreeItems = exports.DockerTreeItem = exports.ITEM_TYPE = void 0;
+const base = __webpack_require__(157);
+const vscode = __webpack_require__(1);
+const logger_1 = __webpack_require__(2);
+const table = __webpack_require__(85);
+exports.ITEM_TYPE = 'Credentials';
+class DockerTreeItem extends base.TreeItem {
+    constructor(label, parentProjectID, credential, collapsibleState) {
+        super(label, collapsibleState, exports.ITEM_TYPE);
+        this.label = label;
+        this.parentProjectID = parentProjectID;
+        this.credential = credential;
+        this.collapsibleState = collapsibleState;
+        this.description = this.credential.server;
+        this.id = this.getName();
+        this.iconPath = this.getIcon();
+        this.contextValue = exports.ITEM_TYPE;
+    }
+    getName() {
+        let elems = this.credential.name.split('/');
+        return elems[elems.length - 1];
+    }
+    getIcon() {
+        return new vscode.ThemeIcon('lock');
+    }
+    printDetails() {
+        if (this.label !== exports.ITEM_TYPE) {
+            let printTable = new table({});
+            printTable.push(['Name', this.getName()]);
+            printTable.push(['Server', this.credential.server]);
+            printTable.push(['Username', this.credential.username]);
+            logger_1.aslogger.log(printTable.toString());
+        }
+    }
+}
+exports.DockerTreeItem = DockerTreeItem;
+function getDockerTreeItems(parentProjectID, akkasls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let items = [];
+        let credentialList = yield akkasls.getDockerCredentials(parentProjectID);
+        for (let credential of credentialList) {
+            items.push(new DockerTreeItem(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
+        }
+        return items;
+    });
+}
+exports.getDockerTreeItems = getDockerTreeItems;
+function getDefaultDockerTreeItem(parentProjectID) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return new DockerTreeItem(exports.ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${exports.ITEM_TYPE}`, server: '', username: '' }, vscode.TreeItemCollapsibleState.Collapsed);
+}
+exports.getDefaultDockerTreeItem = getDefaultDockerTreeItem;
+
+
+/***/ }),
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('docker add-credentials');
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        command.addArgument({ name: 'Credentials', description: 'Credentials string', defaultValue: '--docker-email <> --docker-password <> --docker-server <> --docker-username <>' });
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 166 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, credentialID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('docker delete-credentials');
+        if (projectID && credentialID) {
+            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true, defaultValue: projectID, show: false });
+            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true, defaultValue: credentialID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project remove the credential from', required: true });
+            command.addFlag({ name: 'credential', description: 'ID of the credential to remove', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 167 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(tokenID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('auth token revoke');
+        if (tokenID) {
+            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true, defaultValue: tokenID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'token', description: 'ID of the token to revoke', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
 
 
 /***/ })

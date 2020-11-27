@@ -46,6 +46,9 @@
 		"onView:as.views.projects",
 		"onView:as.views.tools",
 		"onView:as.views.status",
+		"onView:as.views.credentials",
+		"onCommand:as.commandpalette.credentials.add",
+		"onCommand:as.commandpalette.credentials.delete",
 		"onCommand:as.commandpalette.auth.login",
 		"onCommand:as.commandpalette.auth.logout",
 		"onCommand:as.commandpalette.deploy",
@@ -86,6 +89,10 @@
 					"name": "Projects"
 				},
 				{
+					"id": "as.views.credentials",
+					"name": "Credentials"
+				},
+				{
 					"id": "as.views.status",
 					"name": "Status"
 				},
@@ -121,6 +128,14 @@
 				}
 			},
 			{
+				"command": "as.views.credentials.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
 				"command": "as.commandpalette.deploy",
 				"title": "Deploy a service to Akka Serverless",
 				"category": "Akka Serverless"
@@ -139,6 +154,14 @@
 				"command": "as.commandpalette.unexpose",
 				"title": "Removes a service route from a service",
 				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.views.projects.credentials.add",
+				"title": "Add credentials"
+			},
+			{
+				"command": "as.views.projects.credentials.delete",
+				"title": "Delete credentials"
 			},
 			{
 				"command": "as.views.projects.services.deploy",
@@ -173,6 +196,10 @@
 				"title": "View member details"
 			},
 			{
+				"command": "as.views.projects.details.credentials",
+				"title": "View credential details"
+			},
+			{
 				"command": "as.views.projects.details.invites",
 				"title": "View invite details"
 			},
@@ -183,6 +210,14 @@
 			{
 				"command": "as.views.projects.invites.deleteinvite",
 				"title": "Delete invitation for user"
+			},
+			{
+				"command": "as.views.credentials.details.tokens",
+				"title": "View token details"
+			},
+			{
+				"command": "as.views.credentials.revoke",
+				"title": "Revoke token"
 			},
 			{
 				"command": "as.views.projects.new",
@@ -218,6 +253,16 @@
 				"category": "Akka Serverless"
 			},
 			{
+				"command": "as.commandpalette.credentials.add",
+				"title": "Add Docker credentials to an Akka Serverless project",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.credentials.delete",
+				"title": "Delete Docker credentials from an Akka Serverless project",
+				"category": "Akka Serverless"
+			},
+			{
 				"command": "as.commandpalette.auth.logout",
 				"title": "Logout from Akka Serverless",
 				"category": "Akka Serverless"
@@ -244,9 +289,24 @@
 					"command": "as.views.tools.refresh",
 					"when": "view == as.views.tools",
 					"group": "navigation"
+				},
+				{
+					"command": "as.views.credentials.refresh",
+					"when": "view == as.views.credentials",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
+				{
+					"command": "as.views.projects.credentials.add",
+					"when": "view == as.views.projects && viewItem == Credentials",
+					"group": "0"
+				},
+				{
+					"command": "as.views.projects.credentials.delete",
+					"when": "view == as.views.projects && viewItem == Credentials",
+					"group": "0"
+				},
 				{
 					"command": "as.views.projects.services.deploy",
 					"when": "view == as.views.projects && viewItem == Services",
@@ -278,6 +338,11 @@
 					"group": "1"
 				},
 				{
+					"command": "as.views.projects.details.credentials",
+					"when": "view == as.views.projects && viewItem == Credentials",
+					"group": "1"
+				},
+				{
 					"command": "as.views.projects.details.members",
 					"when": "view == as.views.projects && viewItem == Members",
 					"group": "1"
@@ -304,6 +369,16 @@
 				{
 					"command": "as.views.status.info",
 					"when": "view == as.views.status"
+				},
+				{
+					"command": "as.views.credentials.details.tokens",
+					"when": "view == as.views.credentials && viewItem == Tokens",
+					"group": "0"
+				},
+				{
+					"command": "as.views.credentials.revoke",
+					"when": "view == as.views.credentials && viewItem == Tokens",
+					"group": "0"
 				},
 				{
 					"command": "as.views.projects.openbrowser",
