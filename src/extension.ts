@@ -48,6 +48,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('as.views.status.view', async () => { statusExplorer.openTreeItemInBrowser(); }));
 
 	// Menu Items
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.login', async () => { akkasls.login(); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.logout', async () => { akkasls.logout(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.deploy', async () => { akkasls.deployService(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.undeploy', async () => { akkasls.undeployService(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', async () => { akkasls.exposeService(); }));

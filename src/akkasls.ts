@@ -11,6 +11,8 @@ import * as listMembers from './cliwrapper/roles/listbindings';
 import * as listInvites from './cliwrapper/roles/invitations/listinvites';
 import * as listServices from './cliwrapper/services/list';
 
+import * as authLogin from './cliwrapper/auth/login';
+import * as authLogout from './cliwrapper/auth/logout';
 import * as deployService from './cliwrapper/services/deploy';
 import * as undeployService from './cliwrapper/services/undeploy';
 import * as exposeService from './cliwrapper/services/expose';
@@ -105,5 +107,13 @@ export class AkkaServerless {
 
     async unexposeService(projectID?: string, serviceName?: string) {
         unexposeService.run(projectID, serviceName);
+    }
+
+    async login() {
+        authLogin.run();
+    }
+
+    async logout() {
+        authLogout.run();
     }
 }

@@ -43,7 +43,16 @@
 	},
 	"main": "./dist/extension.js",
 	"activationEvents": [
-		"onView:as.views.projects"
+		"onView:as.views.projects",
+		"onView:as.views.tools",
+		"onView:as.views.status",
+		"onCommand:as.commandpalette.auth.login",
+		"onCommand:as.commandpalette.auth.logout",
+		"onCommand:as.commandpalette.deploy",
+		"onCommand:as.commandpalette.undeploy",
+		"onCommand:as.commandpalette.expose",
+		"onCommand:as.commandpalette.unexpose",
+		"onCommand:as.commandpalette.invites.inviteuser"
 	],
 	"contributes": {
 		"configuration": {
@@ -192,6 +201,16 @@
 			{
 				"command": "as.commandpalette.invites.inviteuser",
 				"title": "Invite user to project",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.auth.login",
+				"title": "Login to Akka Serverless",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.auth.logout",
+				"title": "Logout from Akka Serverless",
 				"category": "Akka Serverless"
 			}
 		],

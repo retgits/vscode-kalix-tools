@@ -105,10 +105,10 @@ exports.deactivate = exports.activate = void 0;
 const vscode = __webpack_require__(1);
 // Internal dependencies
 const logger_1 = __webpack_require__(2);
-const projects = __webpack_require__(68);
-const status = __webpack_require__(107);
-const tools = __webpack_require__(151);
-const AkkaServerless = __webpack_require__(69);
+const projects = __webpack_require__(3);
+const status = __webpack_require__(109);
+const tools = __webpack_require__(153);
+const AkkaServerless = __webpack_require__(4);
 function activate(context) {
     const akkasls = new AkkaServerless.AkkaServerless();
     // Projects Tree
@@ -138,6 +138,8 @@ function activate(context) {
     vscode.commands.registerCommand('as.views.status.info', () => statusExplorer.openTreeItemInBrowser());
     context.subscriptions.push(vscode.commands.registerCommand('as.views.status.view', () => __awaiter(this, void 0, void 0, function* () { statusExplorer.openTreeItemInBrowser(); })));
     // Menu Items
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.login', () => __awaiter(this, void 0, void 0, function* () { akkasls.login(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.logout', () => __awaiter(this, void 0, void 0, function* () { akkasls.logout(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.deploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.deployService(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.undeploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.undeployService(); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', () => __awaiter(this, void 0, void 0, function* () { akkasls.exposeService(); })));
@@ -206,23 +208,128 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run(projectID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services deploy');
-        command.addArgument({ name: 'service', description: 'name of the service' });
-        command.addArgument({ name: 'image', description: 'container image url' });
-        if (projectID) {
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+exports.ProjectExplorer = void 0;
+const sls = __webpack_require__(4);
+const invite = __webpack_require__(82);
+const member = __webpack_require__(106);
+const service = __webpack_require__(107);
+const project = __webpack_require__(108);
+const vscode = __webpack_require__(1);
+class ProjectExplorer {
+    constructor(akkaServerless) {
+        this._onDidChangeTreeData = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+        this.akkaServerless = akkaServerless;
+    }
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+    getTreeItem(element) {
+        return element;
+    }
+    getChildren(element) {
+        if (element) {
+            switch (element.type) {
+                case project.ITEM_TYPE:
+                    return Promise.resolve(this.getDefaultProjectItems(element.id));
+                case service.ITEM_TYPE:
+                    return Promise.resolve(service.getServiceTreeItems(element.parentProjectID, this.akkaServerless));
+                case member.ITEM_TYPE:
+                    return Promise.resolve(member.getMemberTreeItems(element.parentProjectID, this.akkaServerless));
+                case invite.ITEM_TYPE:
+                    return Promise.resolve(invite.getInviteTreeItems(element.parentProjectID, this.akkaServerless));
+                default:
+                    break;
+            }
+            return Promise.resolve([]);
         }
-        else {
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        }
-        return command.runCommand();
-    });
+        // if there is no element present, get all projects and populate a new tree
+        return Promise.resolve(project.getProjectTreeItems(this.akkaServerless));
+    }
+    getDefaultProjectItems(parentProjectID) {
+        let defaultTreeItems = [];
+        defaultTreeItems.push(service.getDefaultServiceTreeItem(parentProjectID));
+        defaultTreeItems.push(member.getDefaultMemberTreeItem(parentProjectID));
+        defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
+        return Promise.resolve(defaultTreeItems);
+    }
+    deployService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.deployService(item.parentProjectID);
+            this.refresh();
+        });
+    }
+    undeployService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.undeployService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    exposeService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.exposeService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    unexposeService(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.label !== service.ITEM_TYPE) {
+                this.akkaServerless.unexposeService(item.parentProjectID, item.label);
+                this.refresh();
+            }
+        });
+    }
+    inviteUser(base) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.inviteUser(base.parentProjectID);
+            this.refresh();
+        });
+    }
+    newProject() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.akkaServerless.createNewProject();
+            this.refresh();
+        });
+    }
+    printTreeItemDetails(base) {
+        return __awaiter(this, void 0, void 0, function* () {
+            base.printDetails();
+        });
+    }
+    openTreeItemInBrowser(base) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = '';
+            switch (base.type) {
+                case project.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+                    break;
+                case service.ITEM_TYPE:
+                    if ((_a = base.id) === null || _a === void 0 ? void 0 : _a.includes('-Services')) {
+                        url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
+                    }
+                    else {
+                        url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+                    }
+                    break;
+                case member.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    break;
+                case invite.ITEM_TYPE:
+                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    break;
+                default:
+                    break;
+            }
+            vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+        });
+    }
 }
-exports.run = run;
+exports.ProjectExplorer = ProjectExplorer;
 
 
 /***/ }),
@@ -241,10 +348,183 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AkkaServerless = exports.CONSOLE_URL = void 0;
+const listProjects = __webpack_require__(5);
+const listMembers = __webpack_require__(68);
+const listInvites = __webpack_require__(70);
+const listServices = __webpack_require__(72);
+const authLogin = __webpack_require__(74);
+const authLogout = __webpack_require__(75);
+const deployService = __webpack_require__(76);
+const undeployService = __webpack_require__(77);
+const exposeService = __webpack_require__(78);
+const unexposeService = __webpack_require__(79);
+const inviteUser = __webpack_require__(80);
+const createProject = __webpack_require__(81);
+exports.CONSOLE_URL = "https://console.cloudstate.com/project";
+class AkkaServerless {
+    constructor() {
+        this.projects = [];
+        this.members = new Map();
+        this.invites = new Map();
+        this.services = new Map();
+    }
+    getProjects() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.projects.length === 0) {
+                this.projects = yield this.refreshProjects();
+            }
+            return this.projects;
+        });
+    }
+    refreshProjects() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let projects = yield listProjects.run();
+            this.projects = projects;
+            return projects;
+        });
+    }
+    createNewProject() {
+        return __awaiter(this, void 0, void 0, function* () {
+            createProject.run();
+        });
+    }
+    getMembers(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.members.has(projectID)) {
+                return this.members.get(projectID);
+            }
+            let members = yield this.refreshMembers(projectID);
+            return members;
+        });
+    }
+    refreshMembers(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let members = yield listMembers.run(projectID);
+            this.members.set(projectID, members);
+            return members;
+        });
+    }
+    getInvites(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.invites.has(projectID)) {
+                return this.invites.get(projectID);
+            }
+            let invites = yield this.refreshInvites(projectID);
+            return invites;
+        });
+    }
+    refreshInvites(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let invites = yield listInvites.run(projectID);
+            this.invites.set(projectID, invites);
+            return invites;
+        });
+    }
+    inviteUser(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            inviteUser.run(projectID);
+        });
+    }
+    getServices(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.services.has(projectID)) {
+                return this.services.get(projectID);
+            }
+            let services = yield this.refreshServices(projectID);
+            return services;
+        });
+    }
+    refreshServices(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let services = yield listServices.run(projectID);
+            this.services.set(projectID, services);
+            return services;
+        });
+    }
+    deployService(projectID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            deployService.run(projectID);
+        });
+    }
+    undeployService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            undeployService.run(projectID, serviceName);
+        });
+    }
+    exposeService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            exposeService.run(projectID, serviceName);
+        });
+    }
+    unexposeService(projectID, serviceName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            unexposeService.run(projectID, serviceName);
+        });
+    }
+    login() {
+        return __awaiter(this, void 0, void 0, function* () {
+            authLogin.run();
+        });
+    }
+    logout() {
+        return __awaiter(this, void 0, void 0, function* () {
+            authLogout.run();
+        });
+    }
+}
+exports.AkkaServerless = AkkaServerless;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+const project = __webpack_require__(67);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('projects list -o json');
+        let result = yield command.runCommand();
+        return project.Convert.toProjectArray(result.stdout);
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Command = void 0;
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const shell = __webpack_require__(5);
+const shell = __webpack_require__(7);
 class Command {
     constructor(cmd, args, flags) {
         this.cmd = cmd;
@@ -332,7 +612,7 @@ exports.Command = Command;
 
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -343,9 +623,9 @@ exports.shell = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __webpack_require__(1);
 // Standard node imports
-const URL = __webpack_require__(6);
+const URL = __webpack_require__(8);
 // External dependencies
-const shelljs = __webpack_require__(7);
+const shelljs = __webpack_require__(9);
 // Set the execPath specifically to node due to a bug in shelljs
 // https://github.com/shelljs/shelljs/issues/704
 shelljs.config.execPath = shelljs.which('node').toString();
@@ -391,13 +671,13 @@ function exec(cmd, cwd) {
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //
@@ -408,7 +688,7 @@ module.exports = require("url");
 // http://github.com/shelljs/shelljs
 //
 
-var common = __webpack_require__(8);
+var common = __webpack_require__(10);
 
 //@
 //@ All commands run synchronously, unless otherwise stated.
@@ -423,8 +703,8 @@ var common = __webpack_require__(8);
 //@commands
 
 // Load all default commands
-__webpack_require__(30).forEach(function (command) {
-  __webpack_require__(31)("./" + command);
+__webpack_require__(32).forEach(function (command) {
+  __webpack_require__(33)("./" + command);
 });
 
 //@
@@ -434,7 +714,7 @@ __webpack_require__(30).forEach(function (command) {
 exports.exit = process.exit;
 
 //@include ./src/error
-exports.error = __webpack_require__(38);
+exports.error = __webpack_require__(40);
 
 //@include ./src/common
 exports.ShellString = common.ShellString;
@@ -559,7 +839,7 @@ exports.config = common.config;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -567,10 +847,10 @@ exports.config = common.config;
 /* eslint no-new-wrappers: 0 */
 
 
-var os = __webpack_require__(9);
-var fs = __webpack_require__(10);
-var glob = __webpack_require__(11);
-var shell = __webpack_require__(7);
+var os = __webpack_require__(11);
+var fs = __webpack_require__(12);
+var glob = __webpack_require__(13);
+var shell = __webpack_require__(9);
 
 var shellMethods = Object.create(shell);
 
@@ -1034,19 +1314,19 @@ exports.register = _register;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = require("os");
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Approach:
@@ -1091,27 +1371,27 @@ module.exports = require("fs");
 
 module.exports = glob
 
-var fs = __webpack_require__(10)
-var rp = __webpack_require__(12)
-var minimatch = __webpack_require__(15)
+var fs = __webpack_require__(12)
+var rp = __webpack_require__(14)
+var minimatch = __webpack_require__(17)
 var Minimatch = minimatch.Minimatch
-var inherits = __webpack_require__(19)
-var EE = __webpack_require__(22).EventEmitter
-var path = __webpack_require__(14)
-var assert = __webpack_require__(23)
-var isAbsolute = __webpack_require__(24)
-var globSync = __webpack_require__(25)
-var common = __webpack_require__(26)
+var inherits = __webpack_require__(21)
+var EE = __webpack_require__(24).EventEmitter
+var path = __webpack_require__(16)
+var assert = __webpack_require__(25)
+var isAbsolute = __webpack_require__(26)
+var globSync = __webpack_require__(27)
+var common = __webpack_require__(28)
 var alphasort = common.alphasort
 var alphasorti = common.alphasorti
 var setopts = common.setopts
 var ownProp = common.ownProp
-var inflight = __webpack_require__(27)
-var util = __webpack_require__(20)
+var inflight = __webpack_require__(29)
+var util = __webpack_require__(22)
 var childrenIgnored = common.childrenIgnored
 var isIgnored = common.isIgnored
 
-var once = __webpack_require__(29)
+var once = __webpack_require__(31)
 
 function glob (pattern, options, cb) {
   if (typeof options === 'function') cb = options, options = {}
@@ -1842,7 +2122,7 @@ Glob.prototype._stat2 = function (f, abs, er, stat, cb) {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = realpath
@@ -1852,13 +2132,13 @@ realpath.realpathSync = realpathSync
 realpath.monkeypatch = monkeypatch
 realpath.unmonkeypatch = unmonkeypatch
 
-var fs = __webpack_require__(10)
+var fs = __webpack_require__(12)
 var origRealpath = fs.realpath
 var origRealpathSync = fs.realpathSync
 
 var version = process.version
 var ok = /^v[0-5]\./.test(version)
-var old = __webpack_require__(13)
+var old = __webpack_require__(15)
 
 function newError (er) {
   return er && er.syscall === 'realpath' && (
@@ -1914,7 +2194,7 @@ function unmonkeypatch () {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -1938,9 +2218,9 @@ function unmonkeypatch () {
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var pathModule = __webpack_require__(14);
+var pathModule = __webpack_require__(16);
 var isWindows = process.platform === 'win32';
-var fs = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 // JavaScript implementation of realpath, ported from node pre-v6
 
@@ -2223,13 +2503,13 @@ exports.realpath = function realpath(p, cache, cb) {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = require("path");
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = minimatch
@@ -2237,11 +2517,11 @@ minimatch.Minimatch = Minimatch
 
 var path = { sep: '/' }
 try {
-  path = __webpack_require__(14)
+  path = __webpack_require__(16)
 } catch (er) {}
 
 var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
-var expand = __webpack_require__(16)
+var expand = __webpack_require__(18)
 
 var plTypes = {
   '!': { open: '(?:(?!(?:', close: '))[^/]*?)'},
@@ -3158,11 +3438,11 @@ function regExpEscape (s) {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var concatMap = __webpack_require__(17);
-var balanced = __webpack_require__(18);
+var concatMap = __webpack_require__(19);
+var balanced = __webpack_require__(20);
 
 module.exports = expandTop;
 
@@ -3365,7 +3645,7 @@ function expand(str, isTop) {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = function (xs, fn) {
@@ -3384,7 +3664,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3450,28 +3730,28 @@ function range(a, b, str) {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 try {
-  var util = __webpack_require__(20);
+  var util = __webpack_require__(22);
   /* istanbul ignore next */
   if (typeof util.inherits !== 'function') throw '';
   module.exports = util.inherits;
 } catch (e) {
   /* istanbul ignore next */
-  module.exports = __webpack_require__(21);
+  module.exports = __webpack_require__(23);
 }
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = require("util");
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -3504,19 +3784,19 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = require("assert");
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3543,22 +3823,22 @@ module.exports.win32 = win32;
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = globSync
 globSync.GlobSync = GlobSync
 
-var fs = __webpack_require__(10)
-var rp = __webpack_require__(12)
-var minimatch = __webpack_require__(15)
+var fs = __webpack_require__(12)
+var rp = __webpack_require__(14)
+var minimatch = __webpack_require__(17)
 var Minimatch = minimatch.Minimatch
-var Glob = __webpack_require__(11).Glob
-var util = __webpack_require__(20)
-var path = __webpack_require__(14)
-var assert = __webpack_require__(23)
-var isAbsolute = __webpack_require__(24)
-var common = __webpack_require__(26)
+var Glob = __webpack_require__(13).Glob
+var util = __webpack_require__(22)
+var path = __webpack_require__(16)
+var assert = __webpack_require__(25)
+var isAbsolute = __webpack_require__(26)
+var common = __webpack_require__(28)
 var alphasort = common.alphasort
 var alphasorti = common.alphasorti
 var setopts = common.setopts
@@ -4035,7 +4315,7 @@ GlobSync.prototype._makeAbs = function (f) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports.alphasort = alphasort
@@ -4052,9 +4332,9 @@ function ownProp (obj, field) {
   return Object.prototype.hasOwnProperty.call(obj, field)
 }
 
-var path = __webpack_require__(14)
-var minimatch = __webpack_require__(15)
-var isAbsolute = __webpack_require__(24)
+var path = __webpack_require__(16)
+var minimatch = __webpack_require__(17)
+var isAbsolute = __webpack_require__(26)
 var Minimatch = minimatch.Minimatch
 
 function alphasorti (a, b) {
@@ -4281,12 +4561,12 @@ function childrenIgnored (self, path) {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var wrappy = __webpack_require__(28)
+var wrappy = __webpack_require__(30)
 var reqs = Object.create(null)
-var once = __webpack_require__(29)
+var once = __webpack_require__(31)
 
 module.exports = wrappy(inflight)
 
@@ -4341,7 +4621,7 @@ function slice (args) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports) {
 
 // Returns a wrapper function that returns a wrapped callback
@@ -4380,10 +4660,10 @@ function wrappy (fn, cb) {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var wrappy = __webpack_require__(28)
+var wrappy = __webpack_require__(30)
 module.exports = wrappy(once)
 module.exports.strict = wrappy(onceStrict)
 
@@ -4428,7 +4708,7 @@ function onceStrict (fn) {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = [
@@ -4463,74 +4743,74 @@ module.exports = [
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./cat": 32,
-	"./cat.js": 32,
-	"./cd": 33,
-	"./cd.js": 33,
-	"./chmod": 34,
-	"./chmod.js": 34,
-	"./common": 8,
-	"./common.js": 8,
-	"./cp": 35,
-	"./cp.js": 35,
-	"./dirs": 36,
-	"./dirs.js": 36,
-	"./echo": 37,
-	"./echo.js": 37,
-	"./error": 38,
-	"./error.js": 38,
-	"./exec": 39,
-	"./exec-child": 43,
-	"./exec-child.js": 43,
-	"./exec.js": 39,
-	"./find": 45,
-	"./find.js": 45,
-	"./grep": 47,
-	"./grep.js": 47,
-	"./head": 48,
-	"./head.js": 48,
-	"./ln": 49,
-	"./ln.js": 49,
-	"./ls": 46,
-	"./ls.js": 46,
-	"./mkdir": 50,
-	"./mkdir.js": 50,
-	"./mv": 51,
-	"./mv.js": 51,
-	"./popd": 53,
-	"./popd.js": 53,
-	"./pushd": 54,
-	"./pushd.js": 54,
-	"./pwd": 41,
-	"./pwd.js": 41,
-	"./rm": 52,
-	"./rm.js": 52,
-	"./sed": 55,
-	"./sed.js": 55,
-	"./set": 56,
-	"./set.js": 56,
-	"./sort": 57,
-	"./sort.js": 57,
-	"./tail": 58,
-	"./tail.js": 58,
-	"./tempdir": 40,
-	"./tempdir.js": 40,
-	"./test": 59,
-	"./test.js": 59,
-	"./to": 60,
-	"./to.js": 60,
-	"./toEnd": 61,
-	"./toEnd.js": 61,
-	"./touch": 62,
-	"./touch.js": 62,
-	"./uniq": 63,
-	"./uniq.js": 63,
-	"./which": 64,
-	"./which.js": 64
+	"./cat": 34,
+	"./cat.js": 34,
+	"./cd": 35,
+	"./cd.js": 35,
+	"./chmod": 36,
+	"./chmod.js": 36,
+	"./common": 10,
+	"./common.js": 10,
+	"./cp": 37,
+	"./cp.js": 37,
+	"./dirs": 38,
+	"./dirs.js": 38,
+	"./echo": 39,
+	"./echo.js": 39,
+	"./error": 40,
+	"./error.js": 40,
+	"./exec": 41,
+	"./exec-child": 45,
+	"./exec-child.js": 45,
+	"./exec.js": 41,
+	"./find": 47,
+	"./find.js": 47,
+	"./grep": 49,
+	"./grep.js": 49,
+	"./head": 50,
+	"./head.js": 50,
+	"./ln": 51,
+	"./ln.js": 51,
+	"./ls": 48,
+	"./ls.js": 48,
+	"./mkdir": 52,
+	"./mkdir.js": 52,
+	"./mv": 53,
+	"./mv.js": 53,
+	"./popd": 55,
+	"./popd.js": 55,
+	"./pushd": 56,
+	"./pushd.js": 56,
+	"./pwd": 43,
+	"./pwd.js": 43,
+	"./rm": 54,
+	"./rm.js": 54,
+	"./sed": 57,
+	"./sed.js": 57,
+	"./set": 58,
+	"./set.js": 58,
+	"./sort": 59,
+	"./sort.js": 59,
+	"./tail": 60,
+	"./tail.js": 60,
+	"./tempdir": 42,
+	"./tempdir.js": 42,
+	"./test": 61,
+	"./test.js": 61,
+	"./to": 62,
+	"./to.js": 62,
+	"./toEnd": 63,
+	"./toEnd.js": 63,
+	"./touch": 64,
+	"./touch.js": 64,
+	"./uniq": 65,
+	"./uniq.js": 65,
+	"./which": 66,
+	"./which.js": 66
 };
 
 
@@ -4551,14 +4831,14 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 31;
+webpackContext.id = 33;
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('cat', _cat, {
   canReceivePipe: true,
@@ -4636,11 +4916,11 @@ function numberedLine(n, line) {
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var os = __webpack_require__(9);
-var common = __webpack_require__(8);
+var os = __webpack_require__(11);
+var common = __webpack_require__(10);
 
 common.register('cd', _cd, {});
 
@@ -4681,12 +4961,12 @@ module.exports = _cd;
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
 
 var PERMS = (function (base) {
   return {
@@ -4903,12 +5183,12 @@ module.exports = _chmod;
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
-var common = __webpack_require__(8);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
+var common = __webpack_require__(10);
 
 common.register('cp', _cp, {
   cmdOptions: {
@@ -5213,12 +5493,12 @@ module.exports = _cp;
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var _cd = __webpack_require__(33);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var _cd = __webpack_require__(35);
+var path = __webpack_require__(16);
 
 common.register('dirs', _dirs, {
   wrapOutput: false,
@@ -5431,12 +5711,12 @@ exports.dirs = _dirs;
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var format = __webpack_require__(20).format;
+var format = __webpack_require__(22).format;
 
-var common = __webpack_require__(8);
+var common = __webpack_require__(10);
 
 common.register('echo', _echo, {
   allowGlobbing: false,
@@ -5500,10 +5780,10 @@ module.exports = _echo;
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
+var common = __webpack_require__(10);
 
 //@
 //@ ### error()
@@ -5521,15 +5801,15 @@ module.exports = error;
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(__dirname) {var common = __webpack_require__(8);
-var _tempDir = __webpack_require__(40).tempDir;
-var _pwd = __webpack_require__(41);
-var path = __webpack_require__(14);
-var fs = __webpack_require__(10);
-var child = __webpack_require__(42);
+/* WEBPACK VAR INJECTION */(function(__dirname) {var common = __webpack_require__(10);
+var _tempDir = __webpack_require__(42).tempDir;
+var _pwd = __webpack_require__(43);
+var path = __webpack_require__(16);
+var fs = __webpack_require__(12);
+var child = __webpack_require__(44);
 
 var DEFAULT_MAXBUFFER_SIZE = 20 * 1024 * 1024;
 var DEFAULT_ERROR_CODE = 1;
@@ -5736,12 +6016,12 @@ module.exports = _exec;
 /* WEBPACK VAR INJECTION */}.call(this, "/"))
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var os = __webpack_require__(9);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var os = __webpack_require__(11);
+var fs = __webpack_require__(12);
 
 common.register('tempdir', _tempDir, {
   allowGlobbing: false,
@@ -5817,11 +6097,11 @@ module.exports.clearCache = clearCache;
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var path = __webpack_require__(14);
-var common = __webpack_require__(8);
+var path = __webpack_require__(16);
+var common = __webpack_require__(10);
 
 common.register('pwd', _pwd, {
   allowGlobbing: false,
@@ -5839,21 +6119,21 @@ module.exports = _pwd;
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {if (__webpack_require__.c[__webpack_require__.s] !== module) {
   throw new Error('This file should not be required');
 }
 
-var childProcess = __webpack_require__(42);
-var fs = __webpack_require__(10);
+var childProcess = __webpack_require__(44);
+var fs = __webpack_require__(12);
 
 var paramFilePath = process.argv[2];
 
@@ -5888,10 +6168,10 @@ if (pipe) {
   c.stdin.end(pipe);
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(44)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(46)(module)))
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -5919,12 +6199,12 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var path = __webpack_require__(14);
-var common = __webpack_require__(8);
-var _ls = __webpack_require__(46);
+var path = __webpack_require__(16);
+var common = __webpack_require__(10);
+var _ls = __webpack_require__(48);
 
 common.register('find', _find, {});
 
@@ -5986,13 +6266,13 @@ module.exports = _find;
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var path = __webpack_require__(14);
-var fs = __webpack_require__(10);
-var common = __webpack_require__(8);
-var glob = __webpack_require__(11);
+var path = __webpack_require__(16);
+var fs = __webpack_require__(12);
+var common = __webpack_require__(10);
+var glob = __webpack_require__(13);
 
 var globPatternRecursive = path.sep + '**';
 
@@ -6133,11 +6413,11 @@ module.exports = _ls;
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('grep', _grep, {
   globStart: 2, // don't glob-expand the regex
@@ -6212,11 +6492,11 @@ module.exports = _grep;
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('head', _head, {
   canReceivePipe: true,
@@ -6325,12 +6605,12 @@ module.exports = _head;
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
-var common = __webpack_require__(8);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
+var common = __webpack_require__(10);
 
 common.register('ln', _ln, {
   cmdOptions: {
@@ -6404,12 +6684,12 @@ module.exports = _ln;
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
 
 common.register('mkdir', _mkdir, {
   cmdOptions: {
@@ -6510,14 +6790,14 @@ module.exports = _mkdir;
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
-var common = __webpack_require__(8);
-var cp = __webpack_require__(35);
-var rm = __webpack_require__(52);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
+var common = __webpack_require__(10);
+var cp = __webpack_require__(37);
+var rm = __webpack_require__(54);
 
 common.register('mv', _mv, {
   cmdOptions: {
@@ -6634,11 +6914,11 @@ module.exports = _mv;
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('rm', _rm, {
   cmdOptions: {
@@ -6841,25 +7121,25 @@ module.exports = _rm;
 
 
 /***/ }),
-/* 53 */
-/***/ (function(module, exports) {
-
-// see dirs.js
-
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports) {
-
-// see dirs.js
-
-
-/***/ }),
 /* 55 */
+/***/ (function(module, exports) {
+
+// see dirs.js
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports) {
+
+// see dirs.js
+
+
+/***/ }),
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('sed', _sed, {
   globStart: 3, // don't glob-expand regexes
@@ -6948,10 +7228,10 @@ module.exports = _sed;
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
+var common = __webpack_require__(10);
 
 common.register('set', _set, {
   allowGlobbing: false,
@@ -7010,11 +7290,11 @@ module.exports = _set;
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('sort', _sort, {
   canReceivePipe: true,
@@ -7113,11 +7393,11 @@ module.exports = _sort;
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('tail', _tail, {
   canReceivePipe: true,
@@ -7199,11 +7479,11 @@ module.exports = _tail;
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('test', _test, {
   cmdOptions: {
@@ -7290,12 +7570,12 @@ module.exports = _test;
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
 
 common.register('to', _to, {
   pipeOnly: true,
@@ -7333,12 +7613,12 @@ module.exports = _to;
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
 
 common.register('toEnd', _toEnd, {
   pipeOnly: true,
@@ -7375,11 +7655,11 @@ module.exports = _toEnd;
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 common.register('touch', _touch, {
   cmdOptions: {
@@ -7492,11 +7772,11 @@ function tryStatFile(filePath) {
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
 
 // add c spaces to the left of str
 function lpad(c, str) {
@@ -7590,12 +7870,12 @@ module.exports = _uniq;
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var common = __webpack_require__(8);
-var fs = __webpack_require__(10);
-var path = __webpack_require__(14);
+var common = __webpack_require__(10);
+var fs = __webpack_require__(12);
+var path = __webpack_require__(16);
 
 common.register('which', _which, {
   allowGlobbing: false,
@@ -7714,118 +7994,22 @@ module.exports = _which;
 
 
 /***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run(projectID, serviceName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services expose');
-        if (serviceName) {
-            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-        }
-        else {
-            command.addArgument({ name: 'service', description: 'name of the service' });
-        }
-        command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
-        if (projectID) {
-            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run(projectID, serviceName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services undeploy');
-        if (projectID && serviceName) {
-            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addArgument({ name: 'service', description: 'name of the service' });
-            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run(projectID, serviceName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('services expose');
-        if (serviceName) {
-            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
-        }
-        else {
-            command.addArgument({ name: 'service', description: 'name of the service' });
-        }
-        command.addArgument({ name: 'hostname', description: 'hostname to remove' });
-        if (projectID) {
-            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true });
-        }
-        return command.runCommand();
-    });
+exports.Convert = void 0;
+class Convert {
+    static toProjectArray(json) {
+        return JSON.parse(json);
+    }
+    static projectsToJson(value) {
+        return JSON.stringify(value);
+    }
 }
-exports.run = run;
+exports.Convert = Convert;
 
 
 /***/ }),
@@ -7844,128 +8028,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProjectExplorer = void 0;
-const sls = __webpack_require__(69);
-const invite = __webpack_require__(78);
-const member = __webpack_require__(80);
-const service = __webpack_require__(81);
-const project = __webpack_require__(104);
-const vscode = __webpack_require__(1);
-class ProjectExplorer {
-    constructor(akkaServerless) {
-        this._onDidChangeTreeData = new vscode.EventEmitter();
-        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-        this.akkaServerless = akkaServerless;
-    }
-    refresh() {
-        this._onDidChangeTreeData.fire();
-    }
-    getTreeItem(element) {
-        return element;
-    }
-    getChildren(element) {
-        if (element) {
-            switch (element.type) {
-                case project.ITEM_TYPE:
-                    return Promise.resolve(this.getDefaultProjectItems(element.id));
-                case service.ITEM_TYPE:
-                    return Promise.resolve(service.getServiceTreeItems(element.parentProjectID, this.akkaServerless));
-                case member.ITEM_TYPE:
-                    return Promise.resolve(member.getMemberTreeItems(element.parentProjectID, this.akkaServerless));
-                case invite.ITEM_TYPE:
-                    return Promise.resolve(invite.getInviteTreeItems(element.parentProjectID, this.akkaServerless));
-                default:
-                    break;
-            }
-            return Promise.resolve([]);
-        }
-        // if there is no element present, get all projects and populate a new tree
-        return Promise.resolve(project.getProjectTreeItems(this.akkaServerless));
-    }
-    getDefaultProjectItems(parentProjectID) {
-        let defaultTreeItems = [];
-        defaultTreeItems.push(service.getDefaultServiceTreeItem(parentProjectID));
-        defaultTreeItems.push(member.getDefaultMemberTreeItem(parentProjectID));
-        defaultTreeItems.push(invite.getDefaultInviteTreeItem(parentProjectID));
-        return Promise.resolve(defaultTreeItems);
-    }
-    deployService(item) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.deployService(item.parentProjectID);
-            this.refresh();
-        });
-    }
-    undeployService(item) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.undeployService(item.parentProjectID, item.label);
-                this.refresh();
-            }
-        });
-    }
-    exposeService(item) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.exposeService(item.parentProjectID, item.label);
-                this.refresh();
-            }
-        });
-    }
-    unexposeService(item) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (item.label !== service.ITEM_TYPE) {
-                this.akkaServerless.unexposeService(item.parentProjectID, item.label);
-                this.refresh();
-            }
-        });
-    }
-    inviteUser(base) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.inviteUser(base.parentProjectID);
-            this.refresh();
-        });
-    }
-    newProject() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.akkaServerless.createNewProject();
-            this.refresh();
-        });
-    }
-    printTreeItemDetails(base) {
-        return __awaiter(this, void 0, void 0, function* () {
-            base.printDetails();
-        });
-    }
-    openTreeItemInBrowser(base) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            let url = '';
-            switch (base.type) {
-                case project.ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
-                    break;
-                case service.ITEM_TYPE:
-                    if ((_a = base.id) === null || _a === void 0 ? void 0 : _a.includes('-Services')) {
-                        url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
-                    }
-                    else {
-                        url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
-                    }
-                    break;
-                case member.ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-                    break;
-                case invite.ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
-                    break;
-                default:
-                    break;
-            }
-            vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
-        });
-    }
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+const member = __webpack_require__(69);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command(`roles list-bindings --project ${projectID} -o json`);
+        let result = yield command.runCommand();
+        return member.Convert.toMemberArray(result.stdout);
+    });
 }
-exports.ProjectExplorer = ProjectExplorer;
+exports.run = run;
 
 
 /***/ }),
@@ -7974,130 +8047,18 @@ exports.ProjectExplorer = ProjectExplorer;
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AkkaServerless = exports.CONSOLE_URL = void 0;
-const listProjects = __webpack_require__(70);
-const listMembers = __webpack_require__(72);
-const listInvites = __webpack_require__(74);
-const listServices = __webpack_require__(76);
-const deployService = __webpack_require__(3);
-const undeployService = __webpack_require__(66);
-const exposeService = __webpack_require__(65);
-const unexposeService = __webpack_require__(67);
-const inviteUser = __webpack_require__(106);
-const createProject = __webpack_require__(105);
-exports.CONSOLE_URL = "https://console.cloudstate.com/project";
-class AkkaServerless {
-    constructor() {
-        this.projects = [];
-        this.members = new Map();
-        this.invites = new Map();
-        this.services = new Map();
+exports.Convert = void 0;
+// Converts JSON strings to/from your types
+class Convert {
+    static toMemberArray(json) {
+        return JSON.parse(json);
     }
-    getProjects() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.projects.length === 0) {
-                this.projects = yield this.refreshProjects();
-            }
-            return this.projects;
-        });
-    }
-    refreshProjects() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let projects = yield listProjects.run();
-            this.projects = projects;
-            return projects;
-        });
-    }
-    createNewProject() {
-        return __awaiter(this, void 0, void 0, function* () {
-            createProject.run();
-        });
-    }
-    getMembers(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.members.has(projectID)) {
-                return this.members.get(projectID);
-            }
-            let members = yield this.refreshMembers(projectID);
-            return members;
-        });
-    }
-    refreshMembers(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let members = yield listMembers.run(projectID);
-            this.members.set(projectID, members);
-            return members;
-        });
-    }
-    getInvites(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.invites.has(projectID)) {
-                return this.invites.get(projectID);
-            }
-            let invites = yield this.refreshInvites(projectID);
-            return invites;
-        });
-    }
-    refreshInvites(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let invites = yield listInvites.run(projectID);
-            this.invites.set(projectID, invites);
-            return invites;
-        });
-    }
-    inviteUser(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            inviteUser.run(projectID);
-        });
-    }
-    getServices(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.services.has(projectID)) {
-                return this.services.get(projectID);
-            }
-            let services = yield this.refreshServices(projectID);
-            return services;
-        });
-    }
-    refreshServices(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let services = yield listServices.run(projectID);
-            this.services.set(projectID, services);
-            return services;
-        });
-    }
-    deployService(projectID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            deployService.run(projectID);
-        });
-    }
-    undeployService(projectID, serviceName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            undeployService.run(projectID, serviceName);
-        });
-    }
-    exposeService(projectID, serviceName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            exposeService.run(projectID, serviceName);
-        });
-    }
-    unexposeService(projectID, serviceName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            unexposeService.run(projectID, serviceName);
-        });
+    static membersToJson(value) {
+        return JSON.stringify(value);
     }
 }
-exports.AkkaServerless = AkkaServerless;
+exports.Convert = Convert;
 
 
 /***/ }),
@@ -8117,13 +8078,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
-const wrapper = __webpack_require__(4);
-const project = __webpack_require__(71);
-function run() {
+const wrapper = __webpack_require__(6);
+const invite = __webpack_require__(71);
+function run(projectID) {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('projects list -o json');
+        let command = new wrapper.Command(`roles invitations list --project ${projectID} -o json`);
         let result = yield command.runCommand();
-        return project.Convert.toProjectArray(result.stdout);
+        return invite.Convert.toInviteArray(result.stdout);
     });
 }
 exports.run = run;
@@ -8137,11 +8098,12 @@ exports.run = run;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Convert = void 0;
+// Converts JSON strings to/from your types
 class Convert {
-    static toProjectArray(json) {
+    static toInviteArray(json) {
         return JSON.parse(json);
     }
-    static projectsToJson(value) {
+    static invitesToJson(value) {
         return JSON.stringify(value);
     }
 }
@@ -8165,13 +8127,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
-const wrapper = __webpack_require__(4);
-const member = __webpack_require__(73);
+const wrapper = __webpack_require__(6);
+const services = __webpack_require__(73);
 function run(projectID) {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command(`roles list-bindings --project ${projectID} -o json`);
+        let command = new wrapper.Command(`svc list --project ${projectID} -o json`);
         let result = yield command.runCommand();
-        return member.Convert.toMemberArray(result.stdout);
+        return services.Convert.toServiceArray(result.stdout);
     });
 }
 exports.run = run;
@@ -8187,10 +8149,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Convert = void 0;
 // Converts JSON strings to/from your types
 class Convert {
-    static toMemberArray(json) {
+    static toServiceArray(json) {
         return JSON.parse(json);
     }
-    static membersToJson(value) {
+    static servicesToJson(value) {
         return JSON.stringify(value);
     }
 }
@@ -8214,13 +8176,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
-const wrapper = __webpack_require__(4);
-const invite = __webpack_require__(75);
-function run(projectID) {
+const wrapper = __webpack_require__(6);
+function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command(`roles invitations list --project ${projectID} -o json`);
-        let result = yield command.runCommand();
-        return invite.Convert.toInviteArray(result.stdout);
+        let command = new wrapper.Command('auth login');
+        command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
+        return command.runCommand();
     });
 }
 exports.run = run;
@@ -8232,18 +8193,26 @@ exports.run = run;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Convert = void 0;
-// Converts JSON strings to/from your types
-class Convert {
-    static toInviteArray(json) {
-        return JSON.parse(json);
-    }
-    static invitesToJson(value) {
-        return JSON.stringify(value);
-    }
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('auth logout');
+        command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
+        return command.runCommand();
+    });
 }
-exports.Convert = Convert;
+exports.run = run;
 
 
 /***/ }),
@@ -8263,13 +8232,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.run = void 0;
-const wrapper = __webpack_require__(4);
-const services = __webpack_require__(77);
+const wrapper = __webpack_require__(6);
 function run(projectID) {
     return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command(`svc list --project ${projectID} -o json`);
-        let result = yield command.runCommand();
-        return services.Convert.toServiceArray(result.stdout);
+        let command = new wrapper.Command('services deploy');
+        command.addArgument({ name: 'service', description: 'name of the service' });
+        command.addArgument({ name: 'image', description: 'container image url' });
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        return command.runCommand();
     });
 }
 exports.run = run;
@@ -8281,18 +8256,33 @@ exports.run = run;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Convert = void 0;
-// Converts JSON strings to/from your types
-class Convert {
-    static toServiceArray(json) {
-        return JSON.parse(json);
-    }
-    static servicesToJson(value) {
-        return JSON.stringify(value);
-    }
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, serviceName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('services undeploy');
+        if (projectID && serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+            command.addFlag({ name: 'project', description: 'the project to deploy to', required: true });
+        }
+        return command.runCommand();
+    });
 }
-exports.Convert = Convert;
+exports.run = run;
 
 
 /***/ }),
@@ -8311,11 +8301,154 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, serviceName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('services expose');
+        if (serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+        }
+        command.addArgument({ name: 'additional flags', description: 'any additional flags you want to add' });
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to expose a service from', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID, serviceName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('services expose');
+        if (serviceName) {
+            command.addArgument({ name: 'service', description: 'name of the service', defaultValue: serviceName, show: false });
+        }
+        else {
+            command.addArgument({ name: 'service', description: 'name of the service' });
+        }
+        command.addArgument({ name: 'hostname', description: 'hostname to remove' });
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to unexpose a service from', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run(projectID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('roles invitations invite-user');
+        command.addArgument({ name: 'email', description: 'email address of the user to invite' });
+        if (projectID) {
+            command.addFlag({ name: 'project', description: 'the project to invite to', required: true, defaultValue: projectID, show: false });
+        }
+        else {
+            command.addFlag({ name: 'project', description: 'the project to invite to', required: true });
+        }
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const wrapper = __webpack_require__(6);
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let command = new wrapper.Command('projects new');
+        command.addArgument({ name: 'name', description: 'name of the project' });
+        command.addArgument({ name: 'description', description: 'a description to show in the UI' });
+        return command.runCommand();
+    });
+}
+exports.run = run;
+
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefaultInviteTreeItem = exports.getInviteTreeItems = exports.InviteTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(79);
+const base = __webpack_require__(83);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(82);
+const table = __webpack_require__(84);
 exports.ITEM_TYPE = 'Invites';
 class InviteTreeItem extends base.TreeItem {
     constructor(label, parentProjectID, invite, collapsibleState) {
@@ -8376,7 +8509,7 @@ exports.getDefaultInviteTreeItem = getDefaultInviteTreeItem;
 
 
 /***/ }),
-/* 79 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8396,181 +8529,17 @@ exports.TreeItem = TreeItem;
 
 
 /***/ }),
-/* 80 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDefaultMemberTreeItem = exports.getMemberTreeItems = exports.MemberTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(79);
-const vscode = __webpack_require__(1);
-const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(82);
-exports.ITEM_TYPE = 'Members';
-class MemberTreeItem extends base.TreeItem {
-    constructor(label, parentProjectID, member, collapsibleState) {
-        super(label, collapsibleState, exports.ITEM_TYPE);
-        this.label = label;
-        this.parentProjectID = parentProjectID;
-        this.member = member;
-        this.collapsibleState = collapsibleState;
-        this.id = this.getName();
-        this.iconPath = this.getIcon();
-        this.contextValue = exports.ITEM_TYPE;
-    }
-    getName() {
-        return this.member.name;
-    }
-    getUserName() {
-        return this.member.user_name;
-    }
-    getEmail() {
-        return this.member.user_email;
-    }
-    getFullName() {
-        return this.member.user_full_name;
-    }
-    getUserFriendlyName() {
-        return this.member.user_friendly_name;
-    }
-    getIcon() {
-        if (this.label === exports.ITEM_TYPE) {
-            return new vscode.ThemeIcon('organization');
-        }
-        return new vscode.ThemeIcon('person');
-    }
-    printDetails() {
-        if (this.label !== exports.ITEM_TYPE) {
-            let printTable = new table({});
-            printTable.push(['Name', this.member.user_full_name]);
-            printTable.push(['Email address', this.member.user_email]);
-            logger_1.aslogger.log(printTable.toString());
-        }
-    }
-}
-exports.MemberTreeItem = MemberTreeItem;
-function getMemberTreeItems(parentProjectID, akkasls) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let members = [];
-        let membersList = yield akkasls.getMembers(parentProjectID);
-        for (let member of membersList) {
-            members.push(new MemberTreeItem(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None));
-        }
-        return members;
-    });
-}
-exports.getMemberTreeItems = getMemberTreeItems;
-function getDefaultMemberTreeItem(parentProjectID) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new MemberTreeItem(exports.ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${exports.ITEM_TYPE}`, user_name: '', user_email: '', user_full_name: '', user_friendly_name: '' }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-exports.getDefaultMemberTreeItem = getDefaultMemberTreeItem;
-
+module.exports = __webpack_require__(85);
 
 /***/ }),
-/* 81 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDefaultServiceTreeItem = exports.getServiceTreeItems = exports.ServiceTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(79);
-const vscode = __webpack_require__(1);
-const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(82);
-exports.ITEM_TYPE = 'Services';
-class ServiceTreeItem extends base.TreeItem {
-    constructor(label, parentProjectID, service, collapsibleState) {
-        super(label, collapsibleState, exports.ITEM_TYPE);
-        this.label = label;
-        this.parentProjectID = parentProjectID;
-        this.service = service;
-        this.collapsibleState = collapsibleState;
-        this.id = this.getUID();
-        this.iconPath = this.getIcon();
-        this.contextValue = exports.ITEM_TYPE;
-    }
-    getUID() {
-        return this.service.metadata.uid;
-    }
-    getIcon() {
-        if (this.label === exports.ITEM_TYPE) {
-            return new vscode.ThemeIcon('cloud');
-        }
-        return new vscode.ThemeIcon('cloud-upload');
-    }
-    printDetails() {
-        var _a, _b, _c;
-        if (this.label !== exports.ITEM_TYPE) {
-            let printTable = new table({
-                head: ['Item', 'Description']
-            });
-            printTable.push(['Name', this.service.metadata.name]);
-            printTable.push(['Status', (_a = this.service.status) === null || _a === void 0 ? void 0 : _a.summary]);
-            printTable.push(['Created on', new Date(this.service.metadata.creationTimestamp).toLocaleString()]);
-            printTable.push(['Generation', this.service.metadata.generation]);
-            if ((_b = this.service.spec) === null || _b === void 0 ? void 0 : _b.containers) {
-                let containers = [];
-                for (let container of this.service.spec.containers) {
-                    containers.push(container.image);
-                }
-                printTable.push(['Container images', containers.join('\n')]);
-            }
-            printTable.push(['Replicas', (_c = this.service.spec) === null || _c === void 0 ? void 0 : _c.replicas]);
-            logger_1.aslogger.log(printTable.toString());
-        }
-    }
-}
-exports.ServiceTreeItem = ServiceTreeItem;
-function getServiceTreeItems(parentProjectID, akkasls) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let services = [];
-        let servicesList = yield akkasls.getServices(parentProjectID);
-        for (let service of servicesList) {
-            services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, vscode.TreeItemCollapsibleState.None));
-        }
-        return services;
-    });
-}
-exports.getServiceTreeItems = getServiceTreeItems;
-function getDefaultServiceTreeItem(parentProjectID) {
-    return new ServiceTreeItem(exports.ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${exports.ITEM_TYPE}` } }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-exports.getDefaultServiceTreeItem = getDefaultServiceTreeItem;
-
-
-/***/ }),
-/* 82 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(83);
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const utils = __webpack_require__(84);
-const tableLayout = __webpack_require__(91);
+const utils = __webpack_require__(86);
+const tableLayout = __webpack_require__(93);
 
 class Table extends Array {
   constructor(options) {
@@ -8649,11 +8618,11 @@ module.exports = Table;
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(85);
-const stringWidth = __webpack_require__(86);
+const objectAssign = __webpack_require__(87);
+const stringWidth = __webpack_require__(88);
 
 function codeRegex(capture) {
   return capture ? /\u001b\[((?:\d*;){0,5}\d*)m/g : /\u001b\[(?:\d*;){0,5}\d*m/g;
@@ -8958,7 +8927,7 @@ module.exports = {
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9055,14 +9024,14 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const stripAnsi = __webpack_require__(87);
-const isFullwidthCodePoint = __webpack_require__(89);
-const emojiRegex = __webpack_require__(90);
+const stripAnsi = __webpack_require__(89);
+const isFullwidthCodePoint = __webpack_require__(91);
+const emojiRegex = __webpack_require__(92);
 
 const stringWidth = string => {
 	string = string.replace(emojiRegex(), '  ');
@@ -9105,18 +9074,18 @@ module.exports.default = stringWidth;
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const ansiRegex = __webpack_require__(88);
+const ansiRegex = __webpack_require__(90);
 
 module.exports = string => typeof string === 'string' ? string.replace(ansiRegex(), '') : string;
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9133,7 +9102,7 @@ module.exports = ({onlyFirst = false} = {}) => {
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9190,7 +9159,7 @@ module.exports.default = isFullwidthCodePoint;
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9203,11 +9172,11 @@ module.exports = function () {
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const objectAssign = __webpack_require__(85);
-const Cell = __webpack_require__(92);
+const objectAssign = __webpack_require__(87);
+const Cell = __webpack_require__(94);
 const { ColSpanCell, RowSpanCell } = Cell;
 
 (function () {
@@ -9441,10 +9410,10 @@ function makeComputeWidths(colSpan, desiredWidth, x, forcedMin) {
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const utils = __webpack_require__(84);
+const utils = __webpack_require__(86);
 
 class Cell {
   /**
@@ -9632,7 +9601,7 @@ class Cell {
   wrapWithStyleColors(styleProperty, content) {
     if (this[styleProperty] && this[styleProperty].length) {
       try {
-        let colors = __webpack_require__(93);
+        let colors = __webpack_require__(95);
         for (let i = this[styleProperty].length - 1; i >= 0; i--) {
           colors = colors[this[styleProperty][i]];
         }
@@ -9818,7 +9787,7 @@ module.exports.RowSpanCell = RowSpanCell;
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //
@@ -9829,12 +9798,12 @@ module.exports.RowSpanCell = RowSpanCell;
 //   colors.red("foo")
 //
 //
-var colors = __webpack_require__(94);
+var colors = __webpack_require__(96);
 module['exports'] = colors;
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -9872,12 +9841,12 @@ module['exports'] = colors;
 
 colors.themes = {};
 
-var util = __webpack_require__(20);
-var ansiStyles = colors.styles = __webpack_require__(95);
+var util = __webpack_require__(22);
+var ansiStyles = colors.styles = __webpack_require__(97);
 var defineProps = Object.defineProperties;
 var newLineRegex = new RegExp(/[\r\n]+/g);
 
-colors.supportsColor = __webpack_require__(96).supportsColor;
+colors.supportsColor = __webpack_require__(98).supportsColor;
 
 if (typeof colors.enabled === 'undefined') {
   colors.enabled = colors.supportsColor() !== false;
@@ -10029,15 +9998,15 @@ var sequencer = function sequencer(map, str) {
 };
 
 // custom formatter methods
-colors.trap = __webpack_require__(98);
-colors.zalgo = __webpack_require__(99);
+colors.trap = __webpack_require__(100);
+colors.zalgo = __webpack_require__(101);
 
 // maps
 colors.maps = {};
-colors.maps.america = __webpack_require__(100)(colors);
-colors.maps.zebra = __webpack_require__(101)(colors);
-colors.maps.rainbow = __webpack_require__(102)(colors);
-colors.maps.random = __webpack_require__(103)(colors);
+colors.maps.america = __webpack_require__(102)(colors);
+colors.maps.zebra = __webpack_require__(103)(colors);
+colors.maps.rainbow = __webpack_require__(104)(colors);
+colors.maps.random = __webpack_require__(105)(colors);
 
 for (var map in colors.maps) {
   (function(map) {
@@ -10051,7 +10020,7 @@ defineProps(colors, init());
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports) {
 
 /*
@@ -10152,7 +10121,7 @@ Object.keys(codes).forEach(function(key) {
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10183,8 +10152,8 @@ THE SOFTWARE.
 
 
 
-var os = __webpack_require__(9);
-var hasFlag = __webpack_require__(97);
+var os = __webpack_require__(11);
+var hasFlag = __webpack_require__(99);
 
 var env = process.env;
 
@@ -10310,7 +10279,7 @@ module.exports = {
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10352,7 +10321,7 @@ module.exports = function(flag, argv) {
 
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, exports) {
 
 module['exports'] = function runTheTrap(text, options) {
@@ -10404,7 +10373,7 @@ module['exports'] = function runTheTrap(text, options) {
 
 
 /***/ }),
-/* 99 */
+/* 101 */
 /***/ (function(module, exports) {
 
 // please no
@@ -10520,7 +10489,7 @@ module['exports'] = function zalgo(text, options) {
 
 
 /***/ }),
-/* 100 */
+/* 102 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10536,7 +10505,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 101 */
+/* 103 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10547,7 +10516,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 102 */
+/* 104 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10565,7 +10534,7 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 103 */
+/* 105 */
 /***/ (function(module, exports) {
 
 module['exports'] = function(colors) {
@@ -10582,7 +10551,171 @@ module['exports'] = function(colors) {
 
 
 /***/ }),
-/* 104 */
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDefaultMemberTreeItem = exports.getMemberTreeItems = exports.MemberTreeItem = exports.ITEM_TYPE = void 0;
+const base = __webpack_require__(83);
+const vscode = __webpack_require__(1);
+const logger_1 = __webpack_require__(2);
+const table = __webpack_require__(84);
+exports.ITEM_TYPE = 'Members';
+class MemberTreeItem extends base.TreeItem {
+    constructor(label, parentProjectID, member, collapsibleState) {
+        super(label, collapsibleState, exports.ITEM_TYPE);
+        this.label = label;
+        this.parentProjectID = parentProjectID;
+        this.member = member;
+        this.collapsibleState = collapsibleState;
+        this.id = this.getName();
+        this.iconPath = this.getIcon();
+        this.contextValue = exports.ITEM_TYPE;
+    }
+    getName() {
+        return this.member.name;
+    }
+    getUserName() {
+        return this.member.user_name;
+    }
+    getEmail() {
+        return this.member.user_email;
+    }
+    getFullName() {
+        return this.member.user_full_name;
+    }
+    getUserFriendlyName() {
+        return this.member.user_friendly_name;
+    }
+    getIcon() {
+        if (this.label === exports.ITEM_TYPE) {
+            return new vscode.ThemeIcon('organization');
+        }
+        return new vscode.ThemeIcon('person');
+    }
+    printDetails() {
+        if (this.label !== exports.ITEM_TYPE) {
+            let printTable = new table({});
+            printTable.push(['Name', this.member.user_full_name]);
+            printTable.push(['Email address', this.member.user_email]);
+            logger_1.aslogger.log(printTable.toString());
+        }
+    }
+}
+exports.MemberTreeItem = MemberTreeItem;
+function getMemberTreeItems(parentProjectID, akkasls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let members = [];
+        let membersList = yield akkasls.getMembers(parentProjectID);
+        for (let member of membersList) {
+            members.push(new MemberTreeItem(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None));
+        }
+        return members;
+    });
+}
+exports.getMemberTreeItems = getMemberTreeItems;
+function getDefaultMemberTreeItem(parentProjectID) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return new MemberTreeItem(exports.ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${exports.ITEM_TYPE}`, user_name: '', user_email: '', user_full_name: '', user_friendly_name: '' }, vscode.TreeItemCollapsibleState.Collapsed);
+}
+exports.getDefaultMemberTreeItem = getDefaultMemberTreeItem;
+
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDefaultServiceTreeItem = exports.getServiceTreeItems = exports.ServiceTreeItem = exports.ITEM_TYPE = void 0;
+const base = __webpack_require__(83);
+const vscode = __webpack_require__(1);
+const logger_1 = __webpack_require__(2);
+const table = __webpack_require__(84);
+exports.ITEM_TYPE = 'Services';
+class ServiceTreeItem extends base.TreeItem {
+    constructor(label, parentProjectID, service, collapsibleState) {
+        super(label, collapsibleState, exports.ITEM_TYPE);
+        this.label = label;
+        this.parentProjectID = parentProjectID;
+        this.service = service;
+        this.collapsibleState = collapsibleState;
+        this.id = this.getUID();
+        this.iconPath = this.getIcon();
+        this.contextValue = exports.ITEM_TYPE;
+    }
+    getUID() {
+        return this.service.metadata.uid;
+    }
+    getIcon() {
+        if (this.label === exports.ITEM_TYPE) {
+            return new vscode.ThemeIcon('cloud');
+        }
+        return new vscode.ThemeIcon('cloud-upload');
+    }
+    printDetails() {
+        var _a, _b, _c;
+        if (this.label !== exports.ITEM_TYPE) {
+            let printTable = new table({
+                head: ['Item', 'Description']
+            });
+            printTable.push(['Name', this.service.metadata.name]);
+            printTable.push(['Status', (_a = this.service.status) === null || _a === void 0 ? void 0 : _a.summary]);
+            printTable.push(['Created on', new Date(this.service.metadata.creationTimestamp).toLocaleString()]);
+            printTable.push(['Generation', this.service.metadata.generation]);
+            if ((_b = this.service.spec) === null || _b === void 0 ? void 0 : _b.containers) {
+                let containers = [];
+                for (let container of this.service.spec.containers) {
+                    containers.push(container.image);
+                }
+                printTable.push(['Container images', containers.join('\n')]);
+            }
+            printTable.push(['Replicas', (_c = this.service.spec) === null || _c === void 0 ? void 0 : _c.replicas]);
+            logger_1.aslogger.log(printTable.toString());
+        }
+    }
+}
+exports.ServiceTreeItem = ServiceTreeItem;
+function getServiceTreeItems(parentProjectID, akkasls) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let services = [];
+        let servicesList = yield akkasls.getServices(parentProjectID);
+        for (let service of servicesList) {
+            services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, vscode.TreeItemCollapsibleState.None));
+        }
+        return services;
+    });
+}
+exports.getServiceTreeItems = getServiceTreeItems;
+function getDefaultServiceTreeItem(parentProjectID) {
+    return new ServiceTreeItem(exports.ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${exports.ITEM_TYPE}` } }, vscode.TreeItemCollapsibleState.Collapsed);
+}
+exports.getDefaultServiceTreeItem = getDefaultServiceTreeItem;
+
+
+/***/ }),
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10598,10 +10731,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProjectTreeItems = exports.ProjectTreeItem = exports.ITEM_TYPE = void 0;
-const base = __webpack_require__(79);
+const base = __webpack_require__(83);
 const vscode = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const table = __webpack_require__(82);
+const table = __webpack_require__(84);
 exports.ITEM_TYPE = 'Projects';
 class ProjectTreeItem extends base.TreeItem {
     constructor(label, project, collapsibleState) {
@@ -10656,70 +10789,7 @@ exports.getProjectTreeItems = getProjectTreeItems;
 
 
 /***/ }),
-/* 105 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('projects new');
-        command.addArgument({ name: 'name', description: 'name of the project' });
-        command.addArgument({ name: 'description', description: 'a description to show in the UI' });
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 106 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
-const wrapper = __webpack_require__(4);
-function run(projectID) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let command = new wrapper.Command('roles invitations invite-user');
-        command.addArgument({ name: 'email', description: 'email address of the user to invite' });
-        if (projectID) {
-            command.addFlag({ name: 'project', description: 'the project to invite to', required: true, defaultValue: projectID, show: false });
-        }
-        else {
-            command.addFlag({ name: 'project', description: 'the project to invite to', required: true });
-        }
-        return command.runCommand();
-    });
-}
-exports.run = run;
-
-
-/***/ }),
-/* 107 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10727,7 +10797,7 @@ exports.run = run;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatusExplorer = void 0;
 const vscode = __webpack_require__(1);
-const status = __webpack_require__(108);
+const status = __webpack_require__(110);
 class StatusExplorer {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -10750,7 +10820,7 @@ exports.StatusExplorer = StatusExplorer;
 
 
 /***/ }),
-/* 108 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10766,7 +10836,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getServiceStatus = exports.StatusTreeItem = void 0;
-const axios_1 = __webpack_require__(109);
+const axios_1 = __webpack_require__(111);
 const vscode = __webpack_require__(1);
 const CHECK_CODICON = 'check';
 const ERROR_CODICON = 'error';
@@ -10800,23 +10870,23 @@ function getStatusIcon(status) {
 
 
 /***/ }),
-/* 109 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(110);
+module.exports = __webpack_require__(112);
 
 /***/ }),
-/* 110 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var bind = __webpack_require__(112);
-var Axios = __webpack_require__(113);
-var mergeConfig = __webpack_require__(147);
-var defaults = __webpack_require__(119);
+var utils = __webpack_require__(113);
+var bind = __webpack_require__(114);
+var Axios = __webpack_require__(115);
+var mergeConfig = __webpack_require__(149);
+var defaults = __webpack_require__(121);
 
 /**
  * Create an instance of Axios
@@ -10849,15 +10919,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(148);
-axios.CancelToken = __webpack_require__(149);
-axios.isCancel = __webpack_require__(118);
+axios.Cancel = __webpack_require__(150);
+axios.CancelToken = __webpack_require__(151);
+axios.isCancel = __webpack_require__(120);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(150);
+axios.spread = __webpack_require__(152);
 
 module.exports = axios;
 
@@ -10866,13 +10936,13 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 111 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bind = __webpack_require__(112);
+var bind = __webpack_require__(114);
 
 /*global toString:true*/
 
@@ -11224,7 +11294,7 @@ module.exports = {
 
 
 /***/ }),
-/* 112 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11242,17 +11312,17 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 113 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var buildURL = __webpack_require__(114);
-var InterceptorManager = __webpack_require__(115);
-var dispatchRequest = __webpack_require__(116);
-var mergeConfig = __webpack_require__(147);
+var utils = __webpack_require__(113);
+var buildURL = __webpack_require__(116);
+var InterceptorManager = __webpack_require__(117);
+var dispatchRequest = __webpack_require__(118);
+var mergeConfig = __webpack_require__(149);
 
 /**
  * Create a new instance of Axios
@@ -11344,13 +11414,13 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 114 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -11421,13 +11491,13 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 115 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -11480,16 +11550,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 116 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var transformData = __webpack_require__(117);
-var isCancel = __webpack_require__(118);
-var defaults = __webpack_require__(119);
+var utils = __webpack_require__(113);
+var transformData = __webpack_require__(119);
+var isCancel = __webpack_require__(120);
+var defaults = __webpack_require__(121);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -11566,13 +11636,13 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 117 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 /**
  * Transform the data for a request or a response
@@ -11593,7 +11663,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 118 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11605,14 +11675,14 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 119 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var normalizeHeaderName = __webpack_require__(120);
+var utils = __webpack_require__(113);
+var normalizeHeaderName = __webpack_require__(122);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -11628,10 +11698,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(121);
+    adapter = __webpack_require__(123);
   } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(131);
+    adapter = __webpack_require__(133);
   }
   return adapter;
 }
@@ -11710,13 +11780,13 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 120 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -11729,20 +11799,20 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 121 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var settle = __webpack_require__(122);
-var cookies = __webpack_require__(125);
-var buildURL = __webpack_require__(114);
-var buildFullPath = __webpack_require__(126);
-var parseHeaders = __webpack_require__(129);
-var isURLSameOrigin = __webpack_require__(130);
-var createError = __webpack_require__(123);
+var utils = __webpack_require__(113);
+var settle = __webpack_require__(124);
+var cookies = __webpack_require__(127);
+var buildURL = __webpack_require__(116);
+var buildFullPath = __webpack_require__(128);
+var parseHeaders = __webpack_require__(131);
+var isURLSameOrigin = __webpack_require__(132);
+var createError = __webpack_require__(125);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -11915,13 +11985,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 122 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(123);
+var createError = __webpack_require__(125);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -11947,13 +12017,13 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 123 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(124);
+var enhanceError = __webpack_require__(126);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -11972,7 +12042,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 124 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12021,13 +12091,13 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 125 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12081,14 +12151,14 @@ module.exports = (
 
 
 /***/ }),
-/* 126 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var isAbsoluteURL = __webpack_require__(127);
-var combineURLs = __webpack_require__(128);
+var isAbsoluteURL = __webpack_require__(129);
+var combineURLs = __webpack_require__(130);
 
 /**
  * Creates a new URL by combining the baseURL with the requestedURL,
@@ -12108,7 +12178,7 @@ module.exports = function buildFullPath(baseURL, requestedURL) {
 
 
 /***/ }),
-/* 127 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12129,7 +12199,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 128 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12150,13 +12220,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 129 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -12210,13 +12280,13 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 130 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -12285,25 +12355,25 @@ module.exports = (
 
 
 /***/ }),
-/* 131 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
-var settle = __webpack_require__(122);
-var buildFullPath = __webpack_require__(126);
-var buildURL = __webpack_require__(114);
-var http = __webpack_require__(132);
-var https = __webpack_require__(133);
-var httpFollow = __webpack_require__(134).http;
-var httpsFollow = __webpack_require__(134).https;
-var url = __webpack_require__(6);
-var zlib = __webpack_require__(145);
-var pkg = __webpack_require__(146);
-var createError = __webpack_require__(123);
-var enhanceError = __webpack_require__(124);
+var utils = __webpack_require__(113);
+var settle = __webpack_require__(124);
+var buildFullPath = __webpack_require__(128);
+var buildURL = __webpack_require__(116);
+var http = __webpack_require__(134);
+var https = __webpack_require__(135);
+var httpFollow = __webpack_require__(136).http;
+var httpsFollow = __webpack_require__(136).https;
+var url = __webpack_require__(8);
+var zlib = __webpack_require__(147);
+var pkg = __webpack_require__(148);
+var createError = __webpack_require__(125);
+var enhanceError = __webpack_require__(126);
 
 var isHttps = /https:?/;
 
@@ -12579,28 +12649,28 @@ module.exports = function httpAdapter(config) {
 
 
 /***/ }),
-/* 132 */
+/* 134 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 133 */
+/* 135 */
 /***/ (function(module, exports) {
 
 module.exports = require("https");
 
 /***/ }),
-/* 134 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var url = __webpack_require__(6);
+var url = __webpack_require__(8);
 var URL = url.URL;
-var http = __webpack_require__(132);
-var https = __webpack_require__(133);
-var Writable = __webpack_require__(135).Writable;
-var assert = __webpack_require__(23);
-var debug = __webpack_require__(136);
+var http = __webpack_require__(134);
+var https = __webpack_require__(135);
+var Writable = __webpack_require__(137).Writable;
+var assert = __webpack_require__(25);
+var debug = __webpack_require__(138);
 
 // Create handlers that pass events from native requests
 var eventHandlers = Object.create(null);
@@ -13095,19 +13165,19 @@ module.exports.wrap = wrap;
 
 
 /***/ }),
-/* 135 */
+/* 137 */
 /***/ (function(module, exports) {
 
 module.exports = require("stream");
 
 /***/ }),
-/* 136 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var debug;
 try {
   /* eslint global-require: off */
-  debug = __webpack_require__(137)("follow-redirects");
+  debug = __webpack_require__(139)("follow-redirects");
 }
 catch (error) {
   debug = function () { /* */ };
@@ -13116,7 +13186,7 @@ module.exports = debug;
 
 
 /***/ }),
-/* 137 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -13125,14 +13195,14 @@ module.exports = debug;
  */
 
 if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
-	module.exports = __webpack_require__(138);
+	module.exports = __webpack_require__(140);
 } else {
-	module.exports = __webpack_require__(141);
+	module.exports = __webpack_require__(143);
 }
 
 
 /***/ }),
-/* 138 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-env browser */
@@ -13389,7 +13459,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(139)(exports);
+module.exports = __webpack_require__(141)(exports);
 
 const {formatters} = module.exports;
 
@@ -13407,7 +13477,7 @@ formatters.j = function (v) {
 
 
 /***/ }),
-/* 139 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -13423,7 +13493,7 @@ function setup(env) {
 	createDebug.disable = disable;
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(140);
+	createDebug.humanize = __webpack_require__(142);
 	createDebug.destroy = destroy;
 
 	Object.keys(env).forEach(key => {
@@ -13674,7 +13744,7 @@ module.exports = setup;
 
 
 /***/ }),
-/* 140 */
+/* 142 */
 /***/ (function(module, exports) {
 
 /**
@@ -13842,15 +13912,15 @@ function plural(ms, msAbs, n, name) {
 
 
 /***/ }),
-/* 141 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
  */
 
-const tty = __webpack_require__(142);
-const util = __webpack_require__(20);
+const tty = __webpack_require__(144);
+const util = __webpack_require__(22);
 
 /**
  * This is the Node.js implementation of `debug()`.
@@ -13876,7 +13946,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
 try {
 	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
 	// eslint-disable-next-line import/no-extraneous-dependencies
-	const supportsColor = __webpack_require__(143);
+	const supportsColor = __webpack_require__(145);
 
 	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
 		exports.colors = [
@@ -14084,7 +14154,7 @@ function init(debug) {
 	}
 }
 
-module.exports = __webpack_require__(139)(exports);
+module.exports = __webpack_require__(141)(exports);
 
 const {formatters} = module.exports;
 
@@ -14111,19 +14181,19 @@ formatters.O = function (v) {
 
 
 /***/ }),
-/* 142 */
+/* 144 */
 /***/ (function(module, exports) {
 
 module.exports = require("tty");
 
 /***/ }),
-/* 143 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-const os = __webpack_require__(9);
-const hasFlag = __webpack_require__(144);
+const os = __webpack_require__(11);
+const hasFlag = __webpack_require__(146);
 
 const env = process.env;
 
@@ -14255,7 +14325,7 @@ module.exports = {
 
 
 /***/ }),
-/* 144 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14270,25 +14340,25 @@ module.exports = (flag, argv) => {
 
 
 /***/ }),
-/* 145 */
+/* 147 */
 /***/ (function(module, exports) {
 
 module.exports = require("zlib");
 
 /***/ }),
-/* 146 */
+/* 148 */
 /***/ (function(module) {
 
 module.exports = JSON.parse("{\"_args\":[[\"axios@0.21.0\",\"/home/retgits/Downloads/vscode-akkasls-tools\"]],\"_from\":\"axios@0.21.0\",\"_id\":\"axios@0.21.0\",\"_inBundle\":false,\"_integrity\":\"sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==\",\"_location\":\"/axios\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"version\",\"registry\":true,\"raw\":\"axios@0.21.0\",\"name\":\"axios\",\"escapedName\":\"axios\",\"rawSpec\":\"0.21.0\",\"saveSpec\":null,\"fetchSpec\":\"0.21.0\"},\"_requiredBy\":[\"/\"],\"_resolved\":\"https://registry.npmjs.org/axios/-/axios-0.21.0.tgz\",\"_spec\":\"0.21.0\",\"_where\":\"/home/retgits/Downloads/vscode-akkasls-tools\",\"author\":{\"name\":\"Matt Zabriskie\"},\"browser\":{\"./lib/adapters/http.js\":\"./lib/adapters/xhr.js\"},\"bugs\":{\"url\":\"https://github.com/axios/axios/issues\"},\"bundlesize\":[{\"path\":\"./dist/axios.min.js\",\"threshold\":\"5kB\"}],\"dependencies\":{\"follow-redirects\":\"^1.10.0\"},\"description\":\"Promise based HTTP client for the browser and node.js\",\"devDependencies\":{\"bundlesize\":\"^0.17.0\",\"coveralls\":\"^3.0.0\",\"es6-promise\":\"^4.2.4\",\"grunt\":\"^1.0.2\",\"grunt-banner\":\"^0.6.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-clean\":\"^1.1.0\",\"grunt-contrib-watch\":\"^1.0.0\",\"grunt-eslint\":\"^20.1.0\",\"grunt-karma\":\"^2.0.0\",\"grunt-mocha-test\":\"^0.13.3\",\"grunt-ts\":\"^6.0.0-beta.19\",\"grunt-webpack\":\"^1.0.18\",\"istanbul-instrumenter-loader\":\"^1.0.0\",\"jasmine-core\":\"^2.4.1\",\"karma\":\"^1.3.0\",\"karma-chrome-launcher\":\"^2.2.0\",\"karma-coverage\":\"^1.1.1\",\"karma-firefox-launcher\":\"^1.1.0\",\"karma-jasmine\":\"^1.1.1\",\"karma-jasmine-ajax\":\"^0.1.13\",\"karma-opera-launcher\":\"^1.0.0\",\"karma-safari-launcher\":\"^1.0.0\",\"karma-sauce-launcher\":\"^1.2.0\",\"karma-sinon\":\"^1.0.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^1.7.0\",\"load-grunt-tasks\":\"^3.5.2\",\"minimist\":\"^1.2.0\",\"mocha\":\"^5.2.0\",\"sinon\":\"^4.5.0\",\"typescript\":\"^2.8.1\",\"url-search-params\":\"^0.10.0\",\"webpack\":\"^1.13.1\",\"webpack-dev-server\":\"^1.14.1\"},\"homepage\":\"https://github.com/axios/axios\",\"jsdelivr\":\"dist/axios.min.js\",\"keywords\":[\"xhr\",\"http\",\"ajax\",\"promise\",\"node\"],\"license\":\"MIT\",\"main\":\"index.js\",\"name\":\"axios\",\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/axios/axios.git\"},\"scripts\":{\"build\":\"NODE_ENV=production grunt build\",\"coveralls\":\"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\",\"examples\":\"node ./examples/server.js\",\"fix\":\"eslint --fix lib/**/*.js\",\"postversion\":\"git push && git push --tags\",\"preversion\":\"npm test\",\"start\":\"node ./sandbox/server.js\",\"test\":\"grunt test && bundlesize\",\"version\":\"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json\"},\"typings\":\"./index.d.ts\",\"unpkg\":\"dist/axios.min.js\",\"version\":\"0.21.0\"}");
 
 /***/ }),
-/* 147 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(111);
+var utils = __webpack_require__(113);
 
 /**
  * Config-specific merge-function which creates a new config-object
@@ -14376,7 +14446,7 @@ module.exports = function mergeConfig(config1, config2) {
 
 
 /***/ }),
-/* 148 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14402,13 +14472,13 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 149 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(148);
+var Cancel = __webpack_require__(150);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -14466,7 +14536,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 150 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14500,7 +14570,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 151 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14508,7 +14578,7 @@ module.exports = function spread(callback) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TreeDataProvider = void 0;
 const vscode = __webpack_require__(1);
-const tool = __webpack_require__(152);
+const tool = __webpack_require__(154);
 class TreeDataProvider {
     constructor() {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -14531,7 +14601,7 @@ exports.TreeDataProvider = TreeDataProvider;
 
 
 /***/ }),
-/* 152 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14547,9 +14617,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openToolPage = exports.getToolTreeItems = exports.ToolTreeItem = void 0;
-const axios_1 = __webpack_require__(109);
-const shell_1 = __webpack_require__(5);
-const tool = __webpack_require__(153);
+const axios_1 = __webpack_require__(111);
+const shell_1 = __webpack_require__(7);
+const tool = __webpack_require__(155);
 const vscode = __webpack_require__(1);
 const EXISTS_CODICON = 'pass';
 const NOT_EXISTS_CODICON = 'error';
@@ -14625,7 +14695,7 @@ exports.openToolPage = openToolPage;
 
 
 /***/ }),
-/* 153 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
