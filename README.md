@@ -4,6 +4,8 @@ An extension for developers building stateful serverless applications on [Akka S
 
 <img src="./utils/image.svg" width="100%">
 
+*[Illustration by Freepik Stories](https://stories.freepik.com/technology)*
+
 Features include:
 
 * View your projects in an explorer tree view, and drill into services, members, invites, and Docker credentials.
