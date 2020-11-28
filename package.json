@@ -66,12 +66,12 @@
 				"akkaserverless.dryrun": {
 					"type": "boolean",
 					"default": false,
-					"description": "DryRun prints the commands in the log and does not execute them"
+					"description": "If true will print the commands in the log rather than execute them"
 				},
 				"akkaserverless.logOutput": {
 					"type": "boolean",
 					"default": false,
-					"description": "Log output from the Akka Serverless CLI"
+					"description": "If true will log output from the Akka Serverless CLI in the akkasls output window"
 				}
 			}
 		},
@@ -111,7 +111,8 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
-				}
+				},
+				"description": "Refresh the project explorer view"
 			},
 			{
 				"command": "as.views.status.refresh",
@@ -119,7 +120,8 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
-				}
+				},
+				"description": "Refresh the status explorer view"
 			},
 			{
 				"command": "as.views.tools.refresh",
@@ -127,7 +129,8 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
-				}
+				},
+				"description": "Refresh the tools explorer view"
 			},
 			{
 				"command": "as.views.credentials.refresh",
@@ -135,149 +138,182 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
-				}
+				},
+				"description": "Refresh the credentials explorer view"
 			},
 			{
 				"command": "as.commandpalette.deploy",
-				"title": "Deploy a service to Akka Serverless",
-				"category": "Akka Serverless"
+				"title": "Deploy",
+				"category": "Akka Serverless",
+				"description": "Deploy a service to Akka Serverless"
 			},
 			{
 				"command": "as.commandpalette.undeploy",
-				"title": "Remove a service from Akka Serverless",
-				"category": "Akka Serverless"
+				"title": "Undeploy",
+				"category": "Akka Serverless",
+				"description": "Remove a service from Akka Serverless"
 			},
 			{
 				"command": "as.commandpalette.expose",
-				"title": "Expose a service for inbound traffic",
-				"category": "Akka Serverless"
+				"title": "Expose",
+				"category": "Akka Serverless",
+				"description": "Expose a service for inbound traffic"
 			},
 			{
 				"command": "as.commandpalette.unexpose",
-				"title": "Removes a service route from a service",
-				"category": "Akka Serverless"
+				"title": "Unexpose",
+				"category": "Akka Serverless",
+				"description": "Removes a service route from a service"
 			},
 			{
 				"command": "as.views.projects.credentials.add",
-				"title": "Add credentials"
+				"title": "Add credentials",
+				"description": "Add new Docker credentials to your project"
 			},
 			{
 				"command": "as.views.projects.credentials.delete",
-				"title": "Delete credentials"
+				"title": "Delete credentials",
+				"description": "Remove Docker credentials from your project"
 			},
 			{
 				"command": "as.views.projects.services.deploy",
-				"title": "Deploy service"
+				"title": "Deploy",
+				"description": "Deploy a service to Akka Serverless"
 			},
 			{
 				"command": "as.views.projects.services.undeploy",
-				"title": "Undeploy service"
+				"title": "Undeploy",
+				"description": "Remove a service from Akka Serverless"
 			},
 			{
 				"command": "as.views.projects.services.expose",
-				"title": "Expose service"
+				"title": "Expose",
+				"description": "Expose a service for inbound traffic"
 			},
 			{
 				"command": "as.views.projects.services.unexpose",
-				"title": "Unexpose service"
+				"title": "Unexpose",
+				"description": "Removes a service route from a service"
 			},
 			{
 				"command": "as.views.projects.openbrowser",
-				"title": "View in browser"
+				"title": "Open in browser",
+				"description": "Opens the selected resource in the Akka Serverless Web UI"
 			},
 			{
 				"command": "as.views.projects.details.projects",
-				"title": "View project details"
+				"title": "View details",
+				"description": "Print the details of a project to the akkasls output window"
 			},
 			{
 				"command": "as.views.projects.details.services",
-				"title": "View service details"
+				"title": "View details",
+				"description": "Print the details of a service to the akkasls output window"
 			},
 			{
 				"command": "as.views.projects.details.members",
-				"title": "View member details"
+				"title": "View details",
+				"description": "Print the details of a project member to the akkasls output window"
 			},
 			{
 				"command": "as.views.projects.details.credentials",
-				"title": "View credential details"
+				"title": "View details",
+				"description": "Print the details of Docker credentials to the akkasls output window (this option doesn't log the password)"
 			},
 			{
 				"command": "as.views.projects.details.invites",
-				"title": "View invite details"
+				"title": "View details",
+				"description": "Print the details of an invite to the akkasls output window"
 			},
 			{
 				"command": "as.views.projects.invites.inviteuser",
-				"title": "Invite user"
+				"title": "Send invite",
+				"description": "Invite a new user to your project on Akka Serverless"
 			},
 			{
 				"command": "as.views.projects.invites.deleteinvite",
-				"title": "Delete invitation for user"
+				"title": "Delete invite",
+				"description": "Removes the invitation of a user"
 			},
 			{
 				"command": "as.views.credentials.details.tokens",
-				"title": "View token details"
+				"title": "View details",
+				"description": "Print the details of a token to the akkasls output window"
 			},
 			{
 				"command": "as.views.credentials.revoke",
-				"title": "Revoke token"
+				"title": "Revoke",
+				"description": "Revoke a token"
 			},
 			{
 				"command": "as.views.projects.new",
-				"title": "Add new project",
-				"category": "Akka Serverless"
+				"title": "New project",
+				"category": "Akka Serverless",
+				"description": "Create a new project on Akka Serverless"
 			},
 			{
 				"command": "as.views.status.view",
-				"title": "View Akka Serverless status page",
-				"category": "Akka Serverless"
+				"title": "View Status",
+				"category": "Akka Serverless",
+				"description": "Open the Akka Serverless status page in your browser"
 			},
 			{
 				"command": "as.views.tools.info",
-				"title": "Get tool info"
+				"title": "Get info",
+				"description": "Open a webpage with detailed information about the selected tool"
 			},
 			{
 				"command": "as.views.status.info",
-				"title": "Get status info"
+				"title": "Get info",
+				"description": "Open the Akka Serverless status page in your browser"
 			},
 			{
 				"command": "as.commandpalette.invites.inviteuser",
-				"title": "Invite user to project",
-				"category": "Akka Serverless"
+				"title": "Send invite",
+				"category": "Akka Serverless",
+				"description": "Invite a new user to a project on Akka Serverless"
 			},
 			{
 				"command": "as.commandpalette.invites.deleteinvite",
-				"title": "Delete invitation for user from project",
-				"category": "Akka Serverless"
+				"title": "Delete invite",
+				"category": "Akka Serverless",
+				"description": "Removes the invitation of a user for a project"
 			},
 			{
 				"command": "as.commandpalette.auth.login",
-				"title": "Login to Akka Serverless",
-				"category": "Akka Serverless"
+				"title": "Login",
+				"category": "Akka Serverless",
+				"description": "Logs in to Akka Serverless by printing the login URL in the akkasls output window"
 			},
 			{
 				"command": "as.commandpalette.credentials.add",
-				"title": "Add Docker credentials to an Akka Serverless project",
-				"category": "Akka Serverless"
+				"title": "Add credentials",
+				"category": "Akka Serverless",
+				"description": "Add Docker registry credentials to an Akka Serverless project"
 			},
 			{
 				"command": "as.commandpalette.credentials.delete",
-				"title": "Delete Docker credentials from an Akka Serverless project",
-				"category": "Akka Serverless"
+				"title": "Delete credentials",
+				"category": "Akka Serverless",
+				"description": "Remove Docker registry credentials from an Akka Serverless project"
 			},
 			{
 				"command": "as.commandpalette.auth.logout",
-				"title": "Logout from Akka Serverless",
-				"category": "Akka Serverless"
+				"title": "Logout",
+				"category": "Akka Serverless",
+				"description": "Logs out from Akka Serverless"
 			},
 			{
 				"command": "as.commandpalette.projects.local.start",
-				"title": "Run current workspace as Akka Serverless function",
-				"category": "Akka Serverless"
+				"title": "Run local",
+				"category": "Akka Serverless",
+				"description": "Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)"
 			},
 			{
 				"command": "as.commandpalette.projects.local.stop",
-				"title": "Stop current local running Akka Serverless function",
-				"category": "Akka Serverless"
+				"title": "Stop local",
+				"category": "Akka Serverless",
+				"description": "Stops the selected service and Cloudstate proxy"
 			}
 		],
 		"menus": {

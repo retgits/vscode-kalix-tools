@@ -27,62 +27,58 @@ The Akka Serverless extension may need to invoke the following command line tool
 
 `vscode-akkasls-tools` supports a number of commands for interacting with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and may be bound to keys in the normal way.
 
-### General commands (part of the `Akka Serverless` category)
+### General commands
 
-* Add Docker credentials to an Akka Serverless project
-* Add new project
-* Delete Docker credentials from an Akka Serverless project
-* Delete invitation for user from project
-* Deploy a service to Akka Serverless
-* Expose a service for inbound traffic
-* Invite user to project
-* Login to Akka Serverless
-* Logout from Akka Serverless
-* Remove a service from Akka Serverless
-* Removes a service route from a service
-* Run current workspace as Akka Serverless function
-* Stop current local running Akka Serverless function
-* View Akka Serverless status page
+* `Akka Serverless: Add credentials` - Add Docker registry credentials to an Akka Serverless project
+* `Akka Serverless: Delete credentials` - Remove Docker registry credentials from an Akka Serverless project
+* `Akka Serverless: Delete invite` - Removes the invitation of a user for a project
+* `Akka Serverless: Deploy` - Deploy a service to Akka Serverless
+* `Akka Serverless: Expose` - Expose a service for inbound traffic
+* `Akka Serverless: Login` - Logs in to Akka Serverless by printing the login URL in the akkasls output window
+* `Akka Serverless: Logout` - Logs out from Akka Serverless
+* `Akka Serverless: New project` - Create a new project on Akka Serverless
+* `Akka Serverless: Run local` - Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)
+* `Akka Serverless: Send invite` - Invite a new user to a project on Akka Serverless
+* `Akka Serverless: Stop local` - Stops the selected service and Cloudstate proxy
+* `Akka Serverless: Undeploy` - Remove a service from Akka Serverless
+* `Akka Serverless: Unexpose` - Removes a service route from a service
+* `Akka Serverless: View Status` - Open the Akka Serverless status page in your browser
 
 ### Projects
 
-* Add credentials
-* Delete credentials
-* Delete invitation for user
-* Deploy service
-* Expose service
-* Invite user
-* Refresh
-* Undeploy service
-* Unexpose service
-* View credential details
-* View in browser
-* View invite details
-* View member details
-* View project details
-* View service details
+* `Add credentials`: Add new Docker credentials to your project
+* `Delete credentials`: Remove Docker credentials from your project
+* `Delete invite`: Removes the invitation of a user
+* `Deploy`: Deploy a service to Akka Serverless
+* `Expose`: Expose a service for inbound traffic
+* `Open in browser`: Opens the selected resource in the Akka Serverless Web UI
+* `Refresh`: Refresh the project explorer view
+* `Send invite`: Invite a new user to your project on Akka Serverless
+* `Undeploy`: Remove a service from Akka Serverless
+* `Unexpose`: Removes a service route from a service
+* `View details`: Print the details of Docker credentials (doesn't log the password), project members, projects, services, or invites to the akkasls output window
 
 ### Credentials
 
-* Refresh
-* Revoke token
-* View token details
+* `Refresh`: Refresh the credentials explorer view
+* `Revoke`: Revoke a token
+* `View details`: Print the details of a token to the akkasls output window
 
 ### Status
 
-* Get status info
-* Refresh
+* `Get info`: Open the Akka Serverless status page in your browser
+* `Refresh`: Refresh the status explorer view
 
 ### Tools
 
-* Get tool info
-* Refresh
+* `Get info`: Open a webpage with detailed information about the selected tool
+* `Refresh`: Refresh the tools explorer view
 
 ## Extension Settings
 
 * `akkaserverless` - Parent for Akka Serverless-related extension settings
-    * `akkaserverless.dryrun`: DryRun prints the commands in the log and does not execute them
-    * `akkaserverless.logOutput`: Log output from the Akka Serverless CLI
+    * `akkaserverless.dryrun`: If true will print the commands in the log rather than execute them
+    * `akkaserverless.logOutput`: If true will log output from the Akka Serverless CLI in the akkasls output window
 
 ## Release notes
 

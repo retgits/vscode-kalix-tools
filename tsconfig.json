@@ -9,7 +9,7 @@
 		],
 		"sourceMap": true,
 		"rootDir": ".",
-		"strict": true,
+		"alwaysStrict": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,

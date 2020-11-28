@@ -10,18 +10,18 @@ var commandItems = extensionData.contributes.commands;
 var generalCommands = [];
 commandItems.forEach(function (element) {
     if (element.hasOwnProperty('category')) {
-        generalCommands.push("* " + element.title);
+        generalCommands.push("* `Akka Serverless: " + element.title + "` - " + element.description);
     }
     else {
         var view = element.command.split('.');
         var viewname = view[0] + "." + view[1] + "." + view[2];
         var commands = viewsMap.get(viewname);
-        commands === null || commands === void 0 ? void 0 : commands.push("" + element.title);
+        commands === null || commands === void 0 ? void 0 : commands.push(element.title + "||" + element.description);
         viewsMap.set(viewname, commands);
     }
 });
 generalCommands = sortStringArray(generalCommands);
-console.log('### General commands (part of the `Akka Serverless` category)\n');
+console.log('### General commands\n');
 generalCommands.forEach(function (element) {
     console.log(element);
 });
@@ -33,7 +33,8 @@ for (var _i = 0, _a = Array.from(viewsMap.keys()); _i < _a.length; _i++) {
     var commands = viewsMap.get(view);
     commands = sortStringArray(commands);
     commands.forEach(function (element) {
-        console.log("* " + element);
+        var elements = element.split('||');
+        console.log("* `" + elements[0] + "`: " + elements[1]);
     });
 }
 // Get configuration settings

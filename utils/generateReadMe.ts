@@ -14,19 +14,19 @@ let generalCommands: string[] = [];
 
 commandItems.forEach(function (element: any) {
     if (element.hasOwnProperty('category')) {
-        generalCommands.push(`* ${element.title}`);
+        generalCommands.push(`* \`Akka Serverless: ${element.title}\` - ${element.description}`);
     } else {
         let view = element.command.split('.');
         let viewname = `${view[0]}.${view[1]}.${view[2]}`;
         let commands = viewsMap.get(viewname);
-        commands?.push(`${element.title}`);
+        commands?.push(`${element.title}||${element.description}`);
         viewsMap.set(viewname, commands!);
     }
 });
 
 generalCommands = sortStringArray(generalCommands);
 
-console.log('### General commands (part of the `Akka Serverless` category)\n');
+console.log('### General commands\n');
 generalCommands.forEach(function (element: string) {
     console.log(element);
 });
@@ -38,7 +38,8 @@ for(let view of Array.from( viewsMap.keys()) ) {
     let commands = viewsMap.get(view);
     commands = sortStringArray(commands!);
     commands!.forEach((element) => {
-        console.log(`* ${element}`);
+        let elements: string[] = element.split('||'); 
+        console.log(`* \`${elements[0]}\`: ${elements[1]}`);
     });
 }
 
