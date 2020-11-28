@@ -398,7 +398,8 @@ const inviteUser = __webpack_require__(86);
 const deleteInvite = __webpack_require__(87);
 const createProject = __webpack_require__(88);
 const revokeToken = __webpack_require__(89);
-const runLocal = __webpack_require__(90);
+const startLocalService = __webpack_require__(90);
+const stopLocalService = __webpack_require__(203);
 const vscode = __webpack_require__(1);
 exports.CONSOLE_URL = "https://console.cloudstate.com/project";
 class AkkaServerless {
@@ -612,7 +613,7 @@ class AkkaServerless {
     startLocal(doc) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                runLocal.start(doc === null || doc === void 0 ? void 0 : doc.path);
+                startLocalService.run(doc === null || doc === void 0 ? void 0 : doc.path);
             }
             catch (Error) {
                 vscode.window.showErrorMessage(Error.message);
@@ -622,7 +623,7 @@ class AkkaServerless {
     stopLocal(doc) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                runLocal.stop(doc === null || doc === void 0 ? void 0 : doc.path);
+                stopLocalService.run(doc === null || doc === void 0 ? void 0 : doc.path);
             }
             catch (Error) {
                 vscode.window.showErrorMessage(Error);
@@ -687,6 +688,9 @@ class Command {
         this.cmd = cmd;
         this.args = (args) ? args : [];
         this.flags = (flags) ? flags : [];
+    }
+    setBaseDir(baseDir) {
+        this.baseDir = baseDir;
     }
     addArgument({ name, description, defaultValue, show = true }) {
         this.args.push({
@@ -756,7 +760,7 @@ class Command {
                 logger_1.aslogger.log(`${tool} ${params.join('')}`);
                 return null;
             }
-            let res = yield shell.shell.exec(`${tool} ${params.join('')}`);
+            let res = yield shell.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
             if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
                 logger_1.aslogger.log(res.stderr);
                 logger_1.aslogger.log(res.stdout);
@@ -8837,64 +8841,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stop = exports.start = void 0;
-const fs = __webpack_require__(12);
-const path = __webpack_require__(16);
-const jsyaml = __webpack_require__(91);
-const vscode = __webpack_require__(1);
-const URL = __webpack_require__(8);
-const config = __webpack_require__(123);
-const shell_1 = __webpack_require__(7);
+exports.run = void 0;
 const logger_1 = __webpack_require__(2);
-function getConfigFilePath() {
-    var _a;
-    if ((_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.fileName) {
-        if (vscode.window.activeTextEditor.document.fileName.endsWith('.akkaserverless.yaml')) {
-            return vscode.window.activeTextEditor.document.fileName;
+const wrapper = __webpack_require__(6);
+const config = __webpack_require__(123);
+function run(configpath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let asConfig = config.readConfigFile(configpath);
+        let command = new wrapper.Command(`docker build . -t ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
+        command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        let result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
-    }
-    let wd;
-    if (!vscode.workspace.workspaceFolders) {
-        wd = '.';
-    }
-    else {
-        wd = URL.fileURLToPath(vscode.workspace.workspaceFolders[0].uri.toString());
-    }
-    let configPath = path.join(wd, '.akkaserverless.yaml');
-    if (!fs.existsSync(configPath)) {
-        throw new Error(`Config file .akkaserverless.yaml does not exist in ${wd}`);
-    }
-    return configPath;
-}
-function start(configpath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let configFilePath = (configpath) ? configpath : getConfigFilePath();
-        let asConfig = config.Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configFilePath, 'utf-8'))));
-        let basedir = path.dirname(configFilePath);
-        let res = yield shell_1.shell.exec(`docker build . -t ${asConfig.Resources.Docker.Registry}/${asConfig.Resources.Docker.Username}/${asConfig.Resources.Function.Name}`, basedir);
-        logger_1.aslogger.log(res.stdout);
-        res = yield shell_1.shell.exec(`docker run -d --name ${asConfig.Resources.Function.Name} -p 8080:8080 ${asConfig.Resources.Docker.Registry}/${asConfig.Resources.Docker.Username}/${asConfig.Resources.Function.Name}`, basedir);
-        logger_1.aslogger.log(res.stdout);
-        res = yield shell_1.shell.exec(`docker run -d --name ${asConfig.Resources.Function.Name}-proxy -p 9000:9000 --env USER_FUNCTION_HOST=${asConfig.Resources.Docker.Overrides.Host} cloudstateio/cloudstate-proxy-dev-mode:latest`, basedir);
-        logger_1.aslogger.log(res.stdout);
+        command = new wrapper.Command(`docker run -d --name ${asConfig.Resources.Function.Name} -p 8080:8080 ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
+        command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        command = new wrapper.Command(`docker run -d --name ${asConfig.Resources.Function.Name}-proxy -p 9000:9000 --env USER_FUNCTION_HOST=${asConfig.Resources.Docker.Host} cloudstateio/cloudstate-proxy-dev-mode:latest`);
+        command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        return null;
     });
 }
-exports.start = start;
-function stop(configpath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let configFilePath = (configpath) ? configpath : getConfigFilePath();
-        let asConfig = config.Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configFilePath, 'utf-8'))));
-        let res = yield shell_1.shell.exec(`docker stop ${asConfig.Resources.Function.Name}`);
-        logger_1.aslogger.log(res.stdout);
-        res = yield shell_1.shell.exec(`docker rm ${asConfig.Resources.Function.Name}`);
-        logger_1.aslogger.log(res.stdout);
-        res = yield shell_1.shell.exec(`docker stop ${asConfig.Resources.Function.Name}-proxy`);
-        logger_1.aslogger.log(res.stdout);
-        res = yield shell_1.shell.exec(`docker rm ${asConfig.Resources.Function.Name}-proxy`);
-        logger_1.aslogger.log(res.stdout);
-    });
-}
-exports.stop = stop;
+exports.run = run;
 
 
 /***/ }),
@@ -19755,33 +19730,57 @@ module.exports.safeDump = safeDump;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Convert = void 0;
-/* eslint-disable @typescript-eslint/naming-convention */
-const os = __webpack_require__(11);
-// Converts JSON strings to/from your types
-class Convert {
-    static toASConfig(json) {
-        let config = JSON.parse(json);
-        if (!config.Resources.Docker.Overrides) {
-            config.Resources.Docker.Overrides = {
-                Host: getIPAddress()
-            };
-        }
-        return config;
+exports.readConfigFile = void 0;
+const fs = __webpack_require__(12);
+const path = __webpack_require__(16);
+const URL = __webpack_require__(8);
+const vscode = __webpack_require__(1);
+const jsyaml = __webpack_require__(91);
+const localService = __webpack_require__(202);
+// Get the path of the .akkaserverless.yaml file. The precedence is:
+// 1. Selected through the VS Code context menu (configFilePath exists)
+// 2. The current active text editor window in VS Code is called .akkaserverless.yaml
+// 3. Check the current open workspace for a .akkaserverless.yaml
+// 4. Chec the current open folder for a  .akkaserverless.yaml
+// If no file can be found, an error is thrown
+function getConfigFilePath(configpath) {
+    var _a;
+    if (configpath) {
+        return configpath;
     }
-}
-exports.Convert = Convert;
-function getIPAddress() {
-    let networkInterfaces = os.networkInterfaces();
-    for (let name of Object.keys(networkInterfaces)) {
-        for (let networkInterface of networkInterfaces[name]) {
-            if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
-                return networkInterface.address;
-            }
+    if ((_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.fileName) {
+        if (vscode.window.activeTextEditor.document.fileName.endsWith('.akkaserverless.yaml')) {
+            return vscode.window.activeTextEditor.document.fileName;
         }
     }
-    throw new Error('Unable to obtain valid IP address');
+    if (vscode.workspace.workspaceFolders !== undefined) {
+        let dir = URL.fileURLToPath(vscode.workspace.workspaceFolders[0].uri.toString());
+        let configpath = path.join(dir, '.akkaserverless.yaml');
+        if (fs.existsSync(configpath)) {
+            return configpath;
+        }
+    }
+    let dir = '.';
+    configpath = path.join(dir, '.akkaserverless.yaml');
+    if (!fs.existsSync(configpath)) {
+        throw new Error(`Config file .akkaserverless.yaml does not exist in ${dir}`);
+    }
+    return configpath;
 }
+function readConfigFile(configpath) {
+    configpath = getConfigFilePath(configpath);
+    let basedir = path.dirname(configpath);
+    let asConfig = localService.Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configpath, 'utf-8'))));
+    if (vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
+        let dockerImageUser = vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser');
+        asConfig.InternalConfig = {
+            BaseDir: basedir,
+            DockerImageUser: dockerImageUser
+        };
+    }
+    return asConfig;
+}
+exports.readConfigFile = readConfigFile;
 
 
 /***/ }),
@@ -26295,6 +26294,89 @@ class TreeItem extends vscode.TreeItem {
     printDetails() { }
 }
 exports.TreeItem = TreeItem;
+
+
+/***/ }),
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Convert = void 0;
+/* eslint-disable @typescript-eslint/naming-convention */
+const os = __webpack_require__(11);
+// Converts JSON strings to/from your types
+class Convert {
+    static toASConfig(json) {
+        let config = JSON.parse(json);
+        if (!config.Resources.Docker.Host) {
+            config.Resources.Docker.Host = getIPAddress();
+        }
+        return config;
+    }
+}
+exports.Convert = Convert;
+function getIPAddress() {
+    let networkInterfaces = os.networkInterfaces();
+    for (let name of Object.keys(networkInterfaces)) {
+        for (let networkInterface of networkInterfaces[name]) {
+            if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
+                return networkInterface.address;
+            }
+        }
+    }
+    throw new Error('Unable to obtain valid IP address');
+}
+
+
+/***/ }),
+/* 203 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.run = void 0;
+const logger_1 = __webpack_require__(2);
+const wrapper = __webpack_require__(6);
+const config = __webpack_require__(123);
+function run(configpath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let asConfig = config.readConfigFile(configpath);
+        let command = new wrapper.Command(`docker stop ${asConfig.Resources.Function.Name}`);
+        let result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        command = new wrapper.Command(`docker rm ${asConfig.Resources.Function.Name}`);
+        result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        command = new wrapper.Command(`docker stop ${asConfig.Resources.Function.Name}-proxy`);
+        result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        command = new wrapper.Command(`docker rm ${asConfig.Resources.Function.Name}-proxy`);
+        result = yield command.runCommand();
+        if (result === null || result === void 0 ? void 0 : result.stdout) {
+            logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
+        }
+        return null;
+    });
+}
+exports.run = run;
 
 
 /***/ })

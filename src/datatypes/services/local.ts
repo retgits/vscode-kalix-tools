@@ -4,6 +4,12 @@ import * as os from 'os';
 export interface ASConfig {
     ASTemplateVersion: string;
     Resources: Resources;
+    InternalConfig: InternalConfig;
+}
+
+export interface InternalConfig {
+    BaseDir: string;
+    DockerImageUser: string;
 }
 
 export interface Resources {
@@ -13,12 +19,6 @@ export interface Resources {
 
 export interface Docker {
     Dockerfile: string;
-    Username: string;
-    Registry: string;
-    Overrides?: Overrides;
-}
-
-export interface Overrides {
     Host?: string;
 }
 
@@ -31,10 +31,8 @@ export interface Function {
 export class Convert {
     public static toASConfig(json: string): ASConfig {
         let config: ASConfig = JSON.parse(json);
-        if (!config.Resources.Docker.Overrides) {
-            config.Resources.Docker.Overrides = {
-                Host: getIPAddress()
-            };
+        if (!config.Resources.Docker.Host) {
+            config.Resources.Docker.Host = getIPAddress();
         }
         return config;
     }
@@ -42,6 +40,7 @@ export class Convert {
 
 function getIPAddress(): string {
     let networkInterfaces = os.networkInterfaces();
+
     for (let name of Object.keys(networkInterfaces)) {
         for (let networkInterface of networkInterfaces[name]) {
             if (networkInterface.family === 'IPv4' && !networkInterface.internal) {

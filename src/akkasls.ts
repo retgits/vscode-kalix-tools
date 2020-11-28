@@ -27,8 +27,8 @@ import * as inviteUser from './cliwrapper/roles/invitations/inviteuser';
 import * as deleteInvite from './cliwrapper/roles/invitations/delete';
 import * as createProject from './cliwrapper/projects/new';
 import * as revokeToken from './cliwrapper/auth/tokens/revoke';
-
-import * as runLocal from './utils/local/runlocal';
+import * as startLocalService from './cliwrapper/services/local/start';
+import * as stopLocalService from './cliwrapper/services/local/stop';
 
 import * as projectExplorer from './views/projectexplorer/explorer';
 import * as credentialsExplorer from './views/credentialsexplorer/explorer';
@@ -225,7 +225,7 @@ export class AkkaServerless {
 
     async startLocal(doc?: vscode.Uri) {
         try {
-            runLocal.start(doc?.path);
+            startLocalService.run(doc?.path);
         }
         catch (Error) {
             vscode.window.showErrorMessage(Error.message);
@@ -234,7 +234,7 @@ export class AkkaServerless {
 
     async stopLocal(doc?: vscode.Uri) {
         try {
-            runLocal.stop(doc?.path);
+            stopLocalService.run(doc?.path);
         }
         catch (Error) {
             vscode.window.showErrorMessage(Error);

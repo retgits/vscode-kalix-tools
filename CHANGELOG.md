@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.0.4
+
+- Updated and documented the preview of running a function locally
+
 ## Version 0.0.3
 
 - Added CLI wrappers and data types for most commands of the Akka Serverless CLI

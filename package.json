@@ -2,7 +2,7 @@
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"publisher": "retgits",
 	"repository": {
 		"url": "https://github.com/retgits/vscode-akkasls-tools"
@@ -72,6 +72,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "If true will log output from the Akka Serverless CLI in the akkasls output window"
+				},
+				"akkaserverless.dockerImageUser": {
+					"type": "string",
+					"default": null,
+					"description": "Image prefix for docker images ie 'docker.io/retgits'"
 				}
 			}
 		},

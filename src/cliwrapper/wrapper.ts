@@ -1,10 +1,18 @@
-'use strict'
+'use strict';
 
 import * as vscode from 'vscode';
 import { aslogger } from '../utils/logger';
 import  * as shell from '../utils/shell';
 
-export type flag = {
+export type Flag = {
+    name: string
+    description: string
+    required?: boolean
+    defaultValue?: string
+    show?: boolean
+};
+
+interface FlagParameters {
     name: string
     description: string
     required?: boolean
@@ -12,22 +20,14 @@ export type flag = {
     show?: boolean
 }
 
-interface flagParameters {
-    name: string
-    description: string
-    required?: boolean
-    defaultValue?: string
-    show?: boolean
-}
-
-export type argument = {
+export type Argument = {
     name: string
     description: string
     defaultValue?: string
     show?: boolean
-}
+};
 
-interface argumentParameters {
+interface ArgumentParameters {
     name: string
     description: string
     defaultValue?: string
@@ -35,37 +35,43 @@ interface argumentParameters {
 }
 
 export class Command {
-    public readonly cmd: string
-    private args: Array<argument>
-    private flags: Array<flag>
+    public readonly cmd: string;
+    private args: Array<Argument>;
+    private flags: Array<Flag>;
+    public baseDir?: string;
 
-    constructor(cmd: string, args?: Array<argument>, flags?: Array<flag>) {
+    constructor(cmd: string, args?: Array<Argument>, flags?: Array<Flag>) {
         this.cmd = cmd;
         this.args = (args) ? args : [];
         this.flags = (flags) ? flags : [];
+
     }
 
-    addArgument({ name, description, defaultValue, show = true }: argumentParameters) {
+    setBaseDir(baseDir: string) {
+        this.baseDir = baseDir;
+    }
+
+    addArgument({ name, description, defaultValue, show = true }: ArgumentParameters) {
         this.args.push({
             name: name,
             description: description,
             defaultValue: defaultValue,
             show: show
-        })
+        });
     }
 
-    addFlag({ name, description, defaultValue, required = true, show = true }: flagParameters) {
+    addFlag({ name, description, defaultValue, required = true, show = true }: FlagParameters) {
         this.flags.push({
             name: name,
             description: description,
             required: required,
             defaultValue: defaultValue,
             show: show
-        })
+        });
     }
 
     async runCommand(): Promise<shell.ShellResult | null> {
-        let params: string[] = [this.cmd]
+        let params: string[] = [this.cmd];
 
         for (let index = 0; index < this.args.length; index++) {
             const element = this.args[index];
@@ -75,18 +81,18 @@ export class Command {
                     prompt: `${element.name}: ${element.description}`,
                     ignoreFocusOut: true,
                     value: element.defaultValue
-                })
+                });
     
                 if (param?.includes(" ")) {
-                    param = `"${param}"`
+                    param = `"${param}"`;
                 }
     
-                let p: string = ''
-                p += ` ${param}`
+                let p: string = '';
+                p += ` ${param}`;
     
-                params.push(p)
+                params.push(p);
             } else {
-                params.push(`  ${element.defaultValue}`)
+                params.push(`  ${element.defaultValue}`);
             }
         }
 
@@ -98,42 +104,42 @@ export class Command {
                     prompt: `${element.name}: ${element.description}`,
                     ignoreFocusOut: true,
                     value: element.defaultValue
-                })
+                });
     
                 if (param?.includes(" ")) {
-                    param = `"${param}"`
+                    param = `"${param}"`;
                 }
     
-                let p: string = ''
-                p += ` --${element.name} ${param}`
+                let p: string = '';
+                p += ` --${element.name} ${param}`;
     
     
-                params.push(p)
+                params.push(p);
     
                 if (!param && element.required) {
-                    let message: string = `Cannot complete ${this.cmd}, the parameter ${element.name} needs a value`
-                    vscode.window.showErrorMessage(message)
-                    return null
+                    let message: string = `Cannot complete ${this.cmd}, the parameter ${element.name} needs a value`;
+                    vscode.window.showErrorMessage(message);
+                    return null;
                 }
             } else {
-                params.push(` --${element.name} ${element.defaultValue}`)
+                params.push(` --${element.name} ${element.defaultValue}`);
             }
         }
 
-        let tool: string = 'akkasls'
+        let tool: string = 'akkasls';
 
         if (vscode.workspace.getConfiguration('akkaserverless').get('dryrun')) {
-            aslogger.log(`${tool} ${params.join('')}`)
-            return null
+            aslogger.log(`${tool} ${params.join('')}`);
+            return null;
         }
 
-        let res = await shell.shell.exec(`${tool} ${params.join('')}`)
+        let res = await shell.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
 
         if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
-            aslogger.log(res.stderr)
-            aslogger.log(res.stdout)
+            aslogger.log(res.stderr);
+            aslogger.log(res.stdout);
         }
 
-        return res
+        return res;
     }
 }

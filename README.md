@@ -23,6 +23,31 @@ Features include:
 
 The Akka Serverless extension may need to invoke the following command line tools, depending on which features you use. You will need `akkasls` at minimum, and `docker` if you plan to use the extension to build applications rather than only browse.
 
+### Configuration settings to run services locally
+
+If you want to use the `Akka Serverless: Run local` and `Akka Serverless: Stop local` commands, you'll need to configure a user and repository for your container images. Under `Settings > Extension > Akka Serverless` you need to set `akkaserverless.dockerImageUser` to something like `docker.io/retgits`.
+
+Other configuration details are read from a `.akkaserverless.yaml` file which must be in the same folder as your service. The `.akkaserverless.yaml` file has the following parameters:
+
+```yaml
+ASTemplateVersion: 1 ## The current template version
+Resources:
+    Docker:
+        Dockerfile: ./dockerfile ## The name of the docker file to build your container
+        Host: 127.0.0.1 ## The IP address of your local machine so the container and proxy can communicate. If you do not specify this, the extension will try to find it for you.
+    Function:
+        Name: shoppingcart ## The name of your service
+        Version: '1.0.0' ## The version of your service
+```
+
+You can specify the location of the `.akkaserverless.yaml` file in a few different ways:
+
+* Select the file through the VS Code context menu (right-click on a `.akkaserverless.yaml` file);
+* Run the command while the current active text editor window in VS Code has the `.akkaserverless.yaml` file open;
+* Have a `.akkaserverless.yaml` file in the current open workspace;
+* Have a `.akkaserverless.yaml` file in the current open folder;
+* If no file can be found, an error is displayed on your screen.
+
 ## Commands and features
 
 `vscode-akkasls-tools` supports a number of commands for interacting with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and may be bound to keys in the normal way.
@@ -79,6 +104,7 @@ The Akka Serverless extension may need to invoke the following command line tool
 * `akkaserverless` - Parent for Akka Serverless-related extension settings
     * `akkaserverless.dryrun`: If true will print the commands in the log rather than execute them
     * `akkaserverless.logOutput`: If true will log output from the Akka Serverless CLI in the akkasls output window
+    * `akkaserverless.dockerImageUser`: Image prefix for docker images ie 'docker.io/retgits'
 
 ## Release notes
 
