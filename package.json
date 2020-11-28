@@ -55,7 +55,9 @@
 		"onCommand:as.commandpalette.undeploy",
 		"onCommand:as.commandpalette.expose",
 		"onCommand:as.commandpalette.unexpose",
-		"onCommand:as.commandpalette.invites.inviteuser"
+		"onCommand:as.commandpalette.invites.inviteuser",
+		"onCommand:as.commandpalette.projects.local.start",
+		"onCommand:as.commandpalette.projects.local.stop"
 	],
 	"contributes": {
 		"configuration": {
@@ -266,6 +268,16 @@
 				"command": "as.commandpalette.auth.logout",
 				"title": "Logout from Akka Serverless",
 				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.projects.local.start",
+				"title": "Run current workspace as Akka Serverless function",
+				"category": "Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.projects.local.stop",
+				"title": "Stop current local running Akka Serverless function",
+				"category": "Akka Serverless"
 			}
 		],
 		"menus": {
@@ -460,14 +472,26 @@
 					"command": "as.views.projects.openbrowser",
 					"when": "view == as.views.projects"
 				}
+			],
+			"explorer/context": [
+				{
+					"when": "resourceFilename == .akkaserverless.yaml",
+					"command": "as.commandpalette.projects.local.start"
+				},
+				{
+					"when": "resourceFilename == .akkaserverless.yaml",
+					"command": "as.commandpalette.projects.local.stop"
+				}
 			]
 		}
 	},
 	"dependencies": {
 		"@types/cli-table": "^0.3.0",
+		"@types/js-yaml": "^3.12.5",
 		"@types/shelljs": "^0.8.8",
 		"axios": "^0.21.0",
 		"cli-table3": "^0.6.0",
+		"js-yaml": "^3.14.0",
 		"shelljs": "^0.8.4"
 	}
 }

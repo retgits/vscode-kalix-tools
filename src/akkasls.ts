@@ -28,8 +28,12 @@ import * as deleteInvite from './cliwrapper/roles/invitations/delete';
 import * as createProject from './cliwrapper/projects/new';
 import * as revokeToken from './cliwrapper/auth/tokens/revoke';
 
+import * as runLocal from './utils/local/runlocal';
+
 import * as projectExplorer from './views/projectexplorer/explorer';
 import * as credentialsExplorer from './views/credentialsexplorer/explorer';
+
+import * as vscode from 'vscode';
 
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
 
@@ -217,5 +221,23 @@ export class AkkaServerless {
                 });
             }
         });
+    }
+
+    async startLocal(doc?: vscode.Uri) {
+        try {
+            runLocal.start(doc?.path);
+        }
+        catch (Error) {
+            vscode.window.showErrorMessage(Error.message);
+        }
+    }
+
+    async stopLocal(doc?: vscode.Uri) {
+        try {
+            runLocal.stop(doc?.path);
+        }
+        catch (Error) {
+            vscode.window.showErrorMessage(Error);
+        }
     }
 }

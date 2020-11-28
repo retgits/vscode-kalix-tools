@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
@@ -12,7 +12,7 @@ import * as shelljs from 'shelljs';
 
 // Set the execPath specifically to node due to a bug in shelljs
 // https://github.com/shelljs/shelljs/issues/704
-shelljs.config.execPath = shelljs.which('node').toString()
+shelljs.config.execPath = shelljs.which('node').toString();
 
 export interface ShellResult {
     readonly code: number;
@@ -34,7 +34,7 @@ export interface Shell {
 export const shell: Shell = {
     exec: exec,
     existsInPath: existsInPath
-}
+};
 
 /**
  * existsInPath validates that a given executable exists in the PATH of the user
@@ -42,9 +42,9 @@ export const shell: Shell = {
  */
 function existsInPath(tool: string): boolean {
     if (shelljs.which(tool)) {
-        return true
+        return true;
     }
-    return false
+    return false;
 }
 
 /**
@@ -53,19 +53,19 @@ function existsInPath(tool: string): boolean {
  * @param cwd The directory to start from
  */
 function exec(cmd: string, cwd?: string) {
-    let wd: string
+    let wd: string;
 
     if (!cwd && !vscode.workspace.workspaceFolders) {
-        wd = '.'
+        wd = '.';
     } else {
-        wd = (cwd) ? cwd : URL.fileURLToPath(vscode.workspace.workspaceFolders![0].uri.toString())
+        wd = (cwd) ? cwd : URL.fileURLToPath(vscode.workspace.workspaceFolders![0].uri.toString());
     }
 
     let opts = { 
         env: process.env,
         async: true,
         cwd: wd
-    }
+    };
 
     return new Promise<ShellResult>((resolve) => {
         shelljs.exec(cmd, opts, (code, stdout, stderr) => resolve({code : code, stdout : stdout, stderr : stderr}));
