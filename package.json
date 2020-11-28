@@ -2,7 +2,7 @@
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "retgits",
 	"repository": {
 		"url": "https://github.com/retgits/vscode-akkasls-tools"
@@ -26,18 +26,18 @@
 		"build": "vsce package"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.51.0",
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.0",
 		"@types/node": "^12.11.7",
-		"eslint": "^7.9.0",
+		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"eslint": "^7.9.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
+		"ts-loader": "^8.0.3",
 		"typescript": "^4.0.2",
 		"vscode-test": "^1.4.0",
-		"ts-loader": "^8.0.3",
 		"webpack": "^4.44.1",
 		"webpack-cli": "^3.3.12"
 	},
@@ -159,7 +159,7 @@
 			},
 			{
 				"command": "as.views.projects.credentials.add",
-				"title": "Add credentials (1)"
+				"title": "Add credentials"
 			},
 			{
 				"command": "as.views.projects.credentials.delete",
