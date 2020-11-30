@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.0.5
+
+- Fixed printing ANSI escape sequences in 'view details' pages
+
 ## Version 0.0.4
 
 - Updated and documented the preview of running a function locally

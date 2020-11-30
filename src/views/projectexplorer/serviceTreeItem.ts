@@ -53,7 +53,7 @@ export class ServiceTreeItem extends base.TreeItem {
                 printTable.push(['Container images', containers.join('\n')]);
             }
             printTable.push(['Replicas', this.service.spec?.replicas]);
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }

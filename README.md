@@ -2,7 +2,7 @@
 
 An extension for developers building stateful serverless applications on [Akka Serverless](https://docs.cloudstate.com).
 
-<img src="./utils/image.svg" width="100%">
+![image](utils/image.png)
 
 *[Illustration by Freepik Stories](https://stories.freepik.com/technology)*
 

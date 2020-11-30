@@ -50,7 +50,7 @@ export class ProjectTreeItem extends base.TreeItem {
                 }
                 printTable.push(['Hostnames', names.join('\n')]);
             }
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }

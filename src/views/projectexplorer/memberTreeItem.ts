@@ -57,7 +57,7 @@ export class MemberTreeItem extends base.TreeItem {
             let printTable = new table({});
             printTable.push(['Name', this.member.user_full_name]);
             printTable.push(['Email address', this.member.user_email]);
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }

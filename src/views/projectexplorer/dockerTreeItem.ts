@@ -42,7 +42,7 @@ export class DockerTreeItem extends base.TreeItem {
             printTable.push(['Name', this.getName()]);
             printTable.push(['Server', this.credential.server]);
             printTable.push(['Username', this.credential.username]);
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }

@@ -54,7 +54,7 @@ export class InviteTreeItem extends base.TreeItem {
             printTable.push(['Email address', this.invite.email]);
             printTable.push(['Invited as', this.invite.role_id]);
             printTable.push(['Invited on', new Date(this.invite.created.seconds * 1000).toLocaleDateString()]);
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }

@@ -48,7 +48,7 @@ export class TokenTreeItem extends base.TreeItem {
             printTable.push(['Description', this.token.description]);
             printTable.push(['Created on', new Date(this.token.created_time.seconds * 1000).toLocaleDateString()]);
             printTable.push(['Type', this.getType()]);
-            aslogger.log(printTable.toString());
+            aslogger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
         }
     }
 }
