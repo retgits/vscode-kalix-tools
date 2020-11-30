@@ -66,6 +66,7 @@ You can specify the location of the `.akkaserverless.yaml` file in a few differe
 * `Akka Serverless: Login` - Logs in to Akka Serverless by printing the login URL in the akkasls output window
 * `Akka Serverless: Logout` - Logs out from Akka Serverless
 * `Akka Serverless: New project` - Create a new project on Akka Serverless
+* `Akka Serverless: Revoke token` - Revokes a previously issues Akka Serverless authentication token
 * `Akka Serverless: Run local` - Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)
 * `Akka Serverless: Send invite` - Invite a new user to a project on Akka Serverless
 * `Akka Serverless: Stop local` - Stops the selected service and Cloudstate proxy
