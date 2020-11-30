@@ -70,6 +70,7 @@ You can specify the location of the `.akkaserverless.yaml` file in a few differe
 * `Akka Serverless: Run local` - Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)
 * `Akka Serverless: Send invite` - Invite a new user to a project on Akka Serverless
 * `Akka Serverless: Stop local` - Stops the selected service and Cloudstate proxy
+* `Akka Serverless: Template Wizard` - Start the wizard to generate a project based on existing templates
 * `Akka Serverless: Undeploy` - Remove a service from Akka Serverless
 * `Akka Serverless: Unexpose` - Removes a service route from a service
 * `Akka Serverless: View Status` - Open the Akka Serverless status page in your browser
