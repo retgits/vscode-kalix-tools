@@ -4,6 +4,7 @@
 	"description": "Develop, deploy, and manage Akka Serverless apps",
 	"version": "0.0.5",
 	"publisher": "retgits",
+	"icon": "resources/icon.png",
 	"repository": {
 		"url": "https://github.com/retgits/vscode-akkasls-tools"
 	},
