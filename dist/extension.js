@@ -453,12 +453,13 @@ class AkkaServerless {
     }
     getProjectIDByName(projectName) {
         return __awaiter(this, void 0, void 0, function* () {
+            let name = '';
             (yield this.getProjects()).forEach(project => {
                 if (projectName === project.friendly_name) {
-                    return project.name.substring(9);
+                    name = project.name.substring(9);
                 }
             });
-            return '';
+            return name;
         });
     }
     getHostnamesByProjectID(projectID) {
@@ -577,7 +578,7 @@ class AkkaServerless {
     }
     undeployService(projectID, serviceName) {
         return __awaiter(this, void 0, void 0, function* () {
-            undeployService.run(projectID, serviceName).then(() => {
+            undeployService.run(this, projectID, serviceName).then(() => {
                 if (projectID) {
                     this.refreshServices(projectID).then(() => {
                         this.projectExplorer.refresh();
@@ -599,7 +600,7 @@ class AkkaServerless {
     }
     unexposeService(projectID, serviceName) {
         return __awaiter(this, void 0, void 0, function* () {
-            unexposeService.run(projectID, serviceName).then(() => {
+            unexposeService.run(this, projectID, serviceName).then(() => {
                 if (projectID) {
                     this.refreshServices(projectID).then(() => {
                         this.projectExplorer.refresh();
@@ -667,12 +668,13 @@ class AkkaServerless {
     }
     getDockerCredentialIDByServer(projectID, serverName) {
         return __awaiter(this, void 0, void 0, function* () {
+            let name = '';
             (yield this.getDockerCredentials(projectID)).forEach(cred => {
                 if (cred.server === serverName) {
-                    return cred.name;
+                    name = cred.name;
                 }
             });
-            return '';
+            return name;
         });
     }
     addDockerCredentials(projectID) {

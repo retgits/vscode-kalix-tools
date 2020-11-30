@@ -86,12 +86,13 @@ export class AkkaServerless {
     }
 
     async getProjectIDByName(projectName: string): Promise<string> {
+        let name = '';
         (await this.getProjects()).forEach(project => {
             if(projectName === project.friendly_name) {
-                return project.name.substring(9);
+                name = project.name.substring(9);
             }
         });
-        return '';
+        return name;
     }
 
     async getHostnamesByProjectID(projectID: string): Promise<string[]> {
@@ -197,7 +198,7 @@ export class AkkaServerless {
     }
 
     async undeployService(projectID?: string, serviceName?: string) {
-        undeployService.run(projectID, serviceName).then(() => {
+        undeployService.run(this, projectID, serviceName).then(() => {
             if(projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
@@ -217,7 +218,7 @@ export class AkkaServerless {
     }
 
     async unexposeService(projectID?: string, serviceName?: string) {
-        unexposeService.run(projectID, serviceName).then(() => {
+        unexposeService.run(this, projectID, serviceName).then(() => {
             if(projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
@@ -276,12 +277,13 @@ export class AkkaServerless {
     }
 
     async getDockerCredentialIDByServer(projectID: string, serverName: string): Promise<string> {
+        let name = '';
         (await this.getDockerCredentials(projectID)).forEach(cred => {
             if(cred.server === serverName) {
-                return cred.name;
+                name = cred.name;
             }
         });
-        return '';
+        return name;
     }
 
     async addDockerCredentials(projectID?: string) {
