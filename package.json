@@ -25,7 +25,8 @@
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
 		"gen:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
-		"gen:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js"
+		"gen:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
+		"gen:tag": "tsc ./utils/generateTag.ts && node ./utils/generateTag.js"
 	},
 	"devDependencies": {
 		"@types/js-yaml": "^3.12.5",
@@ -306,6 +307,12 @@
 				"title": "Logout",
 				"category": "Akka Serverless",
 				"description": "Logs out from Akka Serverless"
+			},
+			{
+				"command": "as.commandpalette.tokens.revoke",
+				"title": "Revoke token",
+				"category": "Akka Serverless",
+				"description": "Revokes a previously issues Akka Serverless authentication token"
 			},
 			{
 				"command": "as.commandpalette.projects.local.start",

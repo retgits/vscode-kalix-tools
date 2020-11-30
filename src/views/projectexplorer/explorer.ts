@@ -16,6 +16,7 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
 
     constructor(akkaServerless: sls.AkkaServerless) {
         this.akkaServerless = akkaServerless;
+        akkaServerless.registerProjectExplorer(this);
     }
 
     refresh(): void {
@@ -59,47 +60,47 @@ export class ProjectExplorer implements vscode.TreeDataProvider<base.TreeItem> {
     }
 
     async deployService(item: base.TreeItem) {
-        this.akkaServerless.deployService(item.parentProjectID, this);
+        this.akkaServerless.deployService(item.parentProjectID);
     }
 
     async addDockerCredentials(item: base.TreeItem) {
-        this.akkaServerless.addDockerCredentials(item.parentProjectID, this);
+        this.akkaServerless.addDockerCredentials(item.parentProjectID);
     }
 
     async deleteDockerCredentials(item: docker.DockerTreeItem) {
         if (item.label !== docker.ITEM_TYPE) {
-            this.akkaServerless.deleteDockerCredentials(item.parentProjectID, item.label, this);
+            this.akkaServerless.deleteDockerCredentials(item.parentProjectID, item.label);
         }
     }
 
     async undeployService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.undeployService(item.parentProjectID, item.label, this);
+            this.akkaServerless.undeployService(item.parentProjectID, item.label);
         }
     }
 
     async exposeService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.exposeService(item.parentProjectID, item.label, this);
+            this.akkaServerless.exposeService(item.parentProjectID, item.label);
         }
     }
 
     async unexposeService(item: service.ServiceTreeItem) {
         if (item.label !== service.ITEM_TYPE) {
-            this.akkaServerless.unexposeService(item.parentProjectID, item.label, this);
+            this.akkaServerless.unexposeService(item.parentProjectID, item.label);
         }
     }
 
     async inviteUser(base: base.TreeItem) {
-        this.akkaServerless.inviteUser(base.parentProjectID, this);
+        this.akkaServerless.inviteUser(base.parentProjectID);
     }
 
     async deleteInvite(item: invite.InviteTreeItem) {
-        this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email, this);
+        this.akkaServerless.deleteInvite(item.parentProjectID, item.invite.email);
     }
 
     async newProject() {
-        this.akkaServerless.createNewProject(this);
+        this.akkaServerless.createNewProject();
     }
 
     async printTreeItemDetails(base: base.TreeItem) {

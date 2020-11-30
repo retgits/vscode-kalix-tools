@@ -12,6 +12,7 @@ export class CredentialsExplorer implements vscode.TreeDataProvider<base.TreeIte
 
     constructor(akkaServerless: sls.AkkaServerless) {
         this.akkaServerless = akkaServerless;
+        this.akkaServerless.registerCredentialsExplorer(this);
     }
 
     refresh(): void {
@@ -48,6 +49,6 @@ export class CredentialsExplorer implements vscode.TreeDataProvider<base.TreeIte
     }
 
     async revokeCredential(token: token.TokenTreeItem) {
-        this.akkaServerless.revokeToken(token.id, this);
+        this.akkaServerless.revokeToken(token.id);
     }
 }

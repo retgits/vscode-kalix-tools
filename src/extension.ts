@@ -76,6 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.deleteinvite', async () => { akkasls.deleteInvite(); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.start', async (uri: vscode.Uri) => { akkasls.startLocal(uri); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.stop', async (uri: vscode.Uri) => { akkasls.stopLocal(uri); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.tokens.revoke', async () => { akkasls.revokeToken(); }));
 }
 
 export function deactivate() {

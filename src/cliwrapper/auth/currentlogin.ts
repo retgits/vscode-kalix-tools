@@ -1,13 +1,9 @@
-'use strict'
+'use strict';
 
+import { ShellResult } from '../../utils/shell';
 import * as wrapper from '../wrapper';
 
-export async function fromCLI() {
-    let command = new wrapper.Command('auth current-login')
-    await command.runCommand()
-}
-
-export async function fromUI() {
-    let command = new wrapper.Command('auth current-login')
-    await command.runCommand()
+export async function run(): Promise<ShellResult | null> {
+    let command = new wrapper.Command('auth current-login');
+    return command.runCommand();
 }
