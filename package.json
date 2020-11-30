@@ -23,7 +23,8 @@
 		"pretest": "npm run test-compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"build": "vsce package"
+		"gen:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
+		"gen:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",

@@ -1,3 +1,13 @@
+/**
+ * generateReadMe creates the text for the "commands and features" and "extensions" section of the README
+ * so that it can be copied and pasted when new commands are added, old ones are removed, or existing ones
+ * are updated.
+ * 
+ * You can run this file with:
+ * `npm run gen:readme`
+ */
+
+// Read the package
 let extensionData = require('../package.json');
 
 // Create views map

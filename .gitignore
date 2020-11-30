@@ -159,3 +159,4 @@ dist
 
 ## Zips of the installer
 vscode-akkasls-tools-*.zip
+utils/*.js
