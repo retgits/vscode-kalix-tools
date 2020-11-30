@@ -2,7 +2,7 @@
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
-	"version": "0.0.6",
+	"version": "0.0.8",
 	"publisher": "retgits",
 	"icon": "resources/icon.png",
 	"repository": {
@@ -29,9 +29,11 @@
 		"gen:tag": "tsc ./utils/generateTag.ts && node ./utils/generateTag.js"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "^9.0.4",
 		"@types/js-yaml": "^3.12.5",
 		"@types/node": "^12.11.7",
 		"@types/shelljs": "^0.8.8",
+		"@types/tmp": "^0.2.0",
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
@@ -57,7 +59,8 @@
 		"onCommand:as.commandpalette.unexpose",
 		"onCommand:as.commandpalette.invites.inviteuser",
 		"onCommand:as.commandpalette.projects.local.start",
-		"onCommand:as.commandpalette.projects.local.stop"
+		"onCommand:as.commandpalette.projects.local.stop",
+		"onCommand:as.commandpalette.templatewizard"
 	],
 	"contributes": {
 		"configuration": {
@@ -145,6 +148,12 @@
 					"dark": "resources/dark/refresh.svg"
 				},
 				"description": "Refresh the credentials explorer view"
+			},
+			{
+				"command": "as.commandpalette.templatewizard",
+				"title": "Template Wizard",
+				"category": "Akka Serverless",
+				"description": "Start the wizard to generate a project based on existing templates"
 			},
 			{
 				"command": "as.commandpalette.deploy",
@@ -535,7 +544,10 @@
 	"dependencies": {
 		"axios": "^0.21.0",
 		"cli-table3": "^0.6.0",
+		"fs-extra": "^9.0.1",
 		"js-yaml": "^3.14.0",
-		"shelljs": "^0.8.4"
+		"replace-in-file": "^6.1.0",
+		"shelljs": "^0.8.4",
+		"tmp": "^0.2.1"
 	}
 }

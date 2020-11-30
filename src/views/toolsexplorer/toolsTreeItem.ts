@@ -20,6 +20,11 @@ const toolsJSON: string = `
         "name": "docker",
         "versionCmd": "version --format '{{.Client.Version}}'",
         "infoURL": "https://docs.docker.com/desktop/"
+    },
+    {
+        "name": "git",
+        "versionCmd": "--version",
+        "infoURL": "https://git-scm.com/downloads"
     }
 ]
 `;

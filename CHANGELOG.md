@@ -1,5 +1,14 @@
 # Change Log
 
+## Version 0.0.8
+
+- Added Quick Start templates
+
+## Version 0.0.7
+
+- Replaced inputdialogs with quick picks
+- Reduced size of the installer
+
 ## Version 0.0.5
 
 - Fixed printing ANSI escape sequences in 'view details' pages

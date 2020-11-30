@@ -19,6 +19,7 @@ import * as docker from './views/projectexplorer/dockerTreeItem';
 import * as token from './views/credentialsexplorer/tokenTreeItem';
 
 import * as AkkaServerless from './akkasls';
+import { templateWizard } from './templatewizard/wizard';
 
 export function activate(context: vscode.ExtensionContext) {
 	const akkasls = new AkkaServerless.AkkaServerless();
@@ -77,6 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.start', async (uri: vscode.Uri) => { akkasls.startLocal(uri); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.stop', async (uri: vscode.Uri) => { akkasls.stopLocal(uri); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.tokens.revoke', async () => { akkasls.revokeToken(); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.templatewizard', async () => { templateWizard(); }));
 }
 
 export function deactivate() {
