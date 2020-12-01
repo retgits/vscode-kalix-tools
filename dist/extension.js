@@ -26471,19 +26471,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.templateWizard = void 0;
 const fs_extra_1 = __webpack_require__(199);
-const rif = __webpack_require__(238);
+const replace_in_file_1 = __webpack_require__(238);
 const path_1 = __webpack_require__(15);
 const vscode_1 = __webpack_require__(1);
-const tmp = __webpack_require__(257);
-const shell = __webpack_require__(6);
+const tmp_1 = __webpack_require__(257);
+const shell_1 = __webpack_require__(6);
 const logger_1 = __webpack_require__(2);
 function templateWizard() {
     return __awaiter(this, void 0, void 0, function* () {
         const wizardTitle = 'Create Application Template';
         const totalSteps = 6;
         const templateRepoName = 'https://github.com/retgits/akkasls-templates';
-        const tempFolder = tmp.dirSync();
-        const res = yield shell.shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
+        const tempFolder = tmp_1.dirSync();
+        const res = yield shell_1.shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
         if (vscode_1.workspace.getConfiguration('akkaserverless').get('logOutput')) {
             logger_1.aslogger.log(res.stderr);
             logger_1.aslogger.log(res.stdout);
@@ -26619,7 +26619,7 @@ function templateWizard() {
             fs_extra_1.ensureDirSync(state.location);
             fs_extra_1.copySync(path_1.join(tempFolder.name, state.runtime.label, state.template.label), state.location);
         }
-        rif.replaceInFileSync({
+        replace_in_file_1.replaceInFileSync({
             files: [
                 `${state.location}/**`,
                 `${state.location}/.*`
@@ -26627,7 +26627,7 @@ function templateWizard() {
             from: /{{functionname}}/g,
             to: state.functionName
         });
-        rif.replaceInFileSync({
+        replace_in_file_1.replaceInFileSync({
             files: [
                 `${state.location}/**`,
                 `${state.location}/.*`
@@ -26635,7 +26635,7 @@ function templateWizard() {
             from: /{{functionversion}}/g,
             to: state.functionVersion
         });
-        rif.replaceInFileSync({
+        replace_in_file_1.replaceInFileSync({
             files: [
                 `${state.location}/**`
             ],

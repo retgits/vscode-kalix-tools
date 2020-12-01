@@ -1,26 +1,26 @@
 import { copySync, emptyDirSync, ensureDirSync, existsSync, readdirSync } from 'fs-extra';
-import * as rif from 'replace-in-file';
+import { replaceInFileSync } from 'replace-in-file';
 import { join } from 'path';
 import { workspace, QuickPickItem, window, Disposable, QuickInput, QuickInputButtons } from 'vscode';
-import * as tmp from 'tmp';
-import  * as shell from '../utils/shell';
+import { dirSync } from 'tmp';
+import { shell } from '../utils/shell';
 import { aslogger } from '../utils/logger';
 
 export async function templateWizard() {
 	const wizardTitle = 'Create Application Template';
-    const totalSteps = 6;
-    const templateRepoName = 'https://github.com/retgits/akkasls-templates';
+	const totalSteps = 6;
+	const templateRepoName = 'https://github.com/retgits/akkasls-templates';
 
-	const tempFolder = tmp.dirSync();
+	const tempFolder = dirSync();
 
-	const res = await shell.shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
-    if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
-        aslogger.log(res.stderr);
-        aslogger.log(res.stdout);
-    }
+	const res = await shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
+	if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
+		aslogger.log(res.stderr);
+		aslogger.log(res.stdout);
+	}
 
 	interface State {
-		runtime:  QuickPickItem | string;
+		runtime: QuickPickItem | string;
 		template: QuickPickItem | string;
 		protoPackage: string;
 		functionName: string;
@@ -136,7 +136,7 @@ export async function templateWizard() {
 		return readdirSync(tempFolder.name).slice(1);
 	}
 
-	function getAvailableProjectTemplates(runtime: QuickPickItem|string): string[] {
+	function getAvailableProjectTemplates(runtime: QuickPickItem | string): string[] {
 		if (typeof runtime !== "string") {
 			return readdirSync(join(tempFolder.name, runtime.label));
 		}
@@ -144,15 +144,15 @@ export async function templateWizard() {
 	}
 
 	const state = await collectInputs();
-    window.showInformationMessage(`Creating new template in '${state.location}'`);
-    
+	window.showInformationMessage(`Creating new template in '${state.location}'`);
+
 	if (typeof state.runtime !== "string" && typeof state.template !== "string") {
 		state.location = join(state.location, state.functionName);
 		ensureDirSync(state.location);
 		copySync(join(tempFolder.name, state.runtime.label, state.template.label), state.location);
 	}
 
-	rif.replaceInFileSync({
+	replaceInFileSync({
 		files: [
 			`${state.location}/**`,
 			`${state.location}/.*`
@@ -161,7 +161,7 @@ export async function templateWizard() {
 		to: state.functionName
 	});
 
-	rif.replaceInFileSync({
+	replaceInFileSync({
 		files: [
 			`${state.location}/**`,
 			`${state.location}/.*`
@@ -170,14 +170,14 @@ export async function templateWizard() {
 		to: state.functionVersion
 	});
 
-	rif.replaceInFileSync({
+	replaceInFileSync({
 		files: [
 			`${state.location}/**`
 		],
 		from: /{{protopackage}}/g,
 		to: state.protoPackage
 	});
-    
+
 	// Clean up the temp folder
 	emptyDirSync(tempFolder.name);
 	tempFolder.removeCallback();
