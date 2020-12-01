@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.0.9
+
+- Updated filtering logic for Quick Start templates
+- Refactored logic to make it more reusable
+
 ## Version 0.0.8
 
 - Added Quick Start templates
