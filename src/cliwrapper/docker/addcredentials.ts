@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../utils/shell';
-import * as akkasls from '../../akkasls';
-import * as wrapper from '../wrapper';
+import { AkkaServerless } from '../../akkasls';
+import { Command } from '../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless, projectID?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('docker add-credentials');
+export async function AddDockerCredentials(akkasls: AkkaServerless, projectID?: string): Promise<ShellResult | null> {
+    let command = new Command('docker add-credentials');
 
     if(!projectID) {
         let result = await window.showQuickPick(akkasls.getProjectsArray(), {

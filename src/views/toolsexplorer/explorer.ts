@@ -1,11 +1,11 @@
 'use strict';
 
-import * as vscode from 'vscode';
-import * as tool from './toolsTreeItem';
+import { TreeDataProvider, TreeItem, Event, EventEmitter } from 'vscode';
+import { ToolTreeItem, GetToolTreeItems, OpenToolPage } from './toolsTreeItem';
 
-export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<tool.ToolTreeItem | undefined | void> = new vscode.EventEmitter<tool.ToolTreeItem | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<tool.ToolTreeItem | undefined | void> = this._onDidChangeTreeData.event;
+export class ToolsExplorer implements TreeDataProvider<ToolTreeItem> {
+    private _onDidChangeTreeData: EventEmitter<ToolTreeItem | undefined | void> = new EventEmitter<ToolTreeItem | undefined | void>();
+    readonly onDidChangeTreeData: Event<ToolTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
     constructor() { }
 
@@ -13,15 +13,15 @@ export class TreeDataProvider implements vscode.TreeDataProvider<tool.ToolTreeIt
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: tool.ToolTreeItem): vscode.TreeItem {
+    getTreeItem(element: ToolTreeItem): TreeItem {
         return element;
     }
 
-    getChildren(): Thenable<tool.ToolTreeItem[]> {
-        return Promise.resolve(tool.getToolTreeItems());
+    getChildren(): Thenable<ToolTreeItem[]> {
+        return Promise.resolve(GetToolTreeItems());
     }
 
-    openTreeItemInBrowser(item: tool.ToolTreeItem) {
-        tool.openToolPage(item.tool);
+    openTreeItemInBrowser(item: ToolTreeItem) {
+        OpenToolPage(item.tool);
     }
 }

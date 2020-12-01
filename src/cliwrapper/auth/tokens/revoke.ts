@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../../utils/shell';
-import * as akkasls from '../../../akkasls';
-import * as wrapper from '../../wrapper';
+import { AkkaServerless } from '../../../akkasls';
+import { Command } from '../../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless, tokenID?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('auth tokens revoke');
+export async function RevokeToken(akkasls: AkkaServerless, tokenID?: string): Promise<ShellResult | null> {
+    let command = new Command('auth tokens revoke');
 
     if(!tokenID) {
         tokenID = await window.showQuickPick(akkasls.getTokenArray(), {

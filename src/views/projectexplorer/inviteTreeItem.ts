@@ -1,22 +1,22 @@
 'use strict';
 
-import * as sls from '../../akkasls';
-import * as base from './projectBaseTreeItem';
-import * as invite from '../../datatypes/roles/invitations/invite';
-import * as vscode from 'vscode';
+import { AkkaServerless } from '../../akkasls';
+import { ProjectBaseTreeItem } from './projectBaseTreeItem';
+import { Invite } from '../../datatypes/roles/invitations/invite';
+import { TreeItemCollapsibleState, ThemeIcon} from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
-export const ITEM_TYPE = 'Invites';
+export const INVITE_ITEM_TYPE = 'Invites';
 
-export class InviteTreeItem extends base.TreeItem {
+export class InviteTreeItem extends ProjectBaseTreeItem {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
-        public readonly invite: invite.Invite,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly invite: Invite,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
-        super(label, collapsibleState, ITEM_TYPE);
+        super(label, collapsibleState, INVITE_ITEM_TYPE);
     }
 
     getName(): string {
@@ -35,21 +35,21 @@ export class InviteTreeItem extends base.TreeItem {
         return this.invite.created.seconds;
     }
 
-    getIcon(): vscode.ThemeIcon {
-        if (this.label === ITEM_TYPE) {
-            return new vscode.ThemeIcon('account');
+    getIcon(): ThemeIcon {
+        if (this.label === INVITE_ITEM_TYPE) {
+            return new ThemeIcon('account');
         }
-        return new vscode.ThemeIcon('call-outgoing');
+        return new ThemeIcon('call-outgoing');
     }
 
     id = this.getName();
 
     iconPath = this.getIcon();
 
-    contextValue = ITEM_TYPE;
+    contextValue = INVITE_ITEM_TYPE;
 
     printDetails() {
-        if (this.label !== ITEM_TYPE) {
+        if (this.label !== INVITE_ITEM_TYPE) {
             let printTable = new table({});
             printTable.push(['Email address', this.invite.email]);
             printTable.push(['Invited as', this.invite.role_id]);
@@ -59,19 +59,19 @@ export class InviteTreeItem extends base.TreeItem {
     }
 }
 
-export async function getInviteTreeItems(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<InviteTreeItem[]> {
+export async function GetInviteTreeItems(parentProjectID: string, akkasls: AkkaServerless): Promise<InviteTreeItem[]> {
     let invites: InviteTreeItem[] = [];
 
     let invitesList = await akkasls.getInvites(parentProjectID);
 
     for (let invite of invitesList) {
-        invites.push(new InviteTreeItem(invite.email, parentProjectID, invite, vscode.TreeItemCollapsibleState.None));
+        invites.push(new InviteTreeItem(invite.email, parentProjectID, invite, TreeItemCollapsibleState.None));
     }
 
     return invites;
 }
 
-export function getDefaultInviteTreeItem(parentProjectID: string): InviteTreeItem {
+export function GetDefaultInviteTreeItem(parentProjectID: string): InviteTreeItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new InviteTreeItem(ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${ITEM_TYPE}`, role_id: '', email: '', created: { seconds: 0 } }, vscode.TreeItemCollapsibleState.Collapsed);
+    return new InviteTreeItem(INVITE_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${INVITE_ITEM_TYPE}`, role_id: '', email: '', created: { seconds: 0 } }, TreeItemCollapsibleState.Collapsed);
 }

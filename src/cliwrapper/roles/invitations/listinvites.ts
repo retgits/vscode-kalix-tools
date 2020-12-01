@@ -1,10 +1,11 @@
 'use strict';
 
-import * as wrapper from '../../wrapper';
-import * as invite from '../../../datatypes/roles/invitations/invite';
+import { Command } from '../../wrapper';
+import { Convert } from '../../../datatypes/converter';
+import { Invite } from '../../../datatypes/roles/invitations/invite';
 
-export async function run(projectID: string): Promise<invite.Invite[]> {
-    let command = new wrapper.Command(`roles invitations list --project ${projectID} -o json`);
+export async function ListInvites(projectID: string): Promise<Invite[]> {
+    let command = new Command(`roles invitations list --project ${projectID} -o json`);
     let result = await command.runCommand();
-    return invite.Convert.toInviteArray(result!.stdout);
+    return Convert.toInviteArray(result!.stdout);
 }

@@ -1,11 +1,11 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 
-export abstract class TreeItem extends vscode.TreeItem {
+export abstract class CredentialsBaseTreeItem extends TreeItem {
     public readonly type: string;
 
-    constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState, type: string) {
+    constructor(label: string, collapsibleState: TreeItemCollapsibleState, type: string) {
         super(label, collapsibleState);
         this.type = type;
     }

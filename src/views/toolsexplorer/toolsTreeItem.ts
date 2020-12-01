@@ -1,9 +1,10 @@
 'use strict';
 
 import axios from 'axios';
+import { Convert } from '../../datatypes/converter';
 import { shell } from '../../utils/shell';
-import * as tool from '../../datatypes/tool';
-import * as vscode from 'vscode';
+import { Tool } from '../../datatypes/tool';
+import { TreeItem, TreeItemCollapsibleState, ThemeIcon, window, Uri, commands } from 'vscode';
 
 const EXISTS_CODICON = 'pass';
 const NOT_EXISTS_CODICON = 'error';
@@ -29,11 +30,11 @@ const toolsJSON: string = `
 ]
 `;
 
-export class ToolTreeItem extends vscode.TreeItem {
+export class ToolTreeItem extends TreeItem {
     constructor(
         public readonly label: string,
-        public readonly tool: tool.Tool,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly tool: Tool,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
         super(label, collapsibleState);
     }
@@ -45,20 +46,20 @@ export class ToolTreeItem extends vscode.TreeItem {
     contextValue = 'Tools';
 }
 
-export async function getToolTreeItems(): Promise<ToolTreeItem[]> {
+export async function GetToolTreeItems(): Promise<ToolTreeItem[]> {
     let tools: ToolTreeItem[] = [];
 
-    let toolsList = tool.Convert.toToolArray(toolsJSON);
+    let toolsList = Convert.toToolArray(toolsJSON);
 
     for (let tool of toolsList) {
         tool.currentVersion = await getVersion(tool);
-        tools.push(new ToolTreeItem(tool.name, tool, vscode.TreeItemCollapsibleState.None));
+        tools.push(new ToolTreeItem(tool.name, tool, TreeItemCollapsibleState.None));
     }
 
     return tools;
 }
 
-async function getVersion(tool: tool.Tool): Promise<string> {
+async function getVersion(tool: Tool): Promise<string> {
     let shellResult = await shell.exec(`${tool.name} ${tool.versionCmd}`);
     let version = shellResult.stdout;
     if (tool.updateURL) {
@@ -67,24 +68,24 @@ async function getVersion(tool: tool.Tool): Promise<string> {
     return version;
 }
 
-function getStatus(cmd: string): vscode.ThemeIcon {
+function getStatus(cmd: string): ThemeIcon {
     if (shell.existsInPath(cmd)) {
-        return new vscode.ThemeIcon(EXISTS_CODICON);
+        return new ThemeIcon(EXISTS_CODICON);
     }
-    vscode.window.showErrorMessage(`Unable to find ${cmd} in PATH`);
-    return new vscode.ThemeIcon(NOT_EXISTS_CODICON);
+    window.showErrorMessage(`Unable to find ${cmd} in PATH`);
+    return new ThemeIcon(NOT_EXISTS_CODICON);
 }
 
-function checkUpdatesAvailable(tool: tool.Tool, version: string) {
+function checkUpdatesAvailable(tool: Tool, version: string) {
     axios.get(tool.updateURL!).then((response) => {
         if (response.data !== version) {
-            vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`);
+            window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${version} and ${response.data} is the latest version`);
         }
     });
 }
 
-export function openToolPage(tool: tool.Tool) {
+export function OpenToolPage(tool: Tool) {
     if (tool.infoURL) {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tool.infoURL));
+        commands.executeCommand('vscode.open', Uri.parse(tool.infoURL));
     }
 }

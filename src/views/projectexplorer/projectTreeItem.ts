@@ -1,21 +1,21 @@
 'use strict';
 
-import * as sls from '../../akkasls';
-import * as base from './projectBaseTreeItem';
-import * as project from '../../datatypes/projects/project';
-import * as vscode from 'vscode';
+import { AkkaServerless } from '../../akkasls';
+import { ProjectBaseTreeItem } from './projectBaseTreeItem';
+import { Project } from '../../datatypes/projects/project';
+import { TreeItemCollapsibleState, ThemeIcon} from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
-export const ITEM_TYPE = 'Projects';
+export const PROJECT_ITEM_TYPE = 'Projects';
 
-export class ProjectTreeItem extends base.TreeItem {
+export class ProjectTreeItem extends ProjectBaseTreeItem {
     constructor(
         public readonly label: string,
-        public readonly project: project.Project,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly project: Project,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
-        super(label, collapsibleState, ITEM_TYPE);
+        super(label, collapsibleState, PROJECT_ITEM_TYPE);
     }
 
     getName(): string {
@@ -33,10 +33,10 @@ export class ProjectTreeItem extends base.TreeItem {
 
     tooltip = this.getStatus();
 
-    contextValue = ITEM_TYPE;
+    contextValue = PROJECT_ITEM_TYPE;
 
     printDetails() {
-        if (this.label !== ITEM_TYPE) {
+        if (this.label !== PROJECT_ITEM_TYPE) {
             let printTable = new table({});
             printTable.push(['Name', this.project.friendly_name]);
             if (this.project.description) {
@@ -55,13 +55,13 @@ export class ProjectTreeItem extends base.TreeItem {
     }
 }
 
-export async function getProjectTreeItems(akkasls: sls.AkkaServerless): Promise<ProjectTreeItem[]> {
+export async function GetProjectTreeItems(akkasls: AkkaServerless): Promise<ProjectTreeItem[]> {
     let projects: ProjectTreeItem[] = [];
 
     let projectList = await akkasls.getProjects();
 
     for (let project of projectList) {
-        projects.push(new ProjectTreeItem(project.friendly_name, project, vscode.TreeItemCollapsibleState.Collapsed));
+        projects.push(new ProjectTreeItem(project.friendly_name, project, TreeItemCollapsibleState.Collapsed));
     }
 
     return projects;

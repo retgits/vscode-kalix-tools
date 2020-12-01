@@ -27,18 +27,7 @@ export interface Function {
     Version: string;
 }
 
-// Converts JSON strings to/from your types
-export class Convert {
-    public static toASConfig(json: string): ASConfig {
-        let config: ASConfig = JSON.parse(json);
-        if (!config.Resources.Docker.Host) {
-            config.Resources.Docker.Host = getIPAddress();
-        }
-        return config;
-    }
-}
-
-function getIPAddress(): string {
+export function GetIPAddress(): string {
     let networkInterfaces = os.networkInterfaces();
 
     for (let name of Object.keys(networkInterfaces)) {

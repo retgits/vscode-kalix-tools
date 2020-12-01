@@ -2,10 +2,10 @@
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import { workspace } from 'vscode';
 
 // Standard node imports
-import * as URL from 'url';
+import { fileURLToPath } from 'url';
 
 // External dependencies
 import * as shelljs from 'shelljs';
@@ -55,10 +55,10 @@ function existsInPath(tool: string): boolean {
 function exec(cmd: string, cwd?: string) {
     let wd: string;
 
-    if (!cwd && !vscode.workspace.workspaceFolders) {
+    if (!cwd && !workspace.workspaceFolders) {
         wd = '.';
     } else {
-        wd = (cwd) ? cwd : URL.fileURLToPath(vscode.workspace.workspaceFolders![0].uri.toString());
+        wd = (cwd) ? cwd : fileURLToPath(workspace.workspaceFolders![0].uri.toString());
     }
 
     let opts = { 

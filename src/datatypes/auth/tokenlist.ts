@@ -11,14 +11,3 @@ export interface TokenList {
 export interface Time {
     seconds: number;
 }
-
-// Converts JSON strings to/from your types
-export class Convert {
-    public static toTokenList(json: string): TokenList[] {
-        return JSON.parse(json);
-    }
-
-    public static tokenListToJson(value: TokenList[]): string {
-        return JSON.stringify(value);
-    }
-}

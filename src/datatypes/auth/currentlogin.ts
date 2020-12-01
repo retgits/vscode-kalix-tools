@@ -21,14 +21,3 @@ export interface User {
     fullName:       string;
     email_verified: boolean;
 }
-
-// Converts JSON strings to/from your types
-export class Convert {
-    public static toCurrentLogin(json: string): CurrentLogin {
-        return JSON.parse(json);
-    }
-
-    public static currentLoginToJson(value: CurrentLogin): string {
-        return JSON.stringify(value);
-    }
-}

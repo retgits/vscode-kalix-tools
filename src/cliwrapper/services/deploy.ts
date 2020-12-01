@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../utils/shell';
-import * as akkasls from '../../akkasls';
-import * as wrapper from '../wrapper';
+import { AkkaServerless } from '../../akkasls';
+import { Command } from '../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless, projectID?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('services deploy');
+export async function DeployService(akkasls: AkkaServerless, projectID?: string): Promise<ShellResult | null> {
+    let command = new Command('services deploy');
     command.addArgument({name: 'service', description: 'name of the service'});
     command.addArgument({name: 'image', description: 'container image url'});
 

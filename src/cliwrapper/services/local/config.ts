@@ -3,7 +3,8 @@ import * as path from 'path';
 import * as URL from 'url';
 import * as vscode from 'vscode';
 import * as jsyaml from 'js-yaml';
-import * as localService from '../../../datatypes/services/local';
+import { Convert } from '../../../datatypes/converter';
+import { ASConfig } from '../../../datatypes/services/local';
 
 // Get the path of the .akkaserverless.yaml file. The precedence is:
 // 1. Selected through the VS Code context menu (configFilePath exists)
@@ -40,11 +41,11 @@ function getConfigFilePath(configpath?: string): string {
     return configpath;
 }
 
-export function readConfigFile(configpath?: string): localService.ASConfig {
+export function ReadConfigFile(configpath?: string): ASConfig {
     configpath = getConfigFilePath(configpath);
     let basedir = path.dirname(configpath);
 
-    let asConfig = localService.Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configpath, 'utf-8'))));
+    let asConfig = Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configpath, 'utf-8'))));
     
     if (vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
         let dockerImageUser = vscode.workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!;

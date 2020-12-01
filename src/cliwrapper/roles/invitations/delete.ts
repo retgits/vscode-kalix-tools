@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../../utils/shell';
-import * as akkasls from '../../../akkasls';
-import * as wrapper from '../../wrapper';
+import { AkkaServerless } from '../../../akkasls';
+import { Command } from '../../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless, projectID?: string, emailAddress?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('roles invitations delete');
+export async function DeleteInvite(akkasls: AkkaServerless, projectID?: string, emailAddress?: string): Promise<ShellResult | null> {
+    let command = new Command('roles invitations delete');
 
     if(!projectID) {
         let result = await window.showQuickPick(akkasls.getProjectsArray(), {

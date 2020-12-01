@@ -1,10 +1,11 @@
 'use strict';
 
-import * as wrapper from '../wrapper';
-import * as project from '../../datatypes/projects/project';
+import { Command } from '../wrapper';
+import { Convert } from '../../datatypes/converter';
+import { Project } from '../../datatypes/projects/project';
 
-export async function run(): Promise<project.Project[]> {
-    let command = new wrapper.Command('projects list -o json');
+export async function ListProjects(): Promise<Project[]> {
+    let command = new Command('projects list -o json');
     let result = await command.runCommand();
-    return project.Convert.toProjectArray(result!.stdout);
+    return Convert.toProjectArray(result!.stdout);
 }

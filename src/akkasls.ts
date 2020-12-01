@@ -1,76 +1,75 @@
 'use strict';
 
 // Imports
-import * as invite from './datatypes/roles/invitations/invite';
-import * as member from './datatypes/roles/member';
-import * as project from './datatypes/projects/project';
-import * as service from './datatypes/services/service';
-import * as token from './datatypes/auth/tokenlist';
-import * as credentials from './datatypes/docker/listcredentials';
+import { Invite } from './datatypes/roles/invitations/invite';
+import { Member } from './datatypes/roles/member';
+import { Project } from './datatypes/projects/project';
+import { Service } from './datatypes/services/service';
+import { TokenList } from './datatypes/auth/tokenlist';
+import { ListCredentials } from './datatypes/docker/listcredentials';
 
-import * as listProjects from './cliwrapper/projects/list';
-import * as listMembers from './cliwrapper/roles/listbindings';
-import * as listInvites from './cliwrapper/roles/invitations/listinvites';
-import * as listServices from './cliwrapper/services/list';
-import * as listTokens from './cliwrapper/auth/tokens/list';
-import * as listCredentials from './cliwrapper/docker/listcredentials';
+import { ListProjects } from './cliwrapper/projects/list';
+import { ListMembers } from './cliwrapper/roles/listbindings';
+import { ListInvites } from './cliwrapper/roles/invitations/listinvites';
+import { ListServices } from './cliwrapper/services/list';
+import { ListTokens } from './cliwrapper/auth/tokens/list';
+import { ListDockerCredentials } from './cliwrapper/docker/listcredentials';
+import { Login } from './cliwrapper/auth/login';
+import { Logout } from './cliwrapper/auth/logout';
+import { AddDockerCredentials } from './cliwrapper/docker/addcredentials';
+import { DeleteDockerCredentials } from './cliwrapper/docker/deletecredentials';
+import { DeployService } from './cliwrapper/services/deploy';
+import { UndeployService } from './cliwrapper/services/undeploy';
+import { ExposeService } from './cliwrapper/services/expose';
+import { UnexposeService } from './cliwrapper/services/unexpose';
+import { AddInvite } from './cliwrapper/roles/invitations/inviteuser';
+import { DeleteInvite } from './cliwrapper/roles/invitations/delete';
+import { NewProject } from './cliwrapper/projects/new';
+import { RevokeToken } from './cliwrapper/auth/tokens/revoke';
+import { StartLocal } from './cliwrapper/services/local/start';
+import { StopLocal } from './cliwrapper/services/local/stop';
 
-import * as authLogin from './cliwrapper/auth/login';
-import * as authLogout from './cliwrapper/auth/logout';
-import * as addDockerCredentials from './cliwrapper/docker/addcredentials';
-import * as deleteDockerCredentials from './cliwrapper/docker/deletecredentials';
-import * as deployService from './cliwrapper/services/deploy';
-import * as undeployService from './cliwrapper/services/undeploy';
-import * as exposeService from './cliwrapper/services/expose';
-import * as unexposeService from './cliwrapper/services/unexpose';
-import * as inviteUser from './cliwrapper/roles/invitations/inviteuser';
-import * as deleteInvite from './cliwrapper/roles/invitations/delete';
-import * as createProject from './cliwrapper/projects/new';
-import * as revokeToken from './cliwrapper/auth/tokens/revoke';
-import * as startLocalService from './cliwrapper/services/local/start';
-import * as stopLocalService from './cliwrapper/services/local/stop';
+import { ProjectExplorer } from './views/projectexplorer/explorer';
+import { CredentialsExplorer } from './views/credentialsexplorer/explorer';
 
-import * as projectExplorer from './views/projectexplorer/explorer';
-import * as credentialsExplorer from './views/credentialsexplorer/explorer';
-
-import * as vscode from 'vscode';
+import { Uri, window } from 'vscode';
 
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
 
 export class AkkaServerless {
-    private projects: project.Project[] = [];
-    private members: Map<string, member.Member[]> = new Map();
-    private invites: Map<string, invite.Invite[]> = new Map();
-    private services: Map<string, service.Service[]> = new Map();
-    private credentials: Map<string, credentials.ListCredentials[]> = new Map();
-    private credentialsExplorer: credentialsExplorer.CredentialsExplorer;
-    private projectExplorer: projectExplorer.ProjectExplorer;
-    
-    constructor() {}
+    private projects: Project[] = [];
+    private members: Map<string, Member[]> = new Map();
+    private invites: Map<string, Invite[]> = new Map();
+    private services: Map<string, Service[]> = new Map();
+    private credentials: Map<string, ListCredentials[]> = new Map();
+    private credentialsExplorer: CredentialsExplorer;
+    private projectExplorer: ProjectExplorer;
 
-    registerCredentialsExplorer(credentialsExplorer: credentialsExplorer.CredentialsExplorer) {
+    constructor() { }
+
+    registerCredentialsExplorer(credentialsExplorer: CredentialsExplorer) {
         this.credentialsExplorer = credentialsExplorer;
     }
 
-    registerProjectExplorer(projectExplorer: projectExplorer.ProjectExplorer) {
+    registerProjectExplorer(projectExplorer: ProjectExplorer) {
         this.projectExplorer = projectExplorer;
     }
 
-    async getProjects(): Promise<project.Project[]> {
+    async getProjects(): Promise<Project[]> {
         if (this.projects.length === 0) {
             this.projects = await this.refreshProjects();
         }
         return this.projects;
     }
 
-    async refreshProjects(): Promise<project.Project[]> {
-        let projects = await listProjects.run();
+    async refreshProjects(): Promise<Project[]> {
+        let projects = await ListProjects();
         this.projects = projects;
         return projects;
     }
 
     async createNewProject() {
-        createProject.run().then(() => {
+        NewProject().then(() => {
             this.refreshProjects().then(() => {
                 this.projectExplorer.refresh();
             });
@@ -88,7 +87,7 @@ export class AkkaServerless {
     async getProjectIDByName(projectName: string): Promise<string> {
         let name = '';
         (await this.getProjects()).forEach(project => {
-            if(projectName === project.friendly_name) {
+            if (projectName === project.friendly_name) {
                 name = project.name.substring(9);
             }
         });
@@ -98,8 +97,8 @@ export class AkkaServerless {
     async getHostnamesByProjectID(projectID: string): Promise<string[]> {
         let hostnames: string[] = [];
         (await this.getProjects()).forEach(project => {
-            if(projectID === project.name.substring(9)) {
-                if(project.hostnames) {
+            if (projectID === project.name.substring(9)) {
+                if (project.hostnames) {
                     project.hostnames.forEach(hostname => {
                         hostnames.push(hostname.name);
                     });
@@ -109,22 +108,22 @@ export class AkkaServerless {
         return hostnames;
     }
 
-    async getMembers(projectID: string): Promise<member.Member[]> {
-        if(this.members.has(projectID)) {
+    async getMembers(projectID: string): Promise<Member[]> {
+        if (this.members.has(projectID)) {
             return this.members.get(projectID)!;
         }
         let members = await this.refreshMembers(projectID);
         return members;
     }
 
-    async refreshMembers(projectID: string): Promise<member.Member[]> {
-        let members = await listMembers.run(projectID);
+    async refreshMembers(projectID: string): Promise<Member[]> {
+        let members = await ListMembers(projectID);
         this.members.set(projectID, members);
         return members;
     }
 
-    async getInvites(projectID: string): Promise<invite.Invite[]> {
-        if(this.invites.has(projectID)) {
+    async getInvites(projectID: string): Promise<Invite[]> {
+        if (this.invites.has(projectID)) {
             return this.invites.get(projectID)!;
         }
         let invites = await this.refreshInvites(projectID);
@@ -139,15 +138,15 @@ export class AkkaServerless {
         return invites;
     }
 
-    async refreshInvites(projectID: string): Promise<invite.Invite[]> {
-        let invites = await listInvites.run(projectID);
+    async refreshInvites(projectID: string): Promise<Invite[]> {
+        let invites = await ListInvites(projectID);
         this.invites.set(projectID, invites);
         return invites;
     }
 
     async inviteUser(projectID?: string) {
-        inviteUser.run(this, projectID).then(() => {
-            if(projectID) {
+        AddInvite(this, projectID).then(() => {
+            if (projectID) {
                 this.refreshInvites(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -156,8 +155,8 @@ export class AkkaServerless {
     }
 
     async deleteInvite(projectID?: string, emailAddress?: string) {
-        deleteInvite.run(this, projectID, emailAddress).then(() => {
-            if(projectID) {
+        DeleteInvite(this, projectID, emailAddress).then(() => {
+            if (projectID) {
                 this.refreshInvites(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -165,8 +164,8 @@ export class AkkaServerless {
         });
     }
 
-    async getServices(projectID: string): Promise<service.Service[]> {
-        if(this.services.has(projectID)) {
+    async getServices(projectID: string): Promise<Service[]> {
+        if (this.services.has(projectID)) {
             return this.services.get(projectID)!;
         }
         let services = await this.refreshServices(projectID);
@@ -180,16 +179,16 @@ export class AkkaServerless {
         });
         return services;
     }
-    
-    async refreshServices(projectID: string): Promise<service.Service[]> {
-        let services = await listServices.run(projectID);
+
+    async refreshServices(projectID: string): Promise<Service[]> {
+        let services = await ListServices(projectID);
         this.services.set(projectID, services);
         return services;
     }
 
     async deployService(projectID?: string) {
-        deployService.run(this, projectID).then(() => {
-            if(projectID) {
+        DeployService(this, projectID).then(() => {
+            if (projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -198,8 +197,8 @@ export class AkkaServerless {
     }
 
     async undeployService(projectID?: string, serviceName?: string) {
-        undeployService.run(this, projectID, serviceName).then(() => {
-            if(projectID) {
+        UndeployService(this, projectID, serviceName).then(() => {
+            if (projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -208,8 +207,8 @@ export class AkkaServerless {
     }
 
     async exposeService(projectID?: string, serviceName?: string) {
-        exposeService.run(this, projectID, serviceName).then(() => {
-            if(projectID) {
+        ExposeService(this, projectID, serviceName).then(() => {
+            if (projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -218,8 +217,8 @@ export class AkkaServerless {
     }
 
     async unexposeService(projectID?: string, serviceName?: string) {
-        unexposeService.run(this, projectID, serviceName).then(() => {
-            if(projectID) {
+        UnexposeService(this, projectID, serviceName).then(() => {
+            if (projectID) {
                 this.refreshServices(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -228,40 +227,40 @@ export class AkkaServerless {
     }
 
     async login() {
-        authLogin.run();
+        Login();
     }
 
     async logout() {
-        authLogout.run();
+        Logout();
     }
 
-    async getTokens(): Promise<token.TokenList[]> {
-        return listTokens.run();
+    async getTokens(): Promise<TokenList[]> {
+        return ListTokens();
     }
 
     async getTokenArray(): Promise<string[]> {
         let tokens: string[] = [];
         (await this.getTokens()).forEach(token => {
             let tokenElements = token.name.split('/');
-            tokens.push(tokenElements[tokenElements.length-1]);
+            tokens.push(tokenElements[tokenElements.length - 1]);
         });
         return tokens;
     }
 
     async revokeToken(tokenID?: string) {
-        revokeToken.run(this, tokenID).then(() => {
+        RevokeToken(this, tokenID).then(() => {
             this.credentialsExplorer.refresh();
         });
     }
 
-    async refreshDockerCredentials(projectID: string): Promise<credentials.ListCredentials[]> {
-        let creds = await listCredentials.run(projectID);
+    async refreshDockerCredentials(projectID: string): Promise<ListCredentials[]> {
+        let creds = await ListDockerCredentials(projectID);
         this.credentials.set(projectID, creds);
         return creds;
     }
 
-    async getDockerCredentials(projectID: string): Promise<credentials.ListCredentials[]> {
-        if(this.credentials.has(projectID)) {
+    async getDockerCredentials(projectID: string): Promise<ListCredentials[]> {
+        if (this.credentials.has(projectID)) {
             return this.credentials.get(projectID)!;
         }
         let creds = await this.refreshDockerCredentials(projectID);
@@ -279,7 +278,7 @@ export class AkkaServerless {
     async getDockerCredentialIDByServer(projectID: string, serverName: string): Promise<string> {
         let name = '';
         (await this.getDockerCredentials(projectID)).forEach(cred => {
-            if(cred.server === serverName) {
+            if (cred.server === serverName) {
                 name = cred.name;
             }
         });
@@ -287,8 +286,8 @@ export class AkkaServerless {
     }
 
     async addDockerCredentials(projectID?: string) {
-        addDockerCredentials.run(this, projectID).then(() => {
-            if(projectID) {
+        AddDockerCredentials(this, projectID).then(() => {
+            if (projectID) {
                 this.refreshDockerCredentials(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -297,8 +296,8 @@ export class AkkaServerless {
     }
 
     async deleteDockerCredentials(projectID?: string, credentialID?: string) {
-        deleteDockerCredentials.run(this, projectID, credentialID).then(() => {
-            if(projectID) {
+        DeleteDockerCredentials(this, projectID, credentialID).then(() => {
+            if (projectID) {
                 this.refreshDockerCredentials(projectID!).then(() => {
                     this.projectExplorer.refresh();
                 });
@@ -306,21 +305,21 @@ export class AkkaServerless {
         });
     }
 
-    async startLocal(doc?: vscode.Uri) {
+    async startLocal(doc?: Uri) {
         try {
-            startLocalService.run(doc?.path);
+            StartLocal(doc?.path);
         }
         catch (Error) {
-            vscode.window.showErrorMessage(Error.message);
+            window.showErrorMessage(Error.message);
         }
     }
 
-    async stopLocal(doc?: vscode.Uri) {
+    async stopLocal(doc?: Uri) {
         try {
-            stopLocalService.run(doc?.path);
+            StopLocal(doc?.path);
         }
         catch (Error) {
-            vscode.window.showErrorMessage(Error);
+            window.showErrorMessage(Error);
         }
     }
 }

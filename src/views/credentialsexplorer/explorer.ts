@@ -1,16 +1,16 @@
 'use strict';
 
-import * as sls from '../../akkasls';
-import * as base from './credentialsBaseTreeItem';
-import * as token from './tokenTreeItem';
-import * as vscode from 'vscode';
+import { AkkaServerless } from '../../akkasls';
+import { CredentialsBaseTreeItem } from './credentialsBaseTreeItem';
+import { TokenTreeItem, GetTokenTreeItems, TOKEN_ITEM_TYPE, GetDefaultTokenTreeItem } from './tokenTreeItem';
+import { TreeDataProvider, EventEmitter, Event, TreeItem } from 'vscode';
 
-export class CredentialsExplorer implements vscode.TreeDataProvider<base.TreeItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<base.TreeItem | undefined | void> = new vscode.EventEmitter<base.TreeItem | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<base.TreeItem | undefined | void> = this._onDidChangeTreeData.event;
-    private akkaServerless: sls.AkkaServerless;
+export class CredentialsExplorer implements TreeDataProvider<CredentialsBaseTreeItem> {
+    private _onDidChangeTreeData: EventEmitter<CredentialsBaseTreeItem | undefined | void> = new EventEmitter<CredentialsBaseTreeItem | undefined | void>();
+    readonly onDidChangeTreeData: Event<CredentialsBaseTreeItem | undefined | void> = this._onDidChangeTreeData.event;
+    private akkaServerless: AkkaServerless;
 
-    constructor(akkaServerless: sls.AkkaServerless) {
+    constructor(akkaServerless: AkkaServerless) {
         this.akkaServerless = akkaServerless;
         this.akkaServerless.registerCredentialsExplorer(this);
     }
@@ -19,15 +19,15 @@ export class CredentialsExplorer implements vscode.TreeDataProvider<base.TreeIte
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: base.TreeItem): vscode.TreeItem {
+    getTreeItem(element: CredentialsBaseTreeItem): TreeItem {
         return element;
     }
 
-    getChildren(element?: base.TreeItem): Thenable<base.TreeItem[]> {
+    getChildren(element?: CredentialsBaseTreeItem): Thenable<CredentialsBaseTreeItem[]> {
         if (element) {
             switch (element.type) {
-                case token.ITEM_TYPE:
-                    return Promise.resolve(token.getTokenTreeItems(this.akkaServerless));
+                case TOKEN_ITEM_TYPE:
+                    return Promise.resolve(GetTokenTreeItems(this.akkaServerless));
                 default:
                     break;
             }
@@ -38,17 +38,17 @@ export class CredentialsExplorer implements vscode.TreeDataProvider<base.TreeIte
         return Promise.resolve(this.getDefaultCredentialItems());
     }
 
-    getDefaultCredentialItems(): Promise<base.TreeItem[]> {
-        let defaultTreeItems: base.TreeItem[] = [];
-        defaultTreeItems.push(token.getDefaultTokenTreeItem());
+    getDefaultCredentialItems(): Promise<CredentialsBaseTreeItem[]> {
+        let defaultTreeItems: CredentialsBaseTreeItem[] = [];
+        defaultTreeItems.push(GetDefaultTokenTreeItem());
         return Promise.resolve(defaultTreeItems);
     }
 
-    async printTreeItemDetails(base: base.TreeItem) {
+    async printTreeItemDetails(base: CredentialsBaseTreeItem) {
         base.printDetails();
     }
 
-    async revokeCredential(token: token.TokenTreeItem) {
+    async revokeCredential(token: TokenTreeItem) {
         this.akkaServerless.revokeToken(token.id);
     }
 }

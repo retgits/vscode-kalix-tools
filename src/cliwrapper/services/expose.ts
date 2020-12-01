@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../utils/shell';
-import * as akkasls from '../../akkasls';
-import * as wrapper from '../wrapper';
+import { AkkaServerless } from '../../akkasls';
+import { Command } from '../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless, projectID?: string, serviceName?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('services expose');
+export async function ExposeService(akkasls: AkkaServerless, projectID?: string, serviceName?: string): Promise<ShellResult | null> {
+    let command = new Command('services expose');
 
     if(!projectID) {
         let result = await window.showQuickPick(akkasls.getProjectsArray(), {

@@ -1,10 +1,11 @@
 'use strict';
 
-import * as wrapper from '../wrapper';
-import * as member from '../../datatypes/roles/member';
+import { Command } from '../wrapper';
+import { Convert } from '../../datatypes/converter';
+import { Member } from '../../datatypes/roles/member';
 
-export async function run(projectID: string): Promise<member.Member[]> {
-    let command = new wrapper.Command(`roles list-bindings --project ${projectID} -o json`);
+export async function ListMembers(projectID: string): Promise<Member[]> {
+    let command = new Command(`roles list-bindings --project ${projectID} -o json`);
     let result = await command.runCommand();
-    return member.Convert.toMemberArray(result!.stdout);
+    return Convert.toMemberArray(result!.stdout);
 }

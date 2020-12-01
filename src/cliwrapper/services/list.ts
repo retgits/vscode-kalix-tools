@@ -1,10 +1,11 @@
 'use strict';
 
-import * as wrapper from '../wrapper';
-import * as services from '../../datatypes/services/service';
+import { Command } from '../wrapper';
+import { Convert } from '../../datatypes/converter';
+import { Service } from '../../datatypes/services/service';
 
-export async function run(projectID: string): Promise<services.Service[]> {
-    let command = new wrapper.Command(`svc list --project ${projectID} -o json`);
+export async function ListServices(projectID: string): Promise<Service[]> {
+    let command = new Command(`svc list --project ${projectID} -o json`);
     let result = await command.runCommand();
-    return services.Convert.toServiceArray(result!.stdout);
+    return Convert.toServiceArray(result!.stdout);
 }

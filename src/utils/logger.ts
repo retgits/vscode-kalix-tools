@@ -2,7 +2,7 @@
 
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import { Disposable, OutputChannel, window } from 'vscode';
 
 const AS_CHANNEL = 'akkasls';
 
@@ -10,7 +10,7 @@ const AS_CHANNEL = 'akkasls';
  * Interface Logger extends vscode.Disposable as a resource that can be deleted
  * and recycled.
  */
-interface Logger extends vscode.Disposable {
+interface Logger extends Disposable {
     log(msg: string): void;
 }
 
@@ -18,10 +18,10 @@ interface Logger extends vscode.Disposable {
  * ChannelLogger provides a log-like facility for sending messages to a shared output channel.
  */
 class ChannelLogger implements Logger {
-    channel: vscode.OutputChannel;
+    channel: OutputChannel;
 
     constructor(channelName: string) {
-        this.channel = vscode.window.createOutputChannel(channelName);
+        this.channel = window.createOutputChannel(channelName);
     }
 
     log(msg: string) {

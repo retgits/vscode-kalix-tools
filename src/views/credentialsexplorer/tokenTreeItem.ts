@@ -1,15 +1,15 @@
 'use strict';
 
 import * as sls from '../../akkasls';
-import * as base from './credentialsBaseTreeItem';
+import { CredentialsBaseTreeItem } from './credentialsBaseTreeItem';
 import * as token from '../../datatypes/auth/tokenlist';
 import * as vscode from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
-export const ITEM_TYPE = 'Tokens';
+export const TOKEN_ITEM_TYPE = 'Tokens';
 
-export class TokenTreeItem extends base.TreeItem {
+export class TokenTreeItem extends CredentialsBaseTreeItem {
     private readonly tokenElements: string[] = [];
 
     constructor(
@@ -17,7 +17,7 @@ export class TokenTreeItem extends base.TreeItem {
         public readonly token: token.TokenList,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     ) {
-        super(label, collapsibleState, ITEM_TYPE);
+        super(label, collapsibleState, TOKEN_ITEM_TYPE);
         this.tokenElements = this.token.name.split('/');
     }
 
@@ -39,10 +39,10 @@ export class TokenTreeItem extends base.TreeItem {
 
     iconPath = this.getIcon();
 
-    contextValue = ITEM_TYPE;
+    contextValue = TOKEN_ITEM_TYPE;
 
     printDetails() {
-        if (this.label !== ITEM_TYPE) {
+        if (this.label !== TOKEN_ITEM_TYPE) {
             let printTable = new table({});
             printTable.push(['Name', this.getName()]);
             printTable.push(['Description', this.token.description]);
@@ -53,7 +53,7 @@ export class TokenTreeItem extends base.TreeItem {
     }
 }
 
-export async function getTokenTreeItems(akkasls: sls.AkkaServerless): Promise<TokenTreeItem[]> {
+export async function GetTokenTreeItems(akkasls: sls.AkkaServerless): Promise<TokenTreeItem[]> {
     let items: TokenTreeItem[] = [];
 
     let tokenList = await akkasls.getTokens();
@@ -66,7 +66,7 @@ export async function getTokenTreeItems(akkasls: sls.AkkaServerless): Promise<To
     return items;
 }
 
-export function getDefaultTokenTreeItem(): TokenTreeItem {
+export function GetDefaultTokenTreeItem(): TokenTreeItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new TokenTreeItem(ITEM_TYPE, { name: ITEM_TYPE, description: '', created_time: { seconds: 1}, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
+    return new TokenTreeItem(TOKEN_ITEM_TYPE, { name: TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1}, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
 }

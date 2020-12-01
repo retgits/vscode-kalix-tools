@@ -19,13 +19,3 @@ export interface Hostname {
     name:         string;
     is_generated: boolean;
 }
-
-export class Convert {
-    public static toProjectArray(json: string): Project[] {
-        return JSON.parse(json);
-    }
-
-    public static projectsToJson(value: Project[]): string {
-        return JSON.stringify(value);
-    }
-}

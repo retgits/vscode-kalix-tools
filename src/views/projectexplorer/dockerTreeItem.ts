@@ -1,22 +1,22 @@
 'use strict';
 
-import * as sls from '../../akkasls';
-import * as base from './projectBaseTreeItem';
-import * as credential from '../../datatypes/docker/listcredentials';
-import * as vscode from 'vscode';
+import { AkkaServerless } from '../../akkasls';
+import { ProjectBaseTreeItem } from './projectBaseTreeItem';
+import { ListCredentials } from '../../datatypes/docker/listcredentials';
+import { TreeItemCollapsibleState, ThemeIcon} from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
-export const ITEM_TYPE = 'Credentials';
+export const DOCKER_ITEM_TYPE = 'Credentials';
 
-export class DockerTreeItem extends base.TreeItem {
+export class DockerTreeItem extends ProjectBaseTreeItem {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
-        public readonly credential: credential.ListCredentials,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly credential: ListCredentials,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
-        super(label, collapsibleState, ITEM_TYPE);
+        super(label, collapsibleState, DOCKER_ITEM_TYPE);
     }
 
     getName(): string {
@@ -26,18 +26,18 @@ export class DockerTreeItem extends base.TreeItem {
 
     description = this.credential.server;
 
-    getIcon(): vscode.ThemeIcon {
-        return new vscode.ThemeIcon('lock');
+    getIcon(): ThemeIcon {
+        return new ThemeIcon('lock');
     }
 
     id = this.getName();
 
     iconPath = this.getIcon();
 
-    contextValue = ITEM_TYPE;
+    contextValue = DOCKER_ITEM_TYPE;
 
     printDetails() {
-        if (this.label !== ITEM_TYPE) {
+        if (this.label !== DOCKER_ITEM_TYPE) {
             let printTable = new table({});
             printTable.push(['Name', this.getName()]);
             printTable.push(['Server', this.credential.server]);
@@ -47,19 +47,19 @@ export class DockerTreeItem extends base.TreeItem {
     }
 }
 
-export async function getDockerTreeItems(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<DockerTreeItem[]> {
+export async function GetDockerTreeItems(parentProjectID: string, akkasls: AkkaServerless): Promise<DockerTreeItem[]> {
     let items: DockerTreeItem[] = [];
 
     let credentialList = await akkasls.getDockerCredentials(parentProjectID);
 
     for (let credential of credentialList) {
-        items.push(new DockerTreeItem(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
+        items.push(new DockerTreeItem(credential.server, parentProjectID, credential, TreeItemCollapsibleState.None));
     }
 
     return items;
 }
 
-export function getDefaultDockerTreeItem(parentProjectID: string): DockerTreeItem {
+export function GetDefaultDockerTreeItem(parentProjectID: string): DockerTreeItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new DockerTreeItem(ITEM_TYPE, parentProjectID,{ name: `${parentProjectID}-${ITEM_TYPE}`, server: '', username: ''}, vscode.TreeItemCollapsibleState.Collapsed);
+    return new DockerTreeItem(DOCKER_ITEM_TYPE, parentProjectID,{ name: `${parentProjectID}-${DOCKER_ITEM_TYPE}`, server: '', username: ''}, TreeItemCollapsibleState.Collapsed);
 }

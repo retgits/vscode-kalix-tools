@@ -1,12 +1,12 @@
 'use strict';
 
 import { ShellResult } from '../../../utils/shell';
-import * as akkasls from '../../../akkasls';
-import * as wrapper from '../../wrapper';
+import { AkkaServerless } from '../../../akkasls';
+import { Command } from '../../wrapper';
 import { window } from 'vscode';
 
-export async function run(akkasls: akkasls.AkkaServerless,projectID?: string): Promise<ShellResult | null> {
-    let command = new wrapper.Command('roles invitations invite-user');
+export async function AddInvite(akkasls: AkkaServerless,projectID?: string): Promise<ShellResult | null> {
+    let command = new Command('roles invitations invite-user');
     command.addArgument({name: 'email', description: 'email address of the user to invite'});
 
     if(!projectID) {

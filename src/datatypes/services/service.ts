@@ -58,14 +58,3 @@ export interface Condition {
     reason?: string;
     message?: string;
 }
-
-// Converts JSON strings to/from your types
-export class Convert {
-    public static toServiceArray(json: string): Service[] {
-        return JSON.parse(json);
-    }
-
-    public static servicesToJson(value: Service[]): string {
-        return JSON.stringify(value);
-    }
-}

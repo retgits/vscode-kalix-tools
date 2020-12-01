@@ -1,12 +1,12 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 
-export abstract class TreeItem extends vscode.TreeItem {
+export abstract class ProjectBaseTreeItem extends TreeItem {
     public readonly type: string;
     public readonly parentProjectID: string;
 
-    constructor(label: string, collapsibleState: vscode.TreeItemCollapsibleState, type: string, parentProjectID?: string) {
+    constructor(label: string, collapsibleState: TreeItemCollapsibleState, type: string, parentProjectID?: string) {
         super(label, collapsibleState);
         this.type = type;
         this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';

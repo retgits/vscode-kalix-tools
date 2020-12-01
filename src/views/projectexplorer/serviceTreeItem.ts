@@ -1,43 +1,43 @@
 'use strict';
 
-import * as sls from '../../akkasls';
-import * as base from './projectBaseTreeItem';
-import * as service from '../../datatypes/services/service';
-import * as vscode from 'vscode';
+import { AkkaServerless } from '../../akkasls';
+import { ProjectBaseTreeItem } from './projectBaseTreeItem';
+import { Service } from '../../datatypes/services/service';
+import { TreeItemCollapsibleState, ThemeIcon} from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
-export const ITEM_TYPE = 'Services';
+export const SERVICE_ITEM_TYPE = 'Services';
 
-export class ServiceTreeItem extends base.TreeItem {
+export class ServiceTreeItem extends ProjectBaseTreeItem {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
-        public readonly service: service.Service,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly service: Service,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
-        super(label, collapsibleState, ITEM_TYPE);
+        super(label, collapsibleState, SERVICE_ITEM_TYPE);
     }
 
     getUID(): string {
         return this.service.metadata.uid;
     }
 
-    getIcon(): vscode.ThemeIcon {
-        if (this.label === ITEM_TYPE) {
-            return new vscode.ThemeIcon('cloud');
+    getIcon(): ThemeIcon {
+        if (this.label === SERVICE_ITEM_TYPE) {
+            return new ThemeIcon('cloud');
         }
-        return new vscode.ThemeIcon('cloud-upload');
+        return new ThemeIcon('cloud-upload');
     }
 
     id = this.getUID();
 
     iconPath = this.getIcon();
 
-    contextValue = ITEM_TYPE;
+    contextValue = SERVICE_ITEM_TYPE;
 
     printDetails() {
-        if (this.label !== ITEM_TYPE) {
+        if (this.label !== SERVICE_ITEM_TYPE) {
             let printTable = new table({
                 head: ['Item', 'Description']
             });
@@ -58,18 +58,18 @@ export class ServiceTreeItem extends base.TreeItem {
     }
 }
 
-export async function getServiceTreeItems(parentProjectID: string, akkasls: sls.AkkaServerless): Promise<ServiceTreeItem[]> {
+export async function GetServiceTreeItems(parentProjectID: string, akkasls: AkkaServerless): Promise<ServiceTreeItem[]> {
     let services: ServiceTreeItem[] = [];
 
     let servicesList = await akkasls.getServices(parentProjectID);
 
     for (let service of servicesList) {
-        services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, vscode.TreeItemCollapsibleState.None));
+        services.push(new ServiceTreeItem(service.metadata.name, parentProjectID, service, TreeItemCollapsibleState.None));
     }
 
     return services;
 }
 
-export function getDefaultServiceTreeItem(parentProjectID: string): ServiceTreeItem {
-    return new ServiceTreeItem(ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${ITEM_TYPE}` } }, vscode.TreeItemCollapsibleState.Collapsed);
+export function GetDefaultServiceTreeItem(parentProjectID: string): ServiceTreeItem {
+    return new ServiceTreeItem(SERVICE_ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${SERVICE_ITEM_TYPE}` } }, TreeItemCollapsibleState.Collapsed);
 }

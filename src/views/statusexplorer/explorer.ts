@@ -1,12 +1,11 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import { TreeDataProvider, EventEmitter, Event, commands, Uri } from 'vscode';
+import { StatusTreeItem, GetServiceStatus } from './statusTreeItem';
 
-import * as status from './statusTreeItem';
-
-export class StatusExplorer implements vscode.TreeDataProvider<status.StatusTreeItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<status.StatusTreeItem | undefined | void> = new vscode.EventEmitter<status.StatusTreeItem | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<status.StatusTreeItem | undefined | void> = this._onDidChangeTreeData.event;
+export class StatusExplorer implements TreeDataProvider<StatusTreeItem> {
+    private _onDidChangeTreeData: EventEmitter<StatusTreeItem | undefined | void> = new EventEmitter<StatusTreeItem | undefined | void>();
+    readonly onDidChangeTreeData: Event<StatusTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
     constructor() { }
 
@@ -14,15 +13,15 @@ export class StatusExplorer implements vscode.TreeDataProvider<status.StatusTree
         this._onDidChangeTreeData.fire();
     }
 
-    getTreeItem(element: status.StatusTreeItem): vscode.TreeItem {
+    getTreeItem(element: StatusTreeItem): StatusTreeItem {
         return element;
     }
 
-    getChildren(): Thenable<status.StatusTreeItem[]> {
-        return Promise.resolve(status.getServiceStatus());
+    getChildren(): Thenable<StatusTreeItem[]> {
+        return Promise.resolve(GetServiceStatus());
     }
 
     openTreeItemInBrowser() {
-        vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://status.cloudstate.com/'));
+        commands.executeCommand('vscode.open', Uri.parse('https://status.cloudstate.com/'));
     }
 }
