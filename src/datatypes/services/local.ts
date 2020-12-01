@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import * as os from 'os';
+import { networkInterfaces } from 'os';
 
 export interface ASConfig {
     ASTemplateVersion: string;
@@ -28,10 +28,10 @@ export interface Function {
 }
 
 export function GetIPAddress(): string {
-    let networkInterfaces = os.networkInterfaces();
+    let ni = networkInterfaces();
 
-    for (let name of Object.keys(networkInterfaces)) {
-        for (let networkInterface of networkInterfaces[name]) {
+    for (let name of Object.keys(ni)) {
+        for (let networkInterface of ni[name]) {
             if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
                 return networkInterface.address;
             }

@@ -102,7 +102,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
-const vscode = __webpack_require__(1);
+const vscode_1 = __webpack_require__(1);
 // Internal dependencies
 const logger_1 = __webpack_require__(2);
 const akkasls_1 = __webpack_require__(3);
@@ -115,55 +115,55 @@ function activate(context) {
     const akkasls = new akkasls_1.AkkaServerless();
     // Projects Tree
     const projectExplorer = new explorer_1.ProjectExplorer(akkasls);
-    vscode.window.registerTreeDataProvider('as.views.projects', projectExplorer);
-    vscode.commands.registerCommand('as.views.projects.refresh', () => projectExplorer.refresh());
-    vscode.commands.registerCommand('as.views.projects.credentials.add', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.addDockerCredentials(item); }));
-    vscode.commands.registerCommand('as.views.projects.credentials.delete', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteDockerCredentials(item); }));
-    vscode.commands.registerCommand('as.views.projects.services.deploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deployService(item); }));
-    vscode.commands.registerCommand('as.views.projects.services.undeploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.undeployService(item); }));
-    vscode.commands.registerCommand('as.views.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.exposeService(item); }));
-    vscode.commands.registerCommand('as.views.projects.services.unexpose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.unexposeService(item); }));
-    vscode.commands.registerCommand('as.views.projects.invites.inviteuser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.inviteUser(item); }));
-    vscode.commands.registerCommand('as.views.projects.invites.deleteinvite', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteInvite(item); }));
-    vscode.commands.registerCommand('as.views.projects.new', () => __awaiter(this, void 0, void 0, function* () { return projectExplorer.newProject(); }));
-    vscode.commands.registerCommand('as.views.projects.openbrowser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.openTreeItemInBrowser(item); }));
-    vscode.commands.registerCommand('as.views.projects.details.projects', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
-    vscode.commands.registerCommand('as.views.projects.details.services', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
-    vscode.commands.registerCommand('as.views.projects.details.members', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
-    vscode.commands.registerCommand('as.views.projects.details.invites', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
-    vscode.commands.registerCommand('as.views.projects.details.credentials', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode_1.window.registerTreeDataProvider('as.views.projects', projectExplorer);
+    vscode_1.commands.registerCommand('as.views.projects.refresh', () => projectExplorer.refresh());
+    vscode_1.commands.registerCommand('as.views.projects.credentials.add', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.addDockerCredentials(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.credentials.delete', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteDockerCredentials(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.services.deploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deployService(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.services.undeploy', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.undeployService(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.services.expose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.exposeService(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.services.unexpose', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.unexposeService(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.invites.inviteuser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.inviteUser(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.invites.deleteinvite', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.deleteInvite(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.new', () => __awaiter(this, void 0, void 0, function* () { return projectExplorer.newProject(); }));
+    vscode_1.commands.registerCommand('as.views.projects.openbrowser', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.openTreeItemInBrowser(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.details.projects', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.details.services', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.details.members', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.details.invites', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
+    vscode_1.commands.registerCommand('as.views.projects.details.credentials', (item) => __awaiter(this, void 0, void 0, function* () { return projectExplorer.printTreeItemDetails(item); }));
     // Tools tree
     const toolsExplorer = new explorer_3.ToolsExplorer();
-    vscode.window.registerTreeDataProvider('as.views.tools', toolsExplorer);
-    vscode.commands.registerCommand('as.views.tools.refresh', () => toolsExplorer.refresh());
-    vscode.commands.registerCommand('as.views.tools.info', (item) => __awaiter(this, void 0, void 0, function* () { return toolsExplorer.openTreeItemInBrowser(item); }));
+    vscode_1.window.registerTreeDataProvider('as.views.tools', toolsExplorer);
+    vscode_1.commands.registerCommand('as.views.tools.refresh', () => toolsExplorer.refresh());
+    vscode_1.commands.registerCommand('as.views.tools.info', (item) => __awaiter(this, void 0, void 0, function* () { return toolsExplorer.openTreeItemInBrowser(item); }));
     // Status tree	
     const statusExplorer = new explorer_2.StatusExplorer();
-    vscode.window.registerTreeDataProvider('as.views.status', statusExplorer);
-    vscode.commands.registerCommand('as.views.status.refresh', () => statusExplorer.refresh());
-    vscode.commands.registerCommand('as.views.status.info', () => statusExplorer.openTreeItemInBrowser());
-    context.subscriptions.push(vscode.commands.registerCommand('as.views.status.view', () => __awaiter(this, void 0, void 0, function* () { statusExplorer.openTreeItemInBrowser(); })));
+    vscode_1.window.registerTreeDataProvider('as.views.status', statusExplorer);
+    vscode_1.commands.registerCommand('as.views.status.refresh', () => statusExplorer.refresh());
+    vscode_1.commands.registerCommand('as.views.status.info', () => statusExplorer.openTreeItemInBrowser());
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.views.status.view', () => __awaiter(this, void 0, void 0, function* () { statusExplorer.openTreeItemInBrowser(); })));
     // Credentials Tree
     const credentialsExplorer = new explorer_4.CredentialsExplorer(akkasls);
-    vscode.window.registerTreeDataProvider('as.views.credentials', credentialsExplorer);
-    vscode.commands.registerCommand('as.views.credentials.refresh', () => credentialsExplorer.refresh());
-    vscode.commands.registerCommand('as.views.credentials.revoke', (item) => credentialsExplorer.revokeCredential(item));
-    vscode.commands.registerCommand('as.views.credentials.details.tokens', (item) => __awaiter(this, void 0, void 0, function* () { credentialsExplorer.printTreeItemDetails(item); }));
+    vscode_1.window.registerTreeDataProvider('as.views.credentials', credentialsExplorer);
+    vscode_1.commands.registerCommand('as.views.credentials.refresh', () => credentialsExplorer.refresh());
+    vscode_1.commands.registerCommand('as.views.credentials.revoke', (item) => credentialsExplorer.revokeCredential(item));
+    vscode_1.commands.registerCommand('as.views.credentials.details.tokens', (item) => __awaiter(this, void 0, void 0, function* () { credentialsExplorer.printTreeItemDetails(item); }));
     // Menu Items
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.credentials.add', () => __awaiter(this, void 0, void 0, function* () { akkasls.addDockerCredentials(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.credentials.delete', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteDockerCredentials(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.login', () => __awaiter(this, void 0, void 0, function* () { akkasls.login(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.logout', () => __awaiter(this, void 0, void 0, function* () { akkasls.logout(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.deploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.deployService(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.undeploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.undeployService(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.expose', () => __awaiter(this, void 0, void 0, function* () { akkasls.exposeService(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.unexpose', () => __awaiter(this, void 0, void 0, function* () { akkasls.unexposeService(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.inviteuser', () => __awaiter(this, void 0, void 0, function* () { akkasls.inviteUser(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.invites.deleteinvite', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteInvite(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.start', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.startLocal(uri); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.stop', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.stopLocal(uri); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.tokens.revoke', () => __awaiter(this, void 0, void 0, function* () { akkasls.revokeToken(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.templatewizard', () => __awaiter(this, void 0, void 0, function* () { templateWizard_1.TemplateWizard(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.credentials.add', () => __awaiter(this, void 0, void 0, function* () { akkasls.addDockerCredentials(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.credentials.delete', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteDockerCredentials(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.auth.login', () => __awaiter(this, void 0, void 0, function* () { akkasls.login(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.auth.logout', () => __awaiter(this, void 0, void 0, function* () { akkasls.logout(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.deploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.deployService(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.undeploy', () => __awaiter(this, void 0, void 0, function* () { akkasls.undeployService(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.expose', () => __awaiter(this, void 0, void 0, function* () { akkasls.exposeService(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.unexpose', () => __awaiter(this, void 0, void 0, function* () { akkasls.unexposeService(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.invites.inviteuser', () => __awaiter(this, void 0, void 0, function* () { akkasls.inviteUser(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.invites.deleteinvite', () => __awaiter(this, void 0, void 0, function* () { akkasls.deleteInvite(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.projects.local.start', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.startLocal(uri); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.projects.local.stop', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.stopLocal(uri); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.tokens.revoke', () => __awaiter(this, void 0, void 0, function* () { akkasls.revokeToken(); })));
+    context.subscriptions.push(vscode_1.commands.registerCommand('as.commandpalette.templatewizard', () => __awaiter(this, void 0, void 0, function* () { templateWizard_1.TemplateWizard(); })));
 }
 exports.activate = activate;
 function deactivate() {
@@ -615,9 +615,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Command = void 0;
-const vscode = __webpack_require__(1);
+const vscode_1 = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
-const shell = __webpack_require__(6);
+const shell_1 = __webpack_require__(6);
 class Command {
     constructor(cmd, args, flags) {
         this.cmd = cmd;
@@ -650,7 +650,7 @@ class Command {
             for (let index = 0; index < this.args.length; index++) {
                 const element = this.args[index];
                 if (element.show) {
-                    let param = yield vscode.window.showInputBox({
+                    let param = yield vscode_1.window.showInputBox({
                         prompt: `${element.name}: ${element.description}`,
                         ignoreFocusOut: true,
                         value: element.defaultValue
@@ -669,7 +669,7 @@ class Command {
             for (let index = 0; index < this.flags.length; index++) {
                 const element = this.flags[index];
                 if (element.show) {
-                    let param = yield vscode.window.showInputBox({
+                    let param = yield vscode_1.window.showInputBox({
                         prompt: `${element.name}: ${element.description}`,
                         ignoreFocusOut: true,
                         value: element.defaultValue
@@ -682,7 +682,7 @@ class Command {
                     params.push(p);
                     if (!param && element.required) {
                         let message = `Cannot complete ${this.cmd}, the parameter ${element.name} needs a value`;
-                        vscode.window.showErrorMessage(message);
+                        vscode_1.window.showErrorMessage(message);
                         return null;
                     }
                 }
@@ -691,12 +691,12 @@ class Command {
                 }
             }
             let tool = 'akkasls';
-            if (vscode.workspace.getConfiguration('akkaserverless').get('dryrun')) {
+            if (vscode_1.workspace.getConfiguration('akkaserverless').get('dryrun')) {
                 logger_1.aslogger.log(`${tool} ${params.join('')}`);
                 return null;
             }
-            let res = yield shell.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
-            if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
+            let res = yield shell_1.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
+            if (vscode_1.workspace.getConfiguration('akkaserverless').get('logOutput')) {
                 logger_1.aslogger.log(res.stderr);
                 logger_1.aslogger.log(res.stdout);
             }
@@ -8186,11 +8186,11 @@ exports.Convert = Convert;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetIPAddress = void 0;
 /* eslint-disable @typescript-eslint/naming-convention */
-const os = __webpack_require__(10);
+const os_1 = __webpack_require__(10);
 function GetIPAddress() {
-    let networkInterfaces = os.networkInterfaces();
-    for (let name of Object.keys(networkInterfaces)) {
-        for (let networkInterface of networkInterfaces[name]) {
+    let ni = os_1.networkInterfaces();
+    for (let name of Object.keys(ni)) {
+        for (let networkInterface of ni[name]) {
             if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
                 return networkInterface.address;
             }
@@ -8846,11 +8846,11 @@ exports.StartLocal = StartLocal;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReadConfigFile = void 0;
-const fs = __webpack_require__(11);
-const path = __webpack_require__(15);
-const URL = __webpack_require__(7);
-const vscode = __webpack_require__(1);
-const jsyaml = __webpack_require__(87);
+const fs_extra_1 = __webpack_require__(199);
+const path_1 = __webpack_require__(15);
+const url_1 = __webpack_require__(7);
+const vscode_1 = __webpack_require__(1);
+const js_yaml_1 = __webpack_require__(87);
 const converter_1 = __webpack_require__(66);
 // Get the path of the .akkaserverless.yaml file. The precedence is:
 // 1. Selected through the VS Code context menu (configFilePath exists)
@@ -8863,31 +8863,31 @@ function getConfigFilePath(configpath) {
     if (configpath) {
         return configpath;
     }
-    if ((_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.fileName) {
-        if (vscode.window.activeTextEditor.document.fileName.endsWith('.akkaserverless.yaml')) {
-            return vscode.window.activeTextEditor.document.fileName;
+    if ((_a = vscode_1.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.fileName) {
+        if (vscode_1.window.activeTextEditor.document.fileName.endsWith('.akkaserverless.yaml')) {
+            return vscode_1.window.activeTextEditor.document.fileName;
         }
     }
-    if (vscode.workspace.workspaceFolders !== undefined) {
-        let dir = URL.fileURLToPath(vscode.workspace.workspaceFolders[0].uri.toString());
-        let configpath = path.join(dir, '.akkaserverless.yaml');
-        if (fs.existsSync(configpath)) {
+    if (vscode_1.workspace.workspaceFolders !== undefined) {
+        let dir = url_1.fileURLToPath(vscode_1.workspace.workspaceFolders[0].uri.toString());
+        let configpath = path_1.join(dir, '.akkaserverless.yaml');
+        if (fs_extra_1.existsSync(configpath)) {
             return configpath;
         }
     }
     let dir = '.';
-    configpath = path.join(dir, '.akkaserverless.yaml');
-    if (!fs.existsSync(configpath)) {
+    configpath = path_1.join(dir, '.akkaserverless.yaml');
+    if (!fs_extra_1.existsSync(configpath)) {
         throw new Error(`Config file .akkaserverless.yaml does not exist in ${dir}`);
     }
     return configpath;
 }
 function ReadConfigFile(configpath) {
     configpath = getConfigFilePath(configpath);
-    let basedir = path.dirname(configpath);
-    let asConfig = converter_1.Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configpath, 'utf-8'))));
-    if (vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
-        let dockerImageUser = vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser');
+    let basedir = path_1.dirname(configpath);
+    let asConfig = converter_1.Convert.toASConfig(JSON.stringify(js_yaml_1.safeLoad(fs_extra_1.readFileSync(configpath, 'utf-8'))));
+    if (vscode_1.workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
+        let dockerImageUser = vscode_1.workspace.getConfiguration('akkaserverless').get('dockerImageUser');
         asConfig.InternalConfig = {
             BaseDir: basedir,
             DockerImageUser: dockerImageUser
@@ -19815,7 +19815,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectExplorer = void 0;
-const sls = __webpack_require__(3);
+const akkasls_1 = __webpack_require__(3);
 const inviteTreeItem_1 = __webpack_require__(121);
 const memberTreeItem_1 = __webpack_require__(145);
 const serviceTreeItem_1 = __webpack_require__(146);
@@ -19928,21 +19928,21 @@ class ProjectExplorer {
             let url = '';
             switch (base.type) {
                 case projectTreeItem_1.PROJECT_ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+                    url = `${akkasls_1.CONSOLE_URL}/project/${base.id}/overview`;
                     break;
                 case serviceTreeItem_1.SERVICE_ITEM_TYPE:
                     if ((_a = base.id) === null || _a === void 0 ? void 0 : _a.includes('-Services')) {
-                        url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
+                        url = `${akkasls_1.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
                     }
                     else {
-                        url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+                        url = `${akkasls_1.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
                     }
                     break;
                 case memberTreeItem_1.MEMBER_ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    url = `${akkasls_1.CONSOLE_URL}/project/${base.parentProjectID}/members`;
                     break;
                 case inviteTreeItem_1.INVITE_ITEM_TYPE:
-                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                    url = `${akkasls_1.CONSOLE_URL}/project/${base.parentProjectID}/members`;
                     break;
                 default:
                     break;
@@ -26377,7 +26377,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetDefaultTokenTreeItem = exports.GetTokenTreeItems = exports.TokenTreeItem = exports.TOKEN_ITEM_TYPE = void 0;
 const credentialsBaseTreeItem_1 = __webpack_require__(197);
-const vscode = __webpack_require__(1);
+const vscode_1 = __webpack_require__(1);
 const logger_1 = __webpack_require__(2);
 const table = __webpack_require__(123);
 exports.TOKEN_ITEM_TYPE = 'Tokens';
@@ -26401,7 +26401,7 @@ class TokenTreeItem extends credentialsBaseTreeItem_1.CredentialsBaseTreeItem {
         return this.tokenElements[this.tokenElements.length - 2];
     }
     getIcon() {
-        return new vscode.ThemeIcon('link');
+        return new vscode_1.ThemeIcon('link');
     }
     printDetails() {
         if (this.label !== exports.TOKEN_ITEM_TYPE) {
@@ -26421,7 +26421,7 @@ function GetTokenTreeItems(akkasls) {
         let tokenList = yield akkasls.getTokens();
         for (let token of tokenList) {
             let nameElements = token.name.split('/');
-            items.push(new TokenTreeItem(nameElements[nameElements.length - 1], token, vscode.TreeItemCollapsibleState.None));
+            items.push(new TokenTreeItem(nameElements[nameElements.length - 1], token, vscode_1.TreeItemCollapsibleState.None));
         }
         return items;
     });
@@ -26429,7 +26429,7 @@ function GetTokenTreeItems(akkasls) {
 exports.GetTokenTreeItems = GetTokenTreeItems;
 function GetDefaultTokenTreeItem() {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new TokenTreeItem(exports.TOKEN_ITEM_TYPE, { name: exports.TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1 }, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
+    return new TokenTreeItem(exports.TOKEN_ITEM_TYPE, { name: exports.TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1 }, scopes: [1] }, vscode_1.TreeItemCollapsibleState.Collapsed);
 }
 exports.GetDefaultTokenTreeItem = GetDefaultTokenTreeItem;
 

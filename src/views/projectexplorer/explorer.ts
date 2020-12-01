@@ -1,6 +1,6 @@
 'use strict';
 
-import * as sls from '../../akkasls';
+import { AkkaServerless, CONSOLE_URL } from '../../akkasls';
 import { ProjectBaseTreeItem } from './projectBaseTreeItem';
 import { INVITE_ITEM_TYPE, InviteTreeItem, GetInviteTreeItems, GetDefaultInviteTreeItem } from './inviteTreeItem';
 import { MEMBER_ITEM_TYPE, GetMemberTreeItems, GetDefaultMemberTreeItem } from './memberTreeItem';
@@ -12,9 +12,9 @@ import { TreeDataProvider, EventEmitter, Event, TreeItem, Uri, commands } from '
 export class ProjectExplorer implements TreeDataProvider<ProjectBaseTreeItem> {
     private _onDidChangeTreeData: EventEmitter<ProjectBaseTreeItem | undefined | void> = new EventEmitter<ProjectBaseTreeItem | undefined | void>();
     readonly onDidChangeTreeData: Event<ProjectBaseTreeItem | undefined | void> = this._onDidChangeTreeData.event;
-    private akkaServerless: sls.AkkaServerless;
+    private akkaServerless: AkkaServerless;
 
-    constructor(akkaServerless: sls.AkkaServerless) {
+    constructor(akkaServerless: AkkaServerless) {
         this.akkaServerless = akkaServerless;
         akkaServerless.registerProjectExplorer(this);
     }
@@ -112,20 +112,20 @@ export class ProjectExplorer implements TreeDataProvider<ProjectBaseTreeItem> {
     
         switch (base.type) {
             case PROJECT_ITEM_TYPE:
-                url = `${sls.CONSOLE_URL}/project/${base.id}/overview`;
+                url = `${CONSOLE_URL}/project/${base.id}/overview`;
                 break;
             case SERVICE_ITEM_TYPE:
                 if (base.id?.includes('-Services')) {
-                    url = `${sls.CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
+                    url = `${CONSOLE_URL}/project/${base.id.substring(0, base.id.length - 9)}/services`;
                 } else {
-                    url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
+                    url = `${CONSOLE_URL}/project/${base.parentProjectID}/service/${base.id}`;
                 }
                 break;
             case MEMBER_ITEM_TYPE:
-                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                url = `${CONSOLE_URL}/project/${base.parentProjectID}/members`;
                 break;
             case INVITE_ITEM_TYPE:
-                url = `${sls.CONSOLE_URL}/project/${base.parentProjectID}/members`;
+                url = `${CONSOLE_URL}/project/${base.parentProjectID}/members`;
                 break;
             default:
                 break;

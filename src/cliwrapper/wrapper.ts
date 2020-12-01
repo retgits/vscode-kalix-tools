@@ -1,8 +1,8 @@
 'use strict';
 
-import * as vscode from 'vscode';
+import { window, workspace } from 'vscode';
 import { aslogger } from '../utils/logger';
-import  * as shell from '../utils/shell';
+import { shell, ShellResult } from '../utils/shell';
 
 export type Flag = {
     name: string
@@ -70,26 +70,26 @@ export class Command {
         });
     }
 
-    async runCommand(): Promise<shell.ShellResult | null> {
+    async runCommand(): Promise<ShellResult | null> {
         let params: string[] = [this.cmd];
 
         for (let index = 0; index < this.args.length; index++) {
             const element = this.args[index];
 
             if (element.show) {
-                let param = await vscode.window.showInputBox({
+                let param = await window.showInputBox({
                     prompt: `${element.name}: ${element.description}`,
                     ignoreFocusOut: true,
                     value: element.defaultValue
                 });
-    
+
                 if (param?.includes(" ")) {
                     param = `"${param}"`;
                 }
-    
+
                 let p: string = '';
                 p += ` ${param}`;
-    
+
                 params.push(p);
             } else {
                 params.push(`  ${element.defaultValue}`);
@@ -100,25 +100,25 @@ export class Command {
             const element = this.flags[index];
 
             if (element.show) {
-                let param = await vscode.window.showInputBox({
+                let param = await window.showInputBox({
                     prompt: `${element.name}: ${element.description}`,
                     ignoreFocusOut: true,
                     value: element.defaultValue
                 });
-    
+
                 if (param?.includes(" ")) {
                     param = `"${param}"`;
                 }
-    
+
                 let p: string = '';
                 p += ` --${element.name} ${param}`;
-    
-    
+
+
                 params.push(p);
-    
+
                 if (!param && element.required) {
                     let message: string = `Cannot complete ${this.cmd}, the parameter ${element.name} needs a value`;
-                    vscode.window.showErrorMessage(message);
+                    window.showErrorMessage(message);
                     return null;
                 }
             } else {
@@ -128,14 +128,14 @@ export class Command {
 
         let tool: string = 'akkasls';
 
-        if (vscode.workspace.getConfiguration('akkaserverless').get('dryrun')) {
+        if (workspace.getConfiguration('akkaserverless').get('dryrun')) {
             aslogger.log(`${tool} ${params.join('')}`);
             return null;
         }
 
-        let res = await shell.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
+        let res = await shell.exec(`${tool} ${params.join('')}`, this.baseDir);
 
-        if (vscode.workspace.getConfiguration('akkaserverless').get('logOutput')) {
+        if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
             aslogger.log(res.stderr);
             aslogger.log(res.stdout);
         }

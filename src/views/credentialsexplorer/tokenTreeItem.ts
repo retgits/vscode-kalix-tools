@@ -1,9 +1,9 @@
 'use strict';
 
-import * as sls from '../../akkasls';
+import { AkkaServerless } from '../../akkasls';
 import { CredentialsBaseTreeItem } from './credentialsBaseTreeItem';
-import * as token from '../../datatypes/auth/tokenlist';
-import * as vscode from 'vscode';
+import { TokenList } from '../../datatypes/auth/tokenlist';
+import { TreeItemCollapsibleState, ThemeIcon } from 'vscode';
 import { aslogger } from '../../utils/logger';
 import * as table from 'cli-table3';
 
@@ -14,8 +14,8 @@ export class TokenTreeItem extends CredentialsBaseTreeItem {
 
     constructor(
         public readonly label: string,
-        public readonly token: token.TokenList,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly token: TokenList,
+        public readonly collapsibleState: TreeItemCollapsibleState,
     ) {
         super(label, collapsibleState, TOKEN_ITEM_TYPE);
         this.tokenElements = this.token.name.split('/');
@@ -31,8 +31,8 @@ export class TokenTreeItem extends CredentialsBaseTreeItem {
 
     description = this.token.description;
 
-    getIcon(): vscode.ThemeIcon {
-        return new vscode.ThemeIcon('link');
+    getIcon(): ThemeIcon {
+        return new ThemeIcon('link');
     }
 
     id = this.getName();
@@ -53,14 +53,14 @@ export class TokenTreeItem extends CredentialsBaseTreeItem {
     }
 }
 
-export async function GetTokenTreeItems(akkasls: sls.AkkaServerless): Promise<TokenTreeItem[]> {
+export async function GetTokenTreeItems(akkasls: AkkaServerless): Promise<TokenTreeItem[]> {
     let items: TokenTreeItem[] = [];
 
     let tokenList = await akkasls.getTokens();
 
     for (let token of tokenList) {
         let nameElements = token.name.split('/');
-        items.push(new TokenTreeItem(nameElements[nameElements.length-1], token, vscode.TreeItemCollapsibleState.None));
+        items.push(new TokenTreeItem(nameElements[nameElements.length-1], token, TreeItemCollapsibleState.None));
     }
 
     return items;
@@ -68,5 +68,5 @@ export async function GetTokenTreeItems(akkasls: sls.AkkaServerless): Promise<To
 
 export function GetDefaultTokenTreeItem(): TokenTreeItem {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    return new TokenTreeItem(TOKEN_ITEM_TYPE, { name: TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1}, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
+    return new TokenTreeItem(TOKEN_ITEM_TYPE, { name: TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1}, scopes: [1] }, TreeItemCollapsibleState.Collapsed);
 }

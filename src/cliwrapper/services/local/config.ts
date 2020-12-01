@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as URL from 'url';
-import * as vscode from 'vscode';
-import * as jsyaml from 'js-yaml';
+import { existsSync, readFileSync } from 'fs-extra';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { window, workspace } from 'vscode';
+import { safeLoad } from 'js-yaml';
 import { Convert } from '../../../datatypes/converter';
 import { ASConfig } from '../../../datatypes/services/local';
 
@@ -17,24 +17,24 @@ function getConfigFilePath(configpath?: string): string {
         return configpath;
     }
 
-    if (vscode.window.activeTextEditor?.document.fileName) {
-        if (vscode.window.activeTextEditor!.document.fileName.endsWith('.akkaserverless.yaml')) {
-            return vscode.window.activeTextEditor!.document.fileName;
+    if (window.activeTextEditor?.document.fileName) {
+        if (window.activeTextEditor!.document.fileName.endsWith('.akkaserverless.yaml')) {
+            return window.activeTextEditor!.document.fileName;
         }
     }
 
-    if (vscode.workspace.workspaceFolders !== undefined) {
-        let dir: string = URL.fileURLToPath(vscode.workspace.workspaceFolders![0].uri.toString());
-        let configpath = path.join(dir, '.akkaserverless.yaml');
-        if (fs.existsSync(configpath)) {
+    if (workspace.workspaceFolders !== undefined) {
+        let dir: string = fileURLToPath(workspace.workspaceFolders![0].uri.toString());
+        let configpath = join(dir, '.akkaserverless.yaml');
+        if (existsSync(configpath)) {
             return configpath;
         }
     }
 
     let dir = '.';
-    configpath = path.join(dir, '.akkaserverless.yaml');
+    configpath = join(dir, '.akkaserverless.yaml');
 
-    if (!fs.existsSync(configpath)) {
+    if (!existsSync(configpath)) {
         throw new Error(`Config file .akkaserverless.yaml does not exist in ${dir}`);
     }
 
@@ -43,12 +43,12 @@ function getConfigFilePath(configpath?: string): string {
 
 export function ReadConfigFile(configpath?: string): ASConfig {
     configpath = getConfigFilePath(configpath);
-    let basedir = path.dirname(configpath);
+    let basedir = dirname(configpath);
 
-    let asConfig = Convert.toASConfig(JSON.stringify(jsyaml.safeLoad(fs.readFileSync(configpath, 'utf-8'))));
+    let asConfig = Convert.toASConfig(JSON.stringify(safeLoad(readFileSync(configpath, 'utf-8'))));
     
-    if (vscode.workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
-        let dockerImageUser = vscode.workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!;
+    if (workspace.getConfiguration('akkaserverless').get('dockerImageUser')) {
+        let dockerImageUser = workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!;
         asConfig.InternalConfig = {
             BaseDir: basedir,
             DockerImageUser: dockerImageUser
