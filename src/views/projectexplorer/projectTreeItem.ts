@@ -35,6 +35,8 @@ export class ProjectTreeItem extends ProjectBaseTreeItem {
 
     contextValue = PROJECT_ITEM_TYPE;
 
+    iconPath = new ThemeIcon('project');
+
     printDetails() {
         if (this.label !== PROJECT_ITEM_TYPE) {
             let printTable = new table({});
