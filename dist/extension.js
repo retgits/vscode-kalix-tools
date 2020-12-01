@@ -110,7 +110,7 @@ const explorer_1 = __webpack_require__(120);
 const explorer_2 = __webpack_require__(149);
 const explorer_3 = __webpack_require__(193);
 const explorer_4 = __webpack_require__(195);
-const wizard_1 = __webpack_require__(198);
+const templateWizard_1 = __webpack_require__(198);
 function activate(context) {
     const akkasls = new akkasls_1.AkkaServerless();
     // Projects Tree
@@ -163,7 +163,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.start', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.startLocal(uri); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.projects.local.stop', (uri) => __awaiter(this, void 0, void 0, function* () { akkasls.stopLocal(uri); })));
     context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.tokens.revoke', () => __awaiter(this, void 0, void 0, function* () { akkasls.revokeToken(); })));
-    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.templatewizard', () => __awaiter(this, void 0, void 0, function* () { wizard_1.templateWizard(); })));
+    context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.templatewizard', () => __awaiter(this, void 0, void 0, function* () { templateWizard_1.TemplateWizard(); })));
 }
 exports.activate = activate;
 function deactivate() {
@@ -26469,7 +26469,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.templateWizard = void 0;
+exports.TemplateWizard = void 0;
 const fs_extra_1 = __webpack_require__(199);
 const replace_in_file_1 = __webpack_require__(238);
 const path_1 = __webpack_require__(15);
@@ -26477,13 +26477,14 @@ const vscode_1 = __webpack_require__(1);
 const tmp_1 = __webpack_require__(257);
 const shell_1 = __webpack_require__(6);
 const logger_1 = __webpack_require__(2);
-function templateWizard() {
+const multiStepInput_1 = __webpack_require__(260);
+const WIZARD_TITLE = 'Create Application Template';
+const TOTAL_STEPS = 6;
+const TEMPLATE_REPO_NAME = 'https://github.com/retgits/akkasls-templates';
+function TemplateWizard() {
     return __awaiter(this, void 0, void 0, function* () {
-        const wizardTitle = 'Create Application Template';
-        const totalSteps = 6;
-        const templateRepoName = 'https://github.com/retgits/akkasls-templates';
         const tempFolder = tmp_1.dirSync();
-        const res = yield shell_1.shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
+        const res = yield shell_1.shell.exec(`git clone --depth 1 ${TEMPLATE_REPO_NAME} ${tempFolder.name}`);
         if (vscode_1.workspace.getConfiguration('akkaserverless').get('logOutput')) {
             logger_1.aslogger.log(res.stderr);
             logger_1.aslogger.log(res.stdout);
@@ -26491,7 +26492,7 @@ function templateWizard() {
         function collectInputs() {
             return __awaiter(this, void 0, void 0, function* () {
                 const state = {};
-                yield MultiStepInput.run(input => pickMyRuntime(input, state));
+                yield multiStepInput_1.MultiStepInput.run(input => pickMyRuntime(input, state));
                 return state;
             });
         }
@@ -26499,9 +26500,9 @@ function templateWizard() {
             return __awaiter(this, void 0, void 0, function* () {
                 const runtimes = getAvailableRuntimes().map(label => ({ label }));
                 const pick = yield input.showQuickPick({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 1,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     placeholder: 'Choose your runtime',
                     items: runtimes,
                     activeItem: typeof state.runtime !== 'string' ? state.runtime : undefined
@@ -26514,9 +26515,9 @@ function templateWizard() {
             return __awaiter(this, void 0, void 0, function* () {
                 const templates = getAvailableProjectTemplates(state.runtime).map(label => ({ label }));
                 const pick = yield input.showQuickPick({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 2,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     placeholder: 'Choose a project template',
                     items: templates,
                     activeItem: typeof state.template !== 'string' ? state.template : undefined
@@ -26528,9 +26529,9 @@ function templateWizard() {
         function inputMyPackageName(input, state) {
             return __awaiter(this, void 0, void 0, function* () {
                 state.protoPackage = yield input.showInputBox({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 3,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     value: state.protoPackage || '',
                     prompt: 'Choose a name for your protobuf package',
                     validate: validatePackagename
@@ -26541,9 +26542,9 @@ function templateWizard() {
         function inputMyFunctionName(input, state) {
             return __awaiter(this, void 0, void 0, function* () {
                 state.functionName = yield input.showInputBox({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 4,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     value: state.functionName || '',
                     prompt: 'Choose a name for your function',
                     validate: validateFunctionname
@@ -26554,9 +26555,9 @@ function templateWizard() {
         function inputMyFunctionVersion(input, state) {
             return __awaiter(this, void 0, void 0, function* () {
                 state.functionVersion = yield input.showInputBox({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 5,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     value: state.functionVersion || '',
                     prompt: 'Choose a version number for your function',
                     validate: validateFunctionVersion
@@ -26567,9 +26568,9 @@ function templateWizard() {
         function inputMyLocation(input, state) {
             return __awaiter(this, void 0, void 0, function* () {
                 state.location = yield input.showInputBox({
-                    title: wizardTitle,
+                    title: WIZARD_TITLE,
                     step: 6,
-                    totalSteps: totalSteps,
+                    totalSteps: TOTAL_STEPS,
                     value: state.location || '',
                     prompt: 'Choose a location to store your code',
                     validate: validateLocationExists
@@ -26647,147 +26648,7 @@ function templateWizard() {
         tempFolder.removeCallback();
     });
 }
-exports.templateWizard = templateWizard;
-// -------------------------------------------------------
-// Helper code that wraps the API for the multi-step case.
-// -------------------------------------------------------
-class InputFlowAction {
-}
-InputFlowAction.back = new InputFlowAction();
-InputFlowAction.cancel = new InputFlowAction();
-InputFlowAction.resume = new InputFlowAction();
-class MultiStepInput {
-    constructor() {
-        this.steps = [];
-    }
-    static run(start) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const input = new MultiStepInput();
-            return input.stepThrough(start);
-        });
-    }
-    stepThrough(start) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let step = start;
-            while (step) {
-                this.steps.push(step);
-                if (this.current) {
-                    this.current.enabled = false;
-                    this.current.busy = true;
-                }
-                try {
-                    step = yield step(this);
-                }
-                catch (err) {
-                    if (err === InputFlowAction.back) {
-                        this.steps.pop();
-                        step = this.steps.pop();
-                    }
-                    else if (err === InputFlowAction.resume) {
-                        step = this.steps.pop();
-                    }
-                    else if (err === InputFlowAction.cancel) {
-                        step = undefined;
-                    }
-                    else {
-                        throw err;
-                    }
-                }
-            }
-            if (this.current) {
-                this.current.dispose();
-            }
-        });
-    }
-    showQuickPick({ title, step, totalSteps, items, activeItem, placeholder }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const disposables = [];
-            try {
-                return yield new Promise((resolve, reject) => {
-                    const input = vscode_1.window.createQuickPick();
-                    input.title = title;
-                    input.step = step;
-                    input.totalSteps = totalSteps;
-                    input.placeholder = placeholder;
-                    input.items = items;
-                    if (activeItem) {
-                        input.activeItems = [activeItem];
-                    }
-                    input.buttons = [
-                        ...(this.steps.length > 1 ? [vscode_1.QuickInputButtons.Back] : []),
-                    ];
-                    disposables.push(input.onDidTriggerButton(item => {
-                        if (item === vscode_1.QuickInputButtons.Back) {
-                            reject(InputFlowAction.back);
-                        }
-                        else {
-                            resolve(item);
-                        }
-                    }), input.onDidChangeSelection(items => resolve(items[0])));
-                    if (this.current) {
-                        this.current.dispose();
-                    }
-                    this.current = input;
-                    this.current.show();
-                });
-            }
-            finally {
-                disposables.forEach(d => d.dispose());
-            }
-        });
-    }
-    showInputBox({ title, step, totalSteps, value, prompt, validate }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const disposables = [];
-            try {
-                return yield new Promise((resolve, reject) => {
-                    const input = vscode_1.window.createInputBox();
-                    input.title = title;
-                    input.step = step;
-                    input.totalSteps = totalSteps;
-                    input.value = value || '';
-                    input.prompt = prompt;
-                    input.buttons = [
-                        ...(this.steps.length > 1 ? [vscode_1.QuickInputButtons.Back] : []),
-                    ];
-                    let validating = validate('');
-                    disposables.push(input.onDidTriggerButton(item => {
-                        if (item === vscode_1.QuickInputButtons.Back) {
-                            reject(InputFlowAction.back);
-                        }
-                        else {
-                            resolve(item);
-                        }
-                    }), input.onDidAccept(() => __awaiter(this, void 0, void 0, function* () {
-                        const value = input.value;
-                        input.enabled = false;
-                        input.busy = true;
-                        if (!(yield validate(value))) {
-                            resolve(value);
-                        }
-                        input.enabled = true;
-                        input.busy = false;
-                    })), input.onDidChangeValue((text) => __awaiter(this, void 0, void 0, function* () {
-                        const current = validate(text);
-                        validating = current;
-                        const validationMessage = yield current;
-                        if (current === validating) {
-                            input.validationMessage = validationMessage;
-                        }
-                    })));
-                    if (this.current) {
-                        this.current.dispose();
-                    }
-                    this.current = input;
-                    this.current.show();
-                });
-            }
-            finally {
-                disposables.forEach(d => d.dispose());
-            }
-        });
-    }
-}
+exports.TemplateWizard = TemplateWizard;
 
 
 /***/ }),
@@ -33434,6 +33295,164 @@ const rmkidsSync = (p, options) => {
 
 module.exports = rimraf
 rimraf.sync = rimrafSync
+
+
+/***/ }),
+/* 260 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MultiStepInput = void 0;
+const vscode_1 = __webpack_require__(1);
+class InputFlowAction {
+}
+InputFlowAction.back = new InputFlowAction();
+InputFlowAction.cancel = new InputFlowAction();
+InputFlowAction.resume = new InputFlowAction();
+class MultiStepInput {
+    constructor() {
+        this.steps = [];
+    }
+    static run(start) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const input = new MultiStepInput();
+            return input.stepThrough(start);
+        });
+    }
+    stepThrough(start) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let step = start;
+            while (step) {
+                this.steps.push(step);
+                if (this.current) {
+                    this.current.enabled = false;
+                    this.current.busy = true;
+                }
+                try {
+                    step = yield step(this);
+                }
+                catch (err) {
+                    if (err === InputFlowAction.back) {
+                        this.steps.pop();
+                        step = this.steps.pop();
+                    }
+                    else if (err === InputFlowAction.resume) {
+                        step = this.steps.pop();
+                    }
+                    else if (err === InputFlowAction.cancel) {
+                        step = undefined;
+                    }
+                    else {
+                        throw err;
+                    }
+                }
+            }
+            if (this.current) {
+                this.current.dispose();
+            }
+        });
+    }
+    showQuickPick({ title, step, totalSteps, items, activeItem, placeholder }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const disposables = [];
+            try {
+                return yield new Promise((resolve, reject) => {
+                    const input = vscode_1.window.createQuickPick();
+                    input.title = title;
+                    input.step = step;
+                    input.totalSteps = totalSteps;
+                    input.placeholder = placeholder;
+                    input.items = items;
+                    if (activeItem) {
+                        input.activeItems = [activeItem];
+                    }
+                    input.buttons = [
+                        ...(this.steps.length > 1 ? [vscode_1.QuickInputButtons.Back] : []),
+                    ];
+                    disposables.push(input.onDidTriggerButton(item => {
+                        if (item === vscode_1.QuickInputButtons.Back) {
+                            reject(InputFlowAction.back);
+                        }
+                        else {
+                            resolve(item);
+                        }
+                    }), input.onDidChangeSelection(items => resolve(items[0])));
+                    if (this.current) {
+                        this.current.dispose();
+                    }
+                    this.current = input;
+                    this.current.show();
+                });
+            }
+            finally {
+                disposables.forEach(d => d.dispose());
+            }
+        });
+    }
+    showInputBox({ title, step, totalSteps, value, prompt, validate }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const disposables = [];
+            try {
+                return yield new Promise((resolve, reject) => {
+                    const input = vscode_1.window.createInputBox();
+                    input.title = title;
+                    input.step = step;
+                    input.totalSteps = totalSteps;
+                    input.value = value || '';
+                    input.prompt = prompt;
+                    input.buttons = [
+                        ...(this.steps.length > 1 ? [vscode_1.QuickInputButtons.Back] : []),
+                    ];
+                    let validating = validate('');
+                    disposables.push(input.onDidTriggerButton(item => {
+                        if (item === vscode_1.QuickInputButtons.Back) {
+                            reject(InputFlowAction.back);
+                        }
+                        else {
+                            resolve(item);
+                        }
+                    }), input.onDidAccept(() => __awaiter(this, void 0, void 0, function* () {
+                        const value = input.value;
+                        input.enabled = false;
+                        input.busy = true;
+                        if (!(yield validate(value))) {
+                            resolve(value);
+                        }
+                        input.enabled = true;
+                        input.busy = false;
+                    })), input.onDidChangeValue((text) => __awaiter(this, void 0, void 0, function* () {
+                        const current = validate(text);
+                        validating = current;
+                        const validationMessage = yield current;
+                        if (current === validating) {
+                            input.validationMessage = validationMessage;
+                        }
+                    })));
+                    if (this.current) {
+                        this.current.dispose();
+                    }
+                    this.current = input;
+                    this.current.show();
+                });
+            }
+            finally {
+                disposables.forEach(d => d.dispose());
+            }
+        });
+    }
+}
+exports.MultiStepInput = MultiStepInput;
 
 
 /***/ })

@@ -1,19 +1,21 @@
 import { copySync, emptyDirSync, ensureDirSync, existsSync, readdirSync } from 'fs-extra';
 import { replaceInFileSync } from 'replace-in-file';
 import { join } from 'path';
-import { workspace, QuickPickItem, window, Disposable, QuickInput, QuickInputButtons } from 'vscode';
+import { workspace, QuickPickItem, window } from 'vscode';
 import { dirSync } from 'tmp';
 import { shell } from '../utils/shell';
 import { aslogger } from '../utils/logger';
+import { MultiStepInput } from './multiStepInput';
 
-export async function templateWizard() {
-	const wizardTitle = 'Create Application Template';
-	const totalSteps = 6;
-	const templateRepoName = 'https://github.com/retgits/akkasls-templates';
+const WIZARD_TITLE = 'Create Application Template';
+const TOTAL_STEPS = 6;
+const TEMPLATE_REPO_NAME = 'https://github.com/retgits/akkasls-templates';
 
+
+export async function TemplateWizard() {
 	const tempFolder = dirSync();
 
-	const res = await shell.exec(`git clone --depth 1 ${templateRepoName} ${tempFolder.name}`);
+	const res = await shell.exec(`git clone --depth 1 ${TEMPLATE_REPO_NAME} ${tempFolder.name}`);
 	if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
 		aslogger.log(res.stderr);
 		aslogger.log(res.stdout);
@@ -37,9 +39,9 @@ export async function templateWizard() {
 	async function pickMyRuntime(input: MultiStepInput, state: Partial<State>) {
 		const runtimes: QuickPickItem[] = getAvailableRuntimes().map(label => ({ label }));
 		const pick = await input.showQuickPick({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 1,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			placeholder: 'Choose your runtime',
 			items: runtimes,
 			activeItem: typeof state.runtime !== 'string' ? state.runtime : undefined
@@ -51,9 +53,9 @@ export async function templateWizard() {
 	async function pickMyTemplate(input: MultiStepInput, state: Partial<State>) {
 		const templates: QuickPickItem[] = getAvailableProjectTemplates(state.runtime!).map(label => ({ label }));
 		const pick = await input.showQuickPick({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 2,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			placeholder: 'Choose a project template',
 			items: templates,
 			activeItem: typeof state.template !== 'string' ? state.template : undefined
@@ -64,9 +66,9 @@ export async function templateWizard() {
 
 	async function inputMyPackageName(input: MultiStepInput, state: Partial<State>) {
 		state.protoPackage = await input.showInputBox({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 3,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			value: state.protoPackage || '',
 			prompt: 'Choose a name for your protobuf package',
 			validate: validatePackagename
@@ -76,9 +78,9 @@ export async function templateWizard() {
 
 	async function inputMyFunctionName(input: MultiStepInput, state: Partial<State>) {
 		state.functionName = await input.showInputBox({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 4,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			value: state.functionName || '',
 			prompt: 'Choose a name for your function',
 			validate: validateFunctionname
@@ -88,9 +90,9 @@ export async function templateWizard() {
 
 	async function inputMyFunctionVersion(input: MultiStepInput, state: Partial<State>) {
 		state.functionVersion = await input.showInputBox({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 5,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			value: state.functionVersion || '',
 			prompt: 'Choose a version number for your function',
 			validate: validateFunctionVersion
@@ -100,9 +102,9 @@ export async function templateWizard() {
 
 	async function inputMyLocation(input: MultiStepInput, state: Partial<State>) {
 		state.location = await input.showInputBox({
-			title: wizardTitle,
+			title: WIZARD_TITLE,
 			step: 6,
-			totalSteps: totalSteps,
+			totalSteps: TOTAL_STEPS,
 			value: state.location || '',
 			prompt: 'Choose a location to store your code',
 			validate: validateLocationExists
@@ -181,164 +183,4 @@ export async function templateWizard() {
 	// Clean up the temp folder
 	emptyDirSync(tempFolder.name);
 	tempFolder.removeCallback();
-}
-
-
-// -------------------------------------------------------
-// Helper code that wraps the API for the multi-step case.
-// -------------------------------------------------------
-
-
-class InputFlowAction {
-	static back = new InputFlowAction();
-	static cancel = new InputFlowAction();
-	static resume = new InputFlowAction();
-}
-
-type InputStep = (input: MultiStepInput) => Thenable<InputStep | void>;
-
-interface QuickPickParameters<T extends QuickPickItem> {
-	title: string;
-	step: number;
-	totalSteps: number;
-	items: T[];
-	activeItem?: T;
-	placeholder: string;
-}
-
-interface InputBoxParameters {
-	title: string;
-	step: number;
-	totalSteps: number;
-	value: string;
-	prompt: string;
-	validate: (value: string) => Promise<string | undefined>;
-}
-
-class MultiStepInput {
-
-	static async run<T>(start: InputStep) {
-		const input = new MultiStepInput();
-		return input.stepThrough(start);
-	}
-
-	private current?: QuickInput;
-	private steps: InputStep[] = [];
-
-	private async stepThrough<T>(start: InputStep) {
-		let step: InputStep | void = start;
-		while (step) {
-			this.steps.push(step);
-			if (this.current) {
-				this.current.enabled = false;
-				this.current.busy = true;
-			}
-			try {
-				step = await step(this);
-			} catch (err) {
-				if (err === InputFlowAction.back) {
-					this.steps.pop();
-					step = this.steps.pop();
-				} else if (err === InputFlowAction.resume) {
-					step = this.steps.pop();
-				} else if (err === InputFlowAction.cancel) {
-					step = undefined;
-				} else {
-					throw err;
-				}
-			}
-		}
-		if (this.current) {
-			this.current.dispose();
-		}
-	}
-
-	async showQuickPick<T extends QuickPickItem, P extends QuickPickParameters<T>>({ title, step, totalSteps, items, activeItem, placeholder }: P) {
-		const disposables: Disposable[] = [];
-		try {
-			return await new Promise<T | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
-				const input = window.createQuickPick<T>();
-				input.title = title;
-				input.step = step;
-				input.totalSteps = totalSteps;
-				input.placeholder = placeholder;
-				input.items = items;
-				if (activeItem) {
-					input.activeItems = [activeItem];
-				}
-				input.buttons = [
-					...(this.steps.length > 1 ? [QuickInputButtons.Back] : []),
-				];
-				disposables.push(
-					input.onDidTriggerButton(item => {
-						if (item === QuickInputButtons.Back) {
-							reject(InputFlowAction.back);
-						} else {
-							resolve(<any>item);
-						}
-					}),
-					input.onDidChangeSelection(items => resolve(items[0]))
-				);
-				if (this.current) {
-					this.current.dispose();
-				}
-				this.current = input;
-				this.current.show();
-			});
-		} finally {
-			disposables.forEach(d => d.dispose());
-		}
-	}
-
-	async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate }: P) {
-		const disposables: Disposable[] = [];
-		try {
-			return await new Promise<string | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
-				const input = window.createInputBox();
-				input.title = title;
-				input.step = step;
-				input.totalSteps = totalSteps;
-				input.value = value || '';
-				input.prompt = prompt;
-				input.buttons = [
-					...(this.steps.length > 1 ? [QuickInputButtons.Back] : []),
-				];
-				let validating = validate('');
-				disposables.push(
-					input.onDidTriggerButton(item => {
-						if (item === QuickInputButtons.Back) {
-							reject(InputFlowAction.back);
-						} else {
-							resolve(<any>item);
-						}
-					}),
-					input.onDidAccept(async () => {
-						const value = input.value;
-						input.enabled = false;
-						input.busy = true;
-						if (!(await validate(value))) {
-							resolve(value);
-						}
-						input.enabled = true;
-						input.busy = false;
-					}),
-					input.onDidChangeValue(async text => {
-						const current = validate(text);
-						validating = current;
-						const validationMessage = await current;
-						if (current === validating) {
-							input.validationMessage = validationMessage;
-						}
-					})
-				);
-				if (this.current) {
-					this.current.dispose();
-				}
-				this.current = input;
-				this.current.show();
-			});
-		} finally {
-			disposables.forEach(d => d.dispose());
-		}
-	}
 }
