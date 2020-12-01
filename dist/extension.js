@@ -29674,7 +29674,14 @@ function TemplateWizard() {
             });
         }
         function getAvailableRuntimes() {
-            return fs_extra_1.readdirSync(tempFolder.name).slice(1);
+            let runtimes = [];
+            let files = fs_extra_1.readdirSync(tempFolder.name, { withFileTypes: true });
+            for (let file of files) {
+                if (file.isDirectory() && !file.name.startsWith('.')) {
+                    runtimes.push(file.name);
+                }
+            }
+            return runtimes;
         }
         function getAvailableProjectTemplates(runtime) {
             if (typeof runtime !== "string") {

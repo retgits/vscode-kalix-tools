@@ -135,7 +135,14 @@ export async function TemplateWizard() {
 	}
 
 	function getAvailableRuntimes(): string[] {
-		return readdirSync(tempFolder.name).slice(1);
+		let runtimes: string[] = [];
+		let files = readdirSync(tempFolder.name, {withFileTypes: true });
+		for (let file of files) {
+			if(file.isDirectory() && !file.name.startsWith('.')) {
+				runtimes.push(file.name);
+			}
+		}
+		return runtimes;
 	}
 
 	function getAvailableProjectTemplates(runtime: QuickPickItem | string): string[] {
