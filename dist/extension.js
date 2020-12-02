@@ -697,6 +697,14 @@ class Command {
             let command = params.join('');
             if (this.toolPrefix) {
                 command = `akkasls ${command}`;
+                let configFile = vscode_1.workspace.getConfiguration('akkaserverless').get('configFile');
+                if (configFile) {
+                    command = `${command} --config ${configFile}`;
+                }
+                let context = vscode_1.workspace.getConfiguration('akkaserverless').get('context');
+                if (context) {
+                    command = `${command} --config ${context}`;
+                }
             }
             if (vscode_1.workspace.getConfiguration('akkaserverless').get('dryrun')) {
                 logger_1.aslogger.log(command);
