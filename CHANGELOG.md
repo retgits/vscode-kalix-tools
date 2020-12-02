@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 0.0.10
+
+- A new configuration option has been added to allow the user to override the config file and context
+- The commands to run services locally had the `akkasls` prefix, this has been solved
+- The docker image user is now passed into the template wizard to allow templates to use that option too
+
 ## Version 0.0.9
 
 - Updated filtering logic for Quick Start templates
