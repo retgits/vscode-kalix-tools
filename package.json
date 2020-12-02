@@ -80,6 +80,16 @@
 					"type": "string",
 					"default": null,
 					"description": "Image prefix for docker images ie 'docker.io/retgits'"
+				},
+				"akkaserverless.configFile": {
+					"type": "string",
+					"default": null,
+					"description": "Location of the config file if you want to override it"
+				},
+				"akkaserverless.context": {
+					"type": "string",
+					"default": null,
+					"description": "The context to use"
 				}
 			}
 		},

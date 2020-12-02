@@ -111,6 +111,8 @@ You can specify the location of the `.akkaserverless.yaml` file in a few differe
     * `akkaserverless.dryrun`: If true will print the commands in the log rather than execute them
     * `akkaserverless.logOutput`: If true will log output from the Akka Serverless CLI in the akkasls output window
     * `akkaserverless.dockerImageUser`: Image prefix for docker images ie 'docker.io/retgits'
+    * `akkaserverless.configFile`: Location of the config file if you want to override it
+    * `akkaserverless.context`: The context to use
 
 ## Release notes
 

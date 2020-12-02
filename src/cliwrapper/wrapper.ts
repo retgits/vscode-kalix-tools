@@ -134,6 +134,16 @@ export class Command {
         let command = params.join('');
         if(this.toolPrefix) {
             command = `akkasls ${command}`;
+            
+            let configFile = workspace.getConfiguration('akkaserverless').get<string>('configFile');
+            if (configFile) {
+                command = `${command} --config ${configFile}`;
+            }
+
+            let context = workspace.getConfiguration('akkaserverless').get<string>('context');
+            if (context) {
+                command = `${command} --config ${context}`;
+            }
         }
 
         if (workspace.getConfiguration('akkaserverless').get('dryrun')) {
