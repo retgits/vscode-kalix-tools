@@ -39,6 +39,7 @@ export class Command {
     private args: Array<Argument>;
     private flags: Array<Flag>;
     public baseDir?: string;
+    public toolPrefix: boolean = true;
 
     constructor(cmd: string, args?: Array<Argument>, flags?: Array<Flag>) {
         this.cmd = cmd;
@@ -49,6 +50,10 @@ export class Command {
 
     setBaseDir(baseDir: string) {
         this.baseDir = baseDir;
+    }
+
+    addToolPrefix(toolPrefix: boolean) {
+        this.toolPrefix = toolPrefix;
     }
 
     addArgument({ name, description, defaultValue, show = true }: ArgumentParameters) {
@@ -126,14 +131,17 @@ export class Command {
             }
         }
 
-        let tool: string = 'akkasls';
+        let command = params.join('');
+        if(this.toolPrefix) {
+            command = `akkasls ${command}`;
+        }
 
         if (workspace.getConfiguration('akkaserverless').get('dryrun')) {
-            aslogger.log(`${tool} ${params.join('')}`);
+            aslogger.log(command);
             return null;
         }
 
-        let res = await shell.exec(`${tool} ${params.join('')}`, this.baseDir);
+        let res = await shell.exec(command, this.baseDir);
 
         if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
             aslogger.log(res.stderr);

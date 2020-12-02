@@ -10,6 +10,7 @@ export async function StartLocal(configpath?: string): Promise<ShellResult | nul
 
     let command = new Command(`docker build . -t ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
     command.setBaseDir(asConfig.InternalConfig.BaseDir);
+    command.addToolPrefix(false);
     let result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
@@ -17,6 +18,7 @@ export async function StartLocal(configpath?: string): Promise<ShellResult | nul
 
     command = new Command(`docker run -d --name ${asConfig.Resources.Function.Name} -p 8080:8080 ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
     command.setBaseDir(asConfig.InternalConfig.BaseDir);
+    command.addToolPrefix(false);
     result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
@@ -24,6 +26,7 @@ export async function StartLocal(configpath?: string): Promise<ShellResult | nul
 
     command = new Command(`docker run -d --name ${asConfig.Resources.Function.Name}-proxy -p 9000:9000 --env USER_FUNCTION_HOST=${asConfig.Resources.Docker.Host} cloudstateio/cloudstate-proxy-dev-mode:latest`);
     command.setBaseDir(asConfig.InternalConfig.BaseDir);
+    command.addToolPrefix(false);
     result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);

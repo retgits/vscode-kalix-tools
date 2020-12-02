@@ -9,24 +9,28 @@ export async function StopLocal(configpath?: string): Promise<ShellResult | null
     let asConfig = ReadConfigFile(configpath);
 
     let command = new Command(`docker stop ${asConfig.Resources.Function.Name}`);
+    command.addToolPrefix(false);
     let result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
     }
     
     command = new Command(`docker rm ${asConfig.Resources.Function.Name}`);
+    command.addToolPrefix(false);
     result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
     }
     
     command = new Command(`docker stop ${asConfig.Resources.Function.Name}-proxy`);
+    command.addToolPrefix(false);
     result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
     }
     
     command = new Command(`docker rm ${asConfig.Resources.Function.Name}-proxy`);
+    command.addToolPrefix(false);
     result = await command.runCommand();
     if (result?.stdout) {
         aslogger.log(result?.stdout);
