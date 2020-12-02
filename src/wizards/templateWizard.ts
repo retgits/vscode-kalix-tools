@@ -161,31 +161,23 @@ export async function TemplateWizard() {
 		copySync(join(tempFolder.name, state.runtime.label, state.template.label), state.location);
 	}
 
-	replaceInFileSync({
-		files: [
-			`${state.location}/**`,
-			`${state.location}/.*`
-		],
-		from: /{{functionname}}/g,
-		to: state.functionName
-	});
+	let replaceMap: Map<string, string> = new Map();
+	replaceMap.set('functionname', state.functionName);
+	replaceMap.set('functionversion', state.functionVersion);
+	replaceMap.set('protopackage', state.protoPackage);
+	replaceMap.set('dockerimageuser', workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!);
 
-	replaceInFileSync({
-		files: [
-			`${state.location}/**`,
-			`${state.location}/.*`
-		],
-		from: /{{functionversion}}/g,
-		to: state.functionVersion
-	});
-
-	replaceInFileSync({
-		files: [
-			`${state.location}/**`
-		],
-		from: /{{protopackage}}/g,
-		to: state.protoPackage
-	});
+	for(let replaceKey of replaceMap.keys()) {
+		let regex = new RegExp('{{' + replaceKey + '}}','g');
+		replaceInFileSync({
+			files: [
+				`${state.location}/**`,
+				`${state.location}/.*`
+			],
+			from: regex,
+			to: replaceMap.get(replaceKey)!
+		});
+	}
 
 	// Clean up the temp folder
 	emptyDirSync(tempFolder.name);
