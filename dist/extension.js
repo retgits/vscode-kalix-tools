@@ -620,12 +620,16 @@ const logger_1 = __webpack_require__(2);
 const shell_1 = __webpack_require__(6);
 class Command {
     constructor(cmd, args, flags) {
+        this.toolPrefix = true;
         this.cmd = cmd;
         this.args = (args) ? args : [];
         this.flags = (flags) ? flags : [];
     }
     setBaseDir(baseDir) {
         this.baseDir = baseDir;
+    }
+    addToolPrefix(toolPrefix) {
+        this.toolPrefix = toolPrefix;
     }
     addArgument({ name, description, defaultValue, show = true }) {
         this.args.push({
@@ -690,12 +694,15 @@ class Command {
                     params.push(` --${element.name} ${element.defaultValue}`);
                 }
             }
-            let tool = 'akkasls';
+            let command = params.join('');
+            if (this.toolPrefix) {
+                command = `akkasls ${command}`;
+            }
             if (vscode_1.workspace.getConfiguration('akkaserverless').get('dryrun')) {
-                logger_1.aslogger.log(`${tool} ${params.join('')}`);
+                logger_1.aslogger.log(command);
                 return null;
             }
-            let res = yield shell_1.shell.exec(`${tool} ${params.join('')}`, this.baseDir);
+            let res = yield shell_1.shell.exec(command, this.baseDir);
             if (vscode_1.workspace.getConfiguration('akkaserverless').get('logOutput')) {
                 logger_1.aslogger.log(res.stderr);
                 logger_1.aslogger.log(res.stdout);
@@ -8816,18 +8823,21 @@ function StartLocal(configpath) {
         let asConfig = config_1.ReadConfigFile(configpath);
         let command = new wrapper_1.Command(`docker build . -t ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
         command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        command.addToolPrefix(false);
         let result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
         command = new wrapper_1.Command(`docker run -d --name ${asConfig.Resources.Function.Name} -p 8080:8080 ${asConfig.InternalConfig.DockerImageUser}/${asConfig.Resources.Function.Name}`);
         command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        command.addToolPrefix(false);
         result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
         command = new wrapper_1.Command(`docker run -d --name ${asConfig.Resources.Function.Name}-proxy -p 9000:9000 --env USER_FUNCTION_HOST=${asConfig.Resources.Docker.Host} cloudstateio/cloudstate-proxy-dev-mode:latest`);
         command.setBaseDir(asConfig.InternalConfig.BaseDir);
+        command.addToolPrefix(false);
         result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
@@ -22847,21 +22857,25 @@ function StopLocal(configpath) {
     return __awaiter(this, void 0, void 0, function* () {
         let asConfig = config_1.ReadConfigFile(configpath);
         let command = new wrapper_1.Command(`docker stop ${asConfig.Resources.Function.Name}`);
+        command.addToolPrefix(false);
         let result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
         command = new wrapper_1.Command(`docker rm ${asConfig.Resources.Function.Name}`);
+        command.addToolPrefix(false);
         result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
         command = new wrapper_1.Command(`docker stop ${asConfig.Resources.Function.Name}-proxy`);
+        command.addToolPrefix(false);
         result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
         }
         command = new wrapper_1.Command(`docker rm ${asConfig.Resources.Function.Name}-proxy`);
+        command.addToolPrefix(false);
         result = yield command.runCommand();
         if (result === null || result === void 0 ? void 0 : result.stdout) {
             logger_1.aslogger.log(result === null || result === void 0 ? void 0 : result.stdout);
