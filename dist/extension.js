@@ -29710,29 +29710,22 @@ function TemplateWizard() {
             fs_extra_1.ensureDirSync(state.location);
             fs_extra_1.copySync(path_1.join(tempFolder.name, state.runtime.label, state.template.label), state.location);
         }
-        replace_in_file_1.replaceInFileSync({
-            files: [
-                `${state.location}/**`,
-                `${state.location}/.*`
-            ],
-            from: /{{functionname}}/g,
-            to: state.functionName
-        });
-        replace_in_file_1.replaceInFileSync({
-            files: [
-                `${state.location}/**`,
-                `${state.location}/.*`
-            ],
-            from: /{{functionversion}}/g,
-            to: state.functionVersion
-        });
-        replace_in_file_1.replaceInFileSync({
-            files: [
-                `${state.location}/**`
-            ],
-            from: /{{protopackage}}/g,
-            to: state.protoPackage
-        });
+        let replaceMap = new Map();
+        replaceMap.set('functionname', state.functionName);
+        replaceMap.set('functionversion', state.functionVersion);
+        replaceMap.set('protopackage', state.protoPackage);
+        replaceMap.set('dockerimageuser', vscode_1.workspace.getConfiguration('akkaserverless').get('dockerImageUser'));
+        for (let replaceKey of replaceMap.keys()) {
+            let regex = new RegExp('{{' + replaceKey + '}}', 'g');
+            replace_in_file_1.replaceInFileSync({
+                files: [
+                    `${state.location}/**`,
+                    `${state.location}/.*`
+                ],
+                from: regex,
+                to: replaceMap.get(replaceKey)
+            });
+        }
         // Clean up the temp folder
         fs_extra_1.emptyDirSync(tempFolder.name);
         tempFolder.removeCallback();
