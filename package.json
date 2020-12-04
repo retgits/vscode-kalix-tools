@@ -16,17 +16,17 @@
 	],
 	"scripts": {
 		"vscode:prepublish": "npm run package",
-		"compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
-		"watch": "webpack --watch --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
-		"package": "webpack --mode production --config ./build/node-extension.webpack.config.js",
+		"compile": "webpack --devtool nosources-source-map --config ./utils/webpack.build.config.js",
+		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
+		"package": "webpack --mode production --config ./utils/webpack.build.config.js",
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
 		"pretest": "npm run test-compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js",
-		"gen:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
-		"gen:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
-		"gen:tag": "tsc ./utils/generateTag.ts && node ./utils/generateTag.js"
+		"utils:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
+		"utils:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
+		"utils:createtag": "tsc ./utils/generateTag.ts && node ./utils/generateTag.js"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.4",
