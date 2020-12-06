@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 0.0.11
+
+- Refactor to wrap Akka Serverless commands in a different way
+- Added unit tests
+- Made sure that input boxes didn't disappear after losing focus
+
 ## Version 0.0.10
 
 - A new configuration option has been added to allow the user to override the config file and context
