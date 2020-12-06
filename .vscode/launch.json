@@ -18,17 +18,30 @@
 			"preLaunchTask": "${defaultBuildTask}"
 		},
 		{
-			"name": "Extension Tests",
+			"name": "Test Extension",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+				"--extensionTestsPath=${workspaceFolder}/out/src/test/suite/index"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/test/**/*.js"
+				"${workspaceFolder}/dist/**/*.js"
 			],
-			"preLaunchTask": "npm: test-watch"
-		}
+			"preLaunchTask": "test-compile"
+		},
+		{
+			"name": "Launch File",
+			"type": "node",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/${file}",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+				"${workspaceFolder}/out/**/*.js"
+			]
+        }
 	]
 }

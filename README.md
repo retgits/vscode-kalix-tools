@@ -89,9 +89,9 @@ You can specify the location of the `.akkaserverless.yaml` file in a few differe
 * `Unexpose`: Removes a service route from a service
 * `View details`: Print the details of Docker credentials (doesn't log the password), project members, projects, services, or invites to the akkasls output window
 
-### Credentials
+### Tokens
 
-* `Refresh`: Refresh the credentials explorer view
+* `Refresh`: Refresh the tokens explorer view
 * `Revoke`: Revoke a token
 * `View details`: Print the details of a token to the akkasls output window
 

@@ -65,13 +65,13 @@
 				"description": "Refresh the tools explorer view"
 			},
 			{
-				"command": "as.views.credentials.refresh",
+				"command": "as.views.tokens.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				},
-				"description": "Refresh the credentials explorer view"
+				"description": "Refresh the tokens explorer view"
 			},
 			{
 				"command": "as.commandpalette.templatewizard",
@@ -174,14 +174,26 @@
 				"description": "Removes the invitation of a user"
 			},
 			{
-				"command": "as.views.credentials.details.tokens",
+				"command": "as.views.tokens.details.tokens",
 				"title": "View details",
 				"description": "Print the details of a token to the akkasls output window"
 			},
 			{
-				"command": "as.views.credentials.revoke",
+				"command": "as.views.tokens.revoke",
 				"title": "Revoke",
 				"description": "Revoke a token"
+			},
+			{
+				"command": "as.commandpalette.projects.local.start",
+				"title": "Run local",
+				"category": "Akka Serverless",
+				"description": "Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)"
+			},
+			{
+				"command": "as.commandpalette.projects.local.stop",
+				"title": "Stop local",
+				"category": "Akka Serverless",
+				"description": "Stops the selected service and Cloudstate proxy"
 			},
 			{
 				"command": "as.views.projects.new",
@@ -246,18 +258,6 @@
 				"title": "Revoke token",
 				"category": "Akka Serverless",
 				"description": "Revokes a previously issues Akka Serverless authentication token"
-			},
-			{
-				"command": "as.commandpalette.projects.local.start",
-				"title": "Run local",
-				"category": "Akka Serverless",
-				"description": "Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)"
-			},
-			{
-				"command": "as.commandpalette.projects.local.stop",
-				"title": "Stop local",
-				"category": "Akka Serverless",
-				"description": "Stops the selected service and Cloudstate proxy"
 			}
 		],
 		"configuration": {
@@ -313,8 +313,8 @@
 					"group": "navigation"
 				},
 				{
-					"command": "as.views.credentials.refresh",
-					"when": "view == as.views.credentials",
+					"command": "as.views.tokens.refresh",
+					"when": "view == as.views.tokens",
 					"group": "navigation"
 				}
 			],
@@ -393,13 +393,13 @@
 					"when": "view == as.views.status"
 				},
 				{
-					"command": "as.views.credentials.details.tokens",
-					"when": "view == as.views.credentials && viewItem == Tokens",
+					"command": "as.views.tokens.details.tokens",
+					"when": "view == as.views.tokens && viewItem == Tokens",
 					"group": "0"
 				},
 				{
-					"command": "as.views.credentials.revoke",
-					"when": "view == as.views.credentials && viewItem == Tokens",
+					"command": "as.views.tokens.revoke",
+					"when": "view == as.views.tokens && viewItem == Tokens",
 					"group": "0"
 				},
 				{
@@ -471,12 +471,12 @@
 					"when": "view == as.views.status"
 				},
 				{
-					"command": "as.views.credentials.details.tokens",
-					"when": "view == as.views.credentials"
+					"command": "as.views.tokens.details.tokens",
+					"when": "view == as.views.tokens"
 				},
 				{
-					"command": "as.views.credentials.revoke",
-					"when": "view == as.views.credentials"
+					"command": "as.views.tokens.revoke",
+					"when": "view == as.views.tokens"
 				},
 				{
 					"command": "as.views.projects.openbrowser",
@@ -501,8 +501,8 @@
 					"name": "Projects"
 				},
 				{
-					"id": "as.views.credentials",
-					"name": "Credentials"
+					"id": "as.views.tokens",
+					"name": "Tokens"
 				},
 				{
 					"id": "as.views.status",
@@ -552,17 +552,24 @@
 		"tmp": "^0.2.1"
 	},
 	"devDependencies": {
+		"@types/chai": "^4.2.14",
 		"@types/fs-extra": "^9.0.4",
 		"@types/js-yaml": "^3.12.5",
+		"@types/mocha": "^8.0.4",
 		"@types/node": "^12.11.7",
 		"@types/shelljs": "^0.8.8",
 		"@types/tmp": "^0.2.0",
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"chai": "^4.2.0",
 		"eslint": "^7.9.0",
+		"mocha": "^8.2.1",
+		"nyc": "^15.1.0",
 		"ts-loader": "^8.0.11",
+		"ts-node": "^9.1.0",
 		"typescript": "^4.0.2",
+		"vscode-test": "^1.4.1",
 		"webpack": "4.44.2",
 		"webpack-cli": "^4.2.0"
 	},
