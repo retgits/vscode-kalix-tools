@@ -29,19 +29,6 @@
 				"${workspaceFolder}/dist/**/*.js"
 			],
 			"preLaunchTask": "test-compile"
-		},
-		{
-			"name": "Launch File",
-			"type": "node",
-            "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/${file}",
-            "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": [
-				"${workspaceFolder}/out/**/*.js"
-			]
-        }
+		}
 	]
 }
