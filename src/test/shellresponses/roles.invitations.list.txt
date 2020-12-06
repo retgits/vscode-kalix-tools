@@ -1,0 +1,10 @@
+[
+  {
+    "name": "projects/projectis/invitations/email@example.com",
+    "role_id": "admin",
+    "email": "email@example.com",
+    "created": {
+      "seconds": 1
+    }
+  }
+]

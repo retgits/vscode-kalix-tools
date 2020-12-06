@@ -1,0 +1,47 @@
+[
+  {
+    "kind": "StatefulService",
+    "apiVersion": "cloudstate.io/v1alpha1",
+    "metadata": {
+      "name": "servicename",
+      "namespace": "projectid",
+      "selfLink": "/apis/cloudstate.io/v1alpha1/namespaces/projectid/statefulservices/servicename",
+      "uid": "uuid",
+      "resourceVersion": "1",
+      "generation": 1,
+      "creationTimestamp": "2020-11-25T20:08:54Z",
+      "labels": {
+        "app.kubernetes.io/part-of": "servicename"
+      }
+    },
+    "spec": {
+      "containers": [
+        {
+          "name": "",
+          "image": "docker.io/example/servicename:1.0.0",
+          "resources": {}
+        }
+      ],
+      "replicas": 1,
+      "storeConfig": {
+        "statefulStore": {
+          "name": "default-spanner-store"
+        }
+      }
+    },
+    "status": {
+      "summary": "Ready",
+      "replicas": 1,
+      "selector": "app.kubernetes.io/name=servicename",
+      "conditions": [
+        {
+          "type": "NotReady",
+          "status": "False",
+          "lastTransitionTime": "2020-11-25T20:09:14Z",
+          "reason": "Ready",
+          "message": "All replicas are up to date and fully available"
+        }
+      ]
+    }
+  }
+]

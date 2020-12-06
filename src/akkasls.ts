@@ -1,325 +1,358 @@
-'use strict';
+/**
+ * Auth CLI actions
+ */
+import { login } from './akkasls/commands/auth/login';
+import { logout } from './akkasls/commands/auth/logout';
+import { currentLogin } from './akkasls/commands/auth/currentlogin';
+import { listAuthTokens } from './akkasls/commands/auth/tokens/list';
+import { revokeAuthToken } from './akkasls/commands/auth/tokens/revoke';
 
-// Imports
-import { Invite } from './datatypes/roles/invitations/invite';
-import { Member } from './datatypes/roles/member';
-import { Project } from './datatypes/projects/project';
-import { Service } from './datatypes/services/service';
-import { TokenList } from './datatypes/auth/tokenlist';
-import { ListCredentials } from './datatypes/docker/listcredentials';
+/**
+ * Docker CLI actions
+ */
+import { addDockerCredentials } from './akkasls/commands/docker/addcredentials';
+import { deleteDockerCredentials } from './akkasls/commands/docker/deletecredentials';
+import { listDockerCredentials } from './akkasls/commands/docker/listcredentials';
 
-import { ListProjects } from './cliwrapper/projects/list';
-import { ListMembers } from './cliwrapper/roles/listbindings';
-import { ListInvites } from './cliwrapper/roles/invitations/listinvites';
-import { ListServices } from './cliwrapper/services/list';
-import { ListTokens } from './cliwrapper/auth/tokens/list';
-import { ListDockerCredentials } from './cliwrapper/docker/listcredentials';
-import { Login } from './cliwrapper/auth/login';
-import { Logout } from './cliwrapper/auth/logout';
-import { AddDockerCredentials } from './cliwrapper/docker/addcredentials';
-import { DeleteDockerCredentials } from './cliwrapper/docker/deletecredentials';
-import { DeployService } from './cliwrapper/services/deploy';
-import { UndeployService } from './cliwrapper/services/undeploy';
-import { ExposeService } from './cliwrapper/services/expose';
-import { UnexposeService } from './cliwrapper/services/unexpose';
-import { AddInvite } from './cliwrapper/roles/invitations/inviteuser';
-import { DeleteInvite } from './cliwrapper/roles/invitations/delete';
-import { NewProject } from './cliwrapper/projects/new';
-import { RevokeToken } from './cliwrapper/auth/tokens/revoke';
-import { StartLocal } from './cliwrapper/services/local/start';
-import { StopLocal } from './cliwrapper/services/local/stop';
+/**
+ * Projects CLI actions
+ */
+import { listProjects } from './akkasls/commands/projects/list';
+import { newProject } from './akkasls/commands/projects/new';
 
-import { ProjectExplorer } from './views/projectexplorer/explorer';
-import { CredentialsExplorer } from './views/credentialsexplorer/explorer';
+/**
+ * Roles CLI actions
+ */
+import { deleteInvite } from './akkasls/commands/roles/invitations/delete';
+import { addInvite } from './akkasls/commands/roles/invitations/inviteuser';
+import { listInvites } from './akkasls/commands/roles/invitations/list';
+import { listMembers } from './akkasls/commands/roles/listbindings';
 
-import { Uri, window } from 'vscode';
+/**
+ * Services CLI actions
+ */
+import { deployService } from './akkasls/commands/services/deploy';
+import { exposeService } from './akkasls/commands/services/expose';
+import { listServices } from './akkasls/commands/services/list';
+import { undeployService } from './akkasls/commands/services/undeploy';
+import { unexposeService } from './akkasls/commands/services/unexpose';
+
+/**
+ * Local Proxy CLI extensions
+ */
+import { startLocalProxy } from './akkasls/extensions/commands/localproxy/start';
+import { stopLocalProxy } from './akkasls/extensions/commands/localproxy/stop';
+
+/**
+ * Utils
+ */
+import { Shell } from './utils/shell/shell';
+import { window } from 'vscode';
+
+/**
+ * Wizards
+ */
+import { projectPicker } from './components/wizards/projectPicker';
+import { inputBox } from './components/wizards/inputBox';
+import { dockerCredentialsPicker } from './components/wizards/dockerCredentialsPicker';
+import { servicePicker } from './components/wizards/servicePicker';
+import { invitePicker } from './components/wizards/invitePicker';
+import { tokenPicker } from './components/wizards/tokenPicker';
+
+/**
+ * DataTypes
+ */
+import { CurrentLogin } from './akkasls/datatypes/auth/currentlogin';
+import { Token } from './akkasls/datatypes/auth/tokens';
+import { Credential } from './akkasls/datatypes/docker/credentials';
+import { ShellResult } from './utils/shell/datatypes';
+import { Project } from './akkasls/datatypes/projects/project';
+import { Invite } from './akkasls/datatypes/roles/invitations/invite';
+import { Member } from './akkasls/datatypes/roles/member';
+import { Service } from './akkasls/datatypes/services/service';
+
+/**
+ * Explorer viewa
+ */
+import { ProjectExplorer } from './components/views/projectexplorer/explorer';
+import { ConfigExplorer } from './components/views/configexplorer/explorer';
 
 export const CONSOLE_URL = "https://console.cloudstate.com/project";
 
 export class AkkaServerless {
-    private projects: Project[] = [];
-    private members: Map<string, Member[]> = new Map();
-    private invites: Map<string, Invite[]> = new Map();
-    private services: Map<string, Service[]> = new Map();
-    private credentials: Map<string, ListCredentials[]> = new Map();
-    private credentialsExplorer: CredentialsExplorer;
-    private projectExplorer: ProjectExplorer;
+    private _shell: Shell;
+    private _projectExplorer: ProjectExplorer;
+    private _configExplorer: ConfigExplorer;
 
-    constructor() { }
-
-    registerCredentialsExplorer(credentialsExplorer: CredentialsExplorer) {
-        this.credentialsExplorer = credentialsExplorer;
+    /**
+     * Create a new instance of AkkaServerless which handles communication between the VS code extension and the underlying commands
+     * @param shell a shell that handles execution of commands
+     */
+    constructor(shell: Shell) {
+        this._shell = shell;
     }
 
-    registerProjectExplorer(projectExplorer: ProjectExplorer) {
-        this.projectExplorer = projectExplorer;
+    registerProjectExplorer(pe: ProjectExplorer) {
+        this._projectExplorer = pe;
     }
 
-    async getProjects(): Promise<Project[]> {
-        if (this.projects.length === 0) {
-            this.projects = await this.refreshProjects();
-        }
-        return this.projects;
-    }
-
-    async refreshProjects(): Promise<Project[]> {
-        let projects = await ListProjects();
-        this.projects = projects;
-        return projects;
-    }
-
-    async createNewProject() {
-        NewProject().then(() => {
-            this.refreshProjects().then(() => {
-                this.projectExplorer.refresh();
-            });
-        });
-    }
-
-    async getProjectsArray(): Promise<string[]> {
-        let projects: string[] = [];
-        (await this.getProjects()).forEach(project => {
-            projects.push(project.friendly_name);
-        });
-        return projects;
-    }
-
-    async getProjectIDByName(projectName: string): Promise<string> {
-        let name = '';
-        (await this.getProjects()).forEach(project => {
-            if (projectName === project.friendly_name) {
-                name = project.name.substring(9);
-            }
-        });
-        return name;
-    }
-
-    async getHostnamesByProjectID(projectID: string): Promise<string[]> {
-        let hostnames: string[] = [];
-        (await this.getProjects()).forEach(project => {
-            if (projectID === project.name.substring(9)) {
-                if (project.hostnames) {
-                    project.hostnames.forEach(hostname => {
-                        hostnames.push(hostname.name);
-                    });
-                }
-            }
-        });
-        return hostnames;
-    }
-
-    async getMembers(projectID: string): Promise<Member[]> {
-        if (this.members.has(projectID)) {
-            return this.members.get(projectID)!;
-        }
-        let members = await this.refreshMembers(projectID);
-        return members;
-    }
-
-    async refreshMembers(projectID: string): Promise<Member[]> {
-        let members = await ListMembers(projectID);
-        this.members.set(projectID, members);
-        return members;
-    }
-
-    async getInvites(projectID: string): Promise<Invite[]> {
-        if (this.invites.has(projectID)) {
-            return this.invites.get(projectID)!;
-        }
-        let invites = await this.refreshInvites(projectID);
-        return invites;
-    }
-
-    async getInvitesArray(projectID: string): Promise<string[]> {
-        let invites: string[] = [];
-        (await this.getInvites(projectID)).forEach(invite => {
-            invites.push(invite.email);
-        });
-        return invites;
-    }
-
-    async refreshInvites(projectID: string): Promise<Invite[]> {
-        let invites = await ListInvites(projectID);
-        this.invites.set(projectID, invites);
-        return invites;
-    }
-
-    async inviteUser(projectID?: string) {
-        AddInvite(this, projectID).then(() => {
-            if (projectID) {
-                this.refreshInvites(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async deleteInvite(projectID?: string, emailAddress?: string) {
-        DeleteInvite(this, projectID, emailAddress).then(() => {
-            if (projectID) {
-                this.refreshInvites(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async getServices(projectID: string): Promise<Service[]> {
-        if (this.services.has(projectID)) {
-            return this.services.get(projectID)!;
-        }
-        let services = await this.refreshServices(projectID);
-        return services;
-    }
-
-    async getServiceArray(projectID: string): Promise<string[]> {
-        let services: string[] = [];
-        (await this.getServices(projectID)).forEach(service => {
-            services.push(service.metadata.name);
-        });
-        return services;
-    }
-
-    async refreshServices(projectID: string): Promise<Service[]> {
-        let services = await ListServices(projectID);
-        this.services.set(projectID, services);
-        return services;
-    }
-
-    async deployService(projectID?: string) {
-        DeployService(this, projectID).then(() => {
-            if (projectID) {
-                this.refreshServices(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async undeployService(projectID?: string, serviceName?: string) {
-        UndeployService(this, projectID, serviceName).then(() => {
-            if (projectID) {
-                this.refreshServices(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async exposeService(projectID?: string, serviceName?: string) {
-        ExposeService(this, projectID, serviceName).then(() => {
-            if (projectID) {
-                this.refreshServices(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async unexposeService(projectID?: string, serviceName?: string) {
-        UnexposeService(this, projectID, serviceName).then(() => {
-            if (projectID) {
-                this.refreshServices(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
+    registerConfigExplorer(ce: ConfigExplorer) {
+        this._configExplorer = ce;
     }
 
     async login() {
-        Login();
+        let result = await login(this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
     }
 
     async logout() {
-        Logout();
-    }
-
-    async getTokens(): Promise<TokenList[]> {
-        return ListTokens();
-    }
-
-    async getTokenArray(): Promise<string[]> {
-        let tokens: string[] = [];
-        (await this.getTokens()).forEach(token => {
-            let tokenElements = token.name.split('/');
-            tokens.push(tokenElements[tokenElements.length - 1]);
-        });
-        return tokens;
-    }
-
-    async revokeToken(tokenID?: string) {
-        RevokeToken(this, tokenID).then(() => {
-            this.credentialsExplorer.refresh();
-        });
-    }
-
-    async refreshDockerCredentials(projectID: string): Promise<ListCredentials[]> {
-        let creds = await ListDockerCredentials(projectID);
-        this.credentials.set(projectID, creds);
-        return creds;
-    }
-
-    async getDockerCredentials(projectID: string): Promise<ListCredentials[]> {
-        if (this.credentials.has(projectID)) {
-            return this.credentials.get(projectID)!;
-        }
-        let creds = await this.refreshDockerCredentials(projectID);
-        return creds;
-    }
-
-    async getDockerCredentialsArray(projectID: string): Promise<string[]> {
-        let creds: string[] = [];
-        (await this.getDockerCredentials(projectID)).forEach(cred => {
-            creds.push(cred.server);
-        });
-        return creds;
-    }
-
-    async getDockerCredentialIDByServer(projectID: string, serverName: string): Promise<string> {
-        let name = '';
-        (await this.getDockerCredentials(projectID)).forEach(cred => {
-            if (cred.server === serverName) {
-                name = cred.name;
-            }
-        });
-        return name;
-    }
-
-    async addDockerCredentials(projectID?: string) {
-        AddDockerCredentials(this, projectID).then(() => {
-            if (projectID) {
-                this.refreshDockerCredentials(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async deleteDockerCredentials(projectID?: string, credentialID?: string) {
-        DeleteDockerCredentials(this, projectID, credentialID).then(() => {
-            if (projectID) {
-                this.refreshDockerCredentials(projectID!).then(() => {
-                    this.projectExplorer.refresh();
-                });
-            }
-        });
-    }
-
-    async startLocal(doc?: Uri) {
-        try {
-            StartLocal(doc?.path);
-        }
-        catch (Error) {
-            window.showErrorMessage(Error.message);
+        let result = await logout(this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
         }
     }
 
-    async stopLocal(doc?: Uri) {
-        try {
-            StopLocal(doc?.path);
+    async getCurrentLogin(): Promise<CurrentLogin> {
+        return currentLogin(this._shell);
+    }
+
+    async listAuthTokens(): Promise<Token[]> {
+        return listAuthTokens(this._shell);
+    }
+
+    async revokeAuthToken(tokenID: string): Promise<ShellResult> {
+        let result = await revokeAuthToken(tokenID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
         }
-        catch (Error) {
-            window.showErrorMessage(Error);
+        this._configExplorer.refresh();
+        return result;
+    }
+
+    async addDockerCredentials(projectID: string, credentials: string): Promise<ShellResult> {
+        let result = await addDockerCredentials(projectID, credentials, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
         }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async deleteDockerCredentials(projectID: string, credentialID: string): Promise<ShellResult> {
+        let result = await deleteDockerCredentials(projectID, credentialID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async listDockerCredentials(projectID: string): Promise<Credential[]> {
+        let result = await listDockerCredentials(projectID, this._shell);
+        return result;
+    }
+
+    async createNewProject(name: string, description: string): Promise<ShellResult> {
+        let result = await newProject(name, description, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async listProjects(): Promise<Project[]> {
+        let result = await listProjects(this._shell);
+        return result;
+    }
+
+    async deleteInvite(projectID: string, emailAddress: string): Promise<ShellResult> {
+        let result = await deleteInvite(projectID, emailAddress, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async addInvite(projectID: string, emailAddress: string) : Promise<ShellResult> {
+        let result = await addInvite(projectID, emailAddress, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async listInvites(projectID: string): Promise<Invite[]> {
+        let result = await listInvites(projectID, this._shell);
+        return result;
+    }
+
+    async listMembers(projectID: string): Promise<Member[]> {
+        let result = await listMembers(projectID, this._shell);
+        return result;
+    }
+
+    async deployService(service:string, image:string, projectID:string): Promise<ShellResult> {
+        let result = await deployService(service, image, projectID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async exposeService(service:string, flags:string, projectID:string): Promise<ShellResult> {
+        let result = await exposeService(service, flags, projectID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        return result;
+    }
+
+    async listServices(projectID: string): Promise<Service[]> {
+        let result = await listServices(projectID, this._shell);
+        return result;
+    }
+
+    async undeployService(service:string, projectID:string): Promise<ShellResult> {
+        let result = await undeployService(service, projectID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        this._projectExplorer.refresh();
+        return result;
+    }
+
+    async unexposeService(service:string, hostname:string, projectID:string): Promise<ShellResult> {
+        let result = await unexposeService(service, hostname, projectID, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        return result;
+    }
+
+    async startLocalProxy(configfile: string, dockerImageUser: string): Promise<ShellResult> {
+        let result = await startLocalProxy(configfile, dockerImageUser, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        return result;
+    }
+
+    async stopLocalProxy(configfile: string, dockerImageUser: string): Promise<ShellResult> {
+        let result = await stopLocalProxy(configfile, dockerImageUser, this._shell);
+        if (result.code !== 0) {
+            window.showErrorMessage(result.stderr);
+        }
+        return result;
+    }
+
+    async addDockerCredentialsWizard(projectID?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to add credentials to...', await this.listProjects());
+        }
+
+        let credentials = await inputBox('--docker-server <> --docker-username <>> --docker-password <>', 'enter your credential string...');
+        this.addDockerCredentials(projectID, credentials);
+    }
+
+    async deleteDockerCredentialsWizard(projectID?: string, credentialID?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to remove credentials from...', await this.listProjects());
+        }
+
+        if(!credentialID) {
+            credentialID = await dockerCredentialsPicker(await this.listDockerCredentials(projectID));
+        }
+
+        this.deleteDockerCredentials(projectID, credentialID);
+    }
+
+    async deployServiceWizard(projectID?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to deploy your service to...', await this.listProjects());
+        }
+
+        let service = await inputBox('', 'type your service name...');
+        let image = await inputBox('', 'type your docker image url...');
+
+        this.deployService(service, image, projectID);
+    }
+
+    async undeployServiceWizard(projectID?: string, service?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to undeploy your service from...', await this.listProjects());
+        }
+
+        if(!service) {
+            service = await servicePicker('pick the service to undeploy...', await this.listServices(projectID));
+        }
+
+        this.undeployService(service, projectID);
+    }
+
+    async exposeServiceWizard(projectID?: string, service?:string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to expose your service from...', await this.listProjects());
+        }
+
+        if(!service) {
+            service = await servicePicker('pick the service to expose...', await this.listServices(projectID));
+        }
+
+        let flags = await inputBox('--enable-cors', 'type any additional flags you might want...');
+
+        this.exposeService(service, flags, projectID);
+    }
+
+    async unexposeServiceWizard(projectID?: string, service?:string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to unexpose your service from...', await this.listProjects());
+        }
+
+        if(!service) {
+            service = await servicePicker('pick the service to unexpose...', await this.listServices(projectID));
+        }
+
+        let hostname = await inputBox('', 'type the hostname you want to remove...');
+
+        this.unexposeService(service, hostname, projectID);
+    }
+
+    async inviteUserWizard(projectID?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
+        }
+
+        let emailAddress = await inputBox('', 'type the email address of the person you want to invite...');
+
+        this.addInvite(projectID, emailAddress);
+    }
+
+    async deleteInviteWizard(projectID?: string, emailAddress?: string) {
+        if(!projectID) {
+            projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
+        }
+
+        if(!emailAddress) {
+            emailAddress = await invitePicker('pick the email address to uninvite...', await this.listInvites(projectID));
+        }
+
+        this.deleteInvite(projectID, emailAddress);
+    }
+
+    async newProjectWizard() {
+        let name = await inputBox('', 'type the name of the project you want to create...');
+        let description = await inputBox('', 'type the description of the project you want to create...');
+        this.createNewProject(name, description);
+    }
+
+    async revokeAuthTokenWizard() {
+        let tokenID = await tokenPicker('pick the token you want to revoke...', await this.listAuthTokens());
+        this.revokeAuthToken(tokenID);
     }
 }

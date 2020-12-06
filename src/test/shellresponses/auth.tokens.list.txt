@@ -1,0 +1,22 @@
+[
+  {
+    "name": "users/userid/tokens/refresh/tokenid",
+    "description": "CLI login",
+    "created_time": {
+      "seconds": 1
+    },
+    "scopes": [
+      0
+    ]
+  },
+  {
+    "name": "users/userid/tokens/refresh/tokenid",
+    "description": "CLI login",
+    "created_time": {
+      "seconds": 1
+    },
+    "scopes": [
+      0
+    ]
+  }
+]

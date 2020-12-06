@@ -1,0 +1,17 @@
+[
+  {
+    "name": "projects/projectid",
+    "friendly_name": "acme-sunglasses",
+    "Owner": {
+      "UserOwner": {
+        "id": "userid"
+      }
+    },
+    "hostnames": [
+      {
+        "name": "misty-glitter-6745",
+        "is_generated": true
+      }
+    ]
+  }
+]
