@@ -15,7 +15,7 @@ export class ASLocal {
         this._template = <datatypes.ServerlessFramework>safeLoad(readFileSync(file, { encoding: 'utf-8' }));
         logger.log('Read serverless.yml file');
 
-        this._template.provider.docker.imageUser = (this._template.provider.docker.imageUser) ? this._template.provider.docker.imageUser : workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!;
+        this._template.provider.docker.imageUser = workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!;
         logger.log(`Set imageUser to ${this._template.provider.docker.imageUser}`);
 
         Object.keys(this._template.functions).forEach((service) => {

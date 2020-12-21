@@ -31,17 +31,43 @@ The Akka Serverless extension may need to invoke the following command line tool
 
 If you want to use the `Akka Serverless: Run local` and `Akka Serverless: Stop local` commands, you'll need to configure a user and repository for your container images. Under `Settings > Extension > Akka Serverless` you need to set `akkaserverless.dockerImageUser` to something like `docker.io/retgits`.
 
-Other configuration details are read from a `.akkaserverless.yaml` file which must be in the same folder as your service. The `.akkaserverless.yaml` file has the following parameters:
+Other configuration details are read from a `serverless.yml` file which must be in the same folder as your service. The `serverless.yml` file has the following parameters:
 
 ```yaml
-ASTemplateVersion: 1 ## The current template version
-Resources:
-    Docker:
-        Dockerfile: ./dockerfile ## The name of the docker file to build your container
-        Host: 127.0.0.1 ## The IP address of your local machine so the container and proxy can communicate. If you do not specify this, the extension will try to find it for you.
-    Function:
-        Name: shoppingcart ## The name of your service
-        Version: '1.0.0' ## The version of your service
+frameworkVersion: '2'
+
+custom:
+  akkaServerlessProject: acme-sunglasses
+
+service: ${self:custom.akkaServerlessProject}
+
+provider:
+  name: akkaserverless
+  docker:
+    imageUser: docker.io/retgits
+
+functions:
+  orders:
+    handler: dockerfile
+    context: ./orders
+    tag: '1.0.0'
+    skipBuild: false
+    proxyHostPort: 9001
+  warehouse:
+    handler: dockerfile
+    context: ./warehouse
+    tag: '1.0.0'
+    skipBuild: false
+    proxyHostPort: 9002
+  users:
+    handler: dockerfile
+    context: ./users
+    tag: '1.0.0'
+    skipBuild: false
+    proxyHostPort: 9003
+
+plugins:
+  - '@retgits/akkasls-serverless-framework'
 ```
 
 You can specify the location of the `.akkaserverless.yaml` file in a few different ways:
@@ -113,6 +139,10 @@ You can specify the location of the `.akkaserverless.yaml` file in a few differe
     * `akkaserverless.dockerImageUser`: Image prefix for docker images ie 'docker.io/retgits'
     * `akkaserverless.configFile`: Location of the config file if you want to override it
     * `akkaserverless.context`: The context to use
+
+## Known issues
+
+* Using substitution parameters in `serverless.yml` does not work correctly
 
 ## Release notes
 
