@@ -202,41 +202,28 @@ export class AkkaServerless {
     }
 
     async deleteDockerCredentialsWizard(projectID?: string, credentialID?: string): Promise<void> {
-        if (!projectID) {
-            try {
+        try {
+            if (!projectID) {
                 projectID = await projectPicker('pick a project to remove credentials from...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        if (!credentialID) {
-            try {
+            if (!credentialID) {
                 credentialID = await dockerCredentialsPicker(await this.listDockerCredentials(projectID));
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        this.deleteDockerCredentials(projectID, credentialID);
+            this.deleteDockerCredentials(projectID, credentialID);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+            return;
+        }
     }
 
     async deployServiceWizard(projectID?: string): Promise<void> {
-        if (!projectID) {
-            try {
-                projectID = await projectPicker('pick a project to deploy your service to...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
-            }
-        }
-
         try {
+            if (!projectID) {
+                projectID = await projectPicker('pick a project to deploy your service to...', await this.listProjects());
+            }
             const service = await inputBox('', 'type your service name...');
             const image = await inputBox('', 'type your docker image url...');
             this.deployService(service, image, projectID);
@@ -252,25 +239,20 @@ export class AkkaServerless {
             return;
         }
 
-        if (!projectID) {
-            try {
+        try {
+            if (!projectID) {
                 projectID = await projectPicker('pick a project to undeploy your service from...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        if (!service) {
-            try {
+            if (!service) {
                 service = await servicePicker('pick the service to undeploy...', await this.listServices(projectID));
-                this.undeployService(service, projectID);
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-            }
 
+            }
+            this.undeployService(service, projectID);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+            return;
         }
     }
 
@@ -279,26 +261,21 @@ export class AkkaServerless {
             return;
         }
 
-        if (!projectID) {
-            try {
+        try {
+            if (!projectID) {
                 projectID = await projectPicker('pick a project to expose your service from...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        if (!service) {
-            try {
+            if (!service) {
                 service = await servicePicker('pick the service to expose...', await this.listServices(projectID));
-                const flags = await inputBox('--enable-cors', 'type any additional flags you might want...');
-                this.exposeService(service, flags, projectID);
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
             }
 
+            const flags = await inputBox('--enable-cors', 'type any additional flags you might want...');
+            this.exposeService(service, flags, projectID);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+            return;
         }
     }
 
@@ -307,41 +284,30 @@ export class AkkaServerless {
             return;
         }
 
-        if (!projectID) {
-            try {
+        try {
+            if (!projectID) {
                 projectID = await projectPicker('pick a project to unexpose your service from...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        if (!service) {
-            try {
+            if (!service) {
                 service = await servicePicker('pick the service to unexpose...', await this.listServices(projectID));
-                const hostname = await inputBox('', 'type the hostname you want to remove...');
-                this.unexposeService(service, hostname, projectID);
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
             }
 
+            const hostname = await inputBox('', 'type the hostname you want to remove...');
+            this.unexposeService(service, hostname, projectID);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+            return;
         }
     }
 
     async inviteUserWizard(projectID?: string): Promise<void> {
-        if (!projectID) {
-            try {
-                projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
-            }
-        }
-
         try {
+            if (!projectID) {
+                projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
+            }
+
             const emailAddress = await inputBox('', 'type the email address of the person you want to invite...');
             this.addInvite(projectID, emailAddress);
         } catch (e) {
@@ -352,27 +318,21 @@ export class AkkaServerless {
     }
 
     async deleteInviteWizard(projectID?: string, emailAddress?: string): Promise<void> {
-        if (!projectID) {
-            try {
+        try {
+            if (!projectID) {
                 projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        if (!emailAddress) {
-            try {
+            if (!emailAddress) {
                 emailAddress = await invitePicker('pick the email address to uninvite...', await this.listInvites(projectID));
-            } catch (e) {
-                window.showErrorMessage(e);
-                logger.error(e);
-                return;
             }
-        }
 
-        this.deleteInvite(projectID, emailAddress);
+            this.deleteInvite(projectID, emailAddress);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+            return;
+        }
     }
 
     async newProjectWizard(): Promise<void> {
