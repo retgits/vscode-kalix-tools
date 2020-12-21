@@ -1,7 +1,7 @@
 {
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
-	"version": "0.0.11",
+	"version": "0.1.0",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
 	"categories": [
 		"Programming Languages",
@@ -33,7 +33,7 @@
 		"utils:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
 		"vscode:prepublish": "npm run package",
 		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
-		"release": "npm run utils:installer && standard-version && git push --follow-tags origin main"
+		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
 	},
 	"contributes": {
 		"commands": [
