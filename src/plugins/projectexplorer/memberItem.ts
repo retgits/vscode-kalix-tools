@@ -55,7 +55,7 @@ export class MemberItem extends BaseProjectExplorerItem {
             const printTable = new table({});
             printTable.push(['Name', this.member.user_full_name]);
             printTable.push(['Email address', this.member.user_email]);
-            logger.log(printTable.toString().replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
+            logger.log(printTable.toString());
         }
     }
 }

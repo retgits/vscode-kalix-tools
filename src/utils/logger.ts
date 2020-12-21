@@ -35,7 +35,7 @@ export class Logger {
      */
     public log(message: string, logLevel: LogLevel = LogLevel.INFO): void {
         if (logLevel <= this._logLevel) {
-            this._channel.appendLine(message);
+            this._channel.appendLine(message.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
             this._channel.show(true);
         }
     }
