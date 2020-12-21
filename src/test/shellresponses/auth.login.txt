@@ -1,7 +1,0 @@
-Opening browser window to authorize login:
-https://console.cloudstate.com/login/cli/token
-
-Waiting for UI login...
-You are now logged in.
-You have 1 projects.
-The current project is set to [projectid].

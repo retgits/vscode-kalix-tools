@@ -104,12 +104,12 @@
 				"description": "Removes a service route from a service"
 			},
 			{
-				"command": "as.views.projects.credentials.add",
+				"command": "as.views.projects.dockercredentials.add",
 				"title": "Add credentials",
 				"description": "Add new Docker credentials to your project"
 			},
 			{
-				"command": "as.views.projects.credentials.delete",
+				"command": "as.views.projects.dockercredentials.delete",
 				"title": "Delete credentials",
 				"description": "Remove Docker credentials from your project"
 			},
@@ -154,7 +154,7 @@
 				"description": "Print the details of a project member to the akkasls output window"
 			},
 			{
-				"command": "as.views.projects.details.credentials",
+				"command": "as.views.projects.details.dockercredentials",
 				"title": "View details",
 				"description": "Print the details of Docker credentials to the akkasls output window (this option doesn't log the password)"
 			},
@@ -236,13 +236,13 @@
 				"description": "Logs in to Akka Serverless by printing the login URL in the akkasls output window"
 			},
 			{
-				"command": "as.commandpalette.credentials.add",
+				"command": "as.commandpalette.dockercredentials.add",
 				"title": "Add credentials",
 				"category": "Akka Serverless",
 				"description": "Add Docker registry credentials to an Akka Serverless project"
 			},
 			{
-				"command": "as.commandpalette.credentials.delete",
+				"command": "as.commandpalette.dockercredentials.delete",
 				"title": "Delete credentials",
 				"category": "Akka Serverless",
 				"description": "Remove Docker registry credentials from an Akka Serverless project"
@@ -320,12 +320,12 @@
 			],
 			"view/item/context": [
 				{
-					"command": "as.views.projects.credentials.add",
+					"command": "as.views.projects.dockercredentials.add",
 					"when": "view == as.views.projects && viewItem == Credentials",
 					"group": "0"
 				},
 				{
-					"command": "as.views.projects.credentials.delete",
+					"command": "as.views.projects.dockercredentials.delete",
 					"when": "view == as.views.projects && viewItem == Credentials",
 					"group": "0"
 				},
@@ -360,7 +360,7 @@
 					"group": "1"
 				},
 				{
-					"command": "as.views.projects.details.credentials",
+					"command": "as.views.projects.details.dockercredentials",
 					"when": "view == as.views.projects && viewItem == Credentials",
 					"group": "1"
 				},
@@ -410,11 +410,11 @@
 			],
 			"commandPalette": [
 				{
-					"command": "as.views.projects.credentials.add",
+					"command": "as.views.projects.dockercredentials.add",
 					"when": "view == as.views.projects"
 				},
 				{
-					"command": "as.views.projects.credentials.delete",
+					"command": "as.views.projects.dockercredentials.delete",
 					"when": "view == as.views.projects"
 				},
 				{
@@ -443,7 +443,7 @@
 					"when": "view == as.views.projects"
 				},
 				{
-					"command": "as.views.projects.details.credentials",
+					"command": "as.views.projects.details.dockercredentials",
 					"when": "view == as.views.projects"
 				},
 				{
@@ -485,11 +485,11 @@
 			],
 			"explorer/context": [
 				{
-					"when": "resourceFilename == .akkaserverless.yaml",
+					"when": "resourceFilename == serverless.yml",
 					"command": "as.commandpalette.projects.local.start"
 				},
 				{
-					"when": "resourceFilename == .akkaserverless.yaml",
+					"when": "resourceFilename == serverless.yml",
 					"command": "as.commandpalette.projects.local.stop"
 				}
 			]
@@ -529,8 +529,8 @@
 		"onView:as.views.tools",
 		"onView:as.views.status",
 		"onView:as.views.credentials",
-		"onCommand:as.commandpalette.credentials.add",
-		"onCommand:as.commandpalette.credentials.delete",
+		"onCommand:as.commandpalette.dockercredentials.add",
+		"onCommand:as.commandpalette.dockercredentials.delete",
 		"onCommand:as.commandpalette.auth.login",
 		"onCommand:as.commandpalette.auth.logout",
 		"onCommand:as.commandpalette.deploy",
@@ -543,7 +543,7 @@
 		"onCommand:as.commandpalette.templatewizard"
 	],
 	"dependencies": {
-		"@retgits/akkasls-nodewrapper": "^0.1.1",
+		"@retgits/akkasls-nodewrapper": "^0.1.3",
 		"axios": "^0.21.0",
 		"cli-table3": "^0.6.0",
 		"fs-extra": "^9.0.1",

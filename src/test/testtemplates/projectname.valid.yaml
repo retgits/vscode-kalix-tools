@@ -1,8 +1,0 @@
-ASTemplateVersion: 99.0.0
-
-Globals:
-  Project: acme-sunglasses
-  Description: hello world
-  Local:
-    Host: 127.0.0.1
-    Function: HelloWorld

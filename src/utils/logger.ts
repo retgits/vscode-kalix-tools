@@ -1,27 +1,66 @@
-import { Disposable, OutputChannel, window } from 'vscode';
+import { OutputChannel, window } from 'vscode';
 
-interface Logger extends Disposable {
-    log(msg: string): void;
+/**
+ * Log Level in order from least verbose to most
+ */
+export enum LogLevel {
+    /** Only log error messages */
+    ERROR = 1,
+    /** Only log warnings and error messages */
+    WARN = 2,
+    /** Only log info, warnings and error messages */
+    INFO = 3,
+    /** Log everything */
+    DEBUG = 4
 }
 
-class ChannelLogger implements Logger {
-    channel: OutputChannel;
+export class Logger {
+    /** 
+     * Logging level for service. Specified by 'verbose' or 'v' flag in Serverless Options.
+     * Defaults to 'info' 
+     */
+    private _logLevel: LogLevel;
+    private _channel: OutputChannel;
 
     constructor(channelName: string) {
-        this.channel = window.createOutputChannel(channelName);
+        this._channel = window.createOutputChannel(channelName);
+        this._logLevel = LogLevel.INFO;
     }
 
-    log(msg: string) {
-        this.channel.append(msg);
-        this.channel.append('\n');
-        this.channel.show(true);
+    /**
+     * Logs any message with a level (error, warn, info, debug) less than or equal
+     * to the logging level set in the constructor (defaults to info)
+     * @param message Message to log
+     * @param logLevel Log Level
+     */
+    public log(message: string, logLevel: LogLevel = LogLevel.INFO): void {
+        if (logLevel <= this._logLevel) {
+            this._channel.appendLine(message);
+            this._channel.show(true);
+        }
     }
 
-    dispose() {
-        this.channel.hide();
-        this.channel.clear();
-        this.channel.dispose();
+    public error(message: string): void {
+        this.log(`[ERROR] ${message}`, LogLevel.ERROR);
+    }
+
+    public warn(message: string): void {
+        this.log(`[WARN] ${message}`, LogLevel.WARN);
+    }
+
+    public info(message: string): void {
+        this.log(`[INFO] ${message}`, LogLevel.INFO);
+    }
+
+    public debug(message: string): void {
+        this.log(`[DEBUG] ${message}`, LogLevel.DEBUG);
+    }
+
+    dispose(): void {
+        this._channel.hide();
+        this._channel.clear();
+        this._channel.dispose();
     }
 }
 
-export const aslogger: Logger = new ChannelLogger('akkasls');
+export const logger: Logger = new Logger('akkasls');
