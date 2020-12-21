@@ -1,9 +1,0 @@
-[
-  {
-    "name": "projects/rpojectid/roles/admin/bindings/bindingid",
-    "user_name": "users/userid",
-    "user_email": "email@example.com",
-    "user_full_name": "Hello World",
-    "user_friendly_name": "email-example-com"
-  }
-]

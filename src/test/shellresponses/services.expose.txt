@@ -1,1 +1,0 @@
-Service 'example' was successfully exposed at: empty-king-8939.us-east1.apps.cloudstate.com

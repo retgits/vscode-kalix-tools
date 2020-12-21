@@ -8,6 +8,9 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "extends": [
+        "plugin:@typescript-eslint/recommended"
+    ],
     "rules": {
         "camelcase": "off",
         "@typescript-eslint/naming-convention": [
@@ -16,6 +19,13 @@
                 "selector": "default",
                 "format": [
                     "camelCase"
+                ]
+            },
+            {
+                "selector": "enumMember",
+                "format": [
+                    "camelCase",
+                    "UPPER_CASE"
                 ]
             },
             {
