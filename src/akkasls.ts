@@ -1,41 +1,7 @@
 /**
- * Auth CLI actions
+ * Import actions from Node Wrapper
  */
-import { login } from './akkasls/commands/auth/login';
-import { logout } from './akkasls/commands/auth/logout';
-import { currentLogin } from './akkasls/commands/auth/currentlogin';
-import { listAuthTokens } from './akkasls/commands/auth/tokens/list';
-import { revokeAuthToken } from './akkasls/commands/auth/tokens/revoke';
-
-/**
- * Docker CLI actions
- */
-import { addDockerCredentials } from './akkasls/commands/docker/addcredentials';
-import { deleteDockerCredentials } from './akkasls/commands/docker/deletecredentials';
-import { listDockerCredentials } from './akkasls/commands/docker/listcredentials';
-
-/**
- * Projects CLI actions
- */
-import { listProjects } from './akkasls/commands/projects/list';
-import { newProject } from './akkasls/commands/projects/new';
-
-/**
- * Roles CLI actions
- */
-import { deleteInvite } from './akkasls/commands/roles/invitations/delete';
-import { addInvite } from './akkasls/commands/roles/invitations/inviteuser';
-import { listInvites } from './akkasls/commands/roles/invitations/list';
-import { listMembers } from './akkasls/commands/roles/listbindings';
-
-/**
- * Services CLI actions
- */
-import { deployService } from './akkasls/commands/services/deploy';
-import { exposeService } from './akkasls/commands/services/expose';
-import { listServices } from './akkasls/commands/services/list';
-import { undeployService } from './akkasls/commands/services/undeploy';
-import { unexposeService } from './akkasls/commands/services/unexpose';
+import { login, logout, currentLogin, listAuthTokens, revokeAuthToken, addDockerCredentials, deleteDockerCredentials, listDockerCredentials, listProjects, newProject, deleteInvite, addInvite, listInvites, listMembers, deployService, exposeService, listServices, undeployService, unexposeService, CurrentLogin, Token, Credential, Project, Invite, Member, Service } from '@retgits/akkasls-nodewrapper';
 
 /**
  * Local Proxy CLI extensions
@@ -47,7 +13,7 @@ import { stopLocalProxy } from './akkasls/extensions/commands/localproxy/stop';
  * Utils
  */
 import { Shell } from './utils/shell/shell';
-import { window } from 'vscode';
+import { window, workspace } from 'vscode';
 
 /**
  * Wizards
@@ -62,15 +28,7 @@ import { tokenPicker } from './components/wizards/tokenPicker';
 /**
  * DataTypes
  */
-import { CurrentLogin } from './akkasls/datatypes/auth/currentlogin';
-import { Token } from './akkasls/datatypes/auth/tokens';
-import { Credential } from './akkasls/datatypes/docker/credentials';
 import { ShellResult } from './utils/shell/datatypes';
-import { Project } from './akkasls/datatypes/projects/project';
-import { Invite } from './akkasls/datatypes/roles/invitations/invite';
-import { Member } from './akkasls/datatypes/roles/member';
-import { Service } from './akkasls/datatypes/services/service';
-
 /**
  * Explorer viewa
  */
@@ -83,6 +41,15 @@ export class AkkaServerless {
     private _shell: Shell;
     private _projectExplorer: ProjectExplorer;
     private _configExplorer: ConfigExplorer;
+
+    private _getOpts(): any {
+       return {
+            dryrun: workspace.getConfiguration('akkaserverless').get<boolean>('dryrun'),
+            silent: workspace.getConfiguration('akkaserverless').get<boolean>('logOutput'),
+            configFile: workspace.getConfiguration('akkaserverless').get<string>('configFile'),
+            context: workspace.getConfiguration('akkaserverless').get<string>('context')
+        };
+    }
 
     /**
      * Create a new instance of AkkaServerless which handles communication between the VS code extension and the underlying commands
@@ -101,29 +68,31 @@ export class AkkaServerless {
     }
 
     async login() {
-        let result = await login(this._shell);
+        let result = await login(this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
     }
 
     async logout() {
-        let result = await logout(this._shell);
+        let result = await logout(this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
     }
 
     async getCurrentLogin(): Promise<CurrentLogin> {
-        return currentLogin(this._shell);
+        const res = await currentLogin(this._getOpts());
+        return res.response as CurrentLogin;
     }
 
     async listAuthTokens(): Promise<Token[]> {
-        return listAuthTokens(this._shell);
+        const res = await listAuthTokens(this._getOpts());
+        return res.response as Token[];
     }
 
     async revokeAuthToken(tokenID: string): Promise<ShellResult> {
-        let result = await revokeAuthToken(tokenID, this._shell);
+        let result = await revokeAuthToken(tokenID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -132,7 +101,7 @@ export class AkkaServerless {
     }
 
     async addDockerCredentials(projectID: string, credentials: string): Promise<ShellResult> {
-        let result = await addDockerCredentials(projectID, credentials, this._shell);
+        let result = await addDockerCredentials(projectID, credentials, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -141,7 +110,7 @@ export class AkkaServerless {
     }
 
     async deleteDockerCredentials(projectID: string, credentialID: string): Promise<ShellResult> {
-        let result = await deleteDockerCredentials(projectID, credentialID, this._shell);
+        let result = await deleteDockerCredentials(projectID, credentialID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -150,12 +119,12 @@ export class AkkaServerless {
     }
 
     async listDockerCredentials(projectID: string): Promise<Credential[]> {
-        let result = await listDockerCredentials(projectID, this._shell);
-        return result;
+        const res = await listDockerCredentials(projectID, this._getOpts());
+        return res.response as Credential[];
     }
 
     async createNewProject(name: string, description: string): Promise<ShellResult> {
-        let result = await newProject(name, description, this._shell);
+        let result = await newProject(name, description, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -164,12 +133,12 @@ export class AkkaServerless {
     }
 
     async listProjects(): Promise<Project[]> {
-        let result = await listProjects(this._shell);
-        return result;
+        const res = await listProjects(this._getOpts());
+        return res.response as Project[];
     }
 
     async deleteInvite(projectID: string, emailAddress: string): Promise<ShellResult> {
-        let result = await deleteInvite(projectID, emailAddress, this._shell);
+        let result = await deleteInvite(projectID, emailAddress, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -177,8 +146,8 @@ export class AkkaServerless {
         return result;
     }
 
-    async addInvite(projectID: string, emailAddress: string) : Promise<ShellResult> {
-        let result = await addInvite(projectID, emailAddress, this._shell);
+    async addInvite(projectID: string, emailAddress: string): Promise<ShellResult> {
+        let result = await addInvite(projectID, emailAddress, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -187,17 +156,17 @@ export class AkkaServerless {
     }
 
     async listInvites(projectID: string): Promise<Invite[]> {
-        let result = await listInvites(projectID, this._shell);
-        return result;
+        const res = await listInvites(projectID, this._getOpts());
+        return res.response as Invite[];
     }
 
     async listMembers(projectID: string): Promise<Member[]> {
-        let result = await listMembers(projectID, this._shell);
-        return result;
+        const res = await listMembers(projectID, this._getOpts());
+        return res.response as Member[];
     }
 
-    async deployService(service:string, image:string, projectID:string): Promise<ShellResult> {
-        let result = await deployService(service, image, projectID, this._shell);
+    async deployService(service: string, image: string, projectID: string): Promise<ShellResult> {
+        let result = await deployService(service, image, projectID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -205,8 +174,8 @@ export class AkkaServerless {
         return result;
     }
 
-    async exposeService(service:string, flags:string, projectID:string): Promise<ShellResult> {
-        let result = await exposeService(service, flags, projectID, this._shell);
+    async exposeService(service: string, flags: string, projectID: string): Promise<ShellResult> {
+        let result = await exposeService(service, flags, projectID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -214,12 +183,12 @@ export class AkkaServerless {
     }
 
     async listServices(projectID: string): Promise<Service[]> {
-        let result = await listServices(projectID, this._shell);
-        return result;
+        const res = await listServices(projectID, this._getOpts());
+        return res.response as Service[];
     }
 
-    async undeployService(service:string, projectID:string): Promise<ShellResult> {
-        let result = await undeployService(service, projectID, this._shell);
+    async undeployService(service: string, projectID: string): Promise<ShellResult> {
+        let result = await undeployService(service, projectID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -227,8 +196,8 @@ export class AkkaServerless {
         return result;
     }
 
-    async unexposeService(service:string, hostname:string, projectID:string): Promise<ShellResult> {
-        let result = await unexposeService(service, hostname, projectID, this._shell);
+    async unexposeService(service: string, hostname: string, projectID: string): Promise<ShellResult> {
+        let result = await unexposeService(service, hostname, projectID, this._getOpts());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -252,7 +221,7 @@ export class AkkaServerless {
     }
 
     async addDockerCredentialsWizard(projectID?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to add credentials to...', await this.listProjects());
         }
 
@@ -261,11 +230,11 @@ export class AkkaServerless {
     }
 
     async deleteDockerCredentialsWizard(projectID?: string, credentialID?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to remove credentials from...', await this.listProjects());
         }
 
-        if(!credentialID) {
+        if (!credentialID) {
             credentialID = await dockerCredentialsPicker(await this.listDockerCredentials(projectID));
         }
 
@@ -273,7 +242,7 @@ export class AkkaServerless {
     }
 
     async deployServiceWizard(projectID?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to deploy your service to...', await this.listProjects());
         }
 
@@ -284,23 +253,23 @@ export class AkkaServerless {
     }
 
     async undeployServiceWizard(projectID?: string, service?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to undeploy your service from...', await this.listProjects());
         }
 
-        if(!service) {
+        if (!service) {
             service = await servicePicker('pick the service to undeploy...', await this.listServices(projectID));
         }
 
         this.undeployService(service, projectID);
     }
 
-    async exposeServiceWizard(projectID?: string, service?:string) {
-        if(!projectID) {
+    async exposeServiceWizard(projectID?: string, service?: string) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to expose your service from...', await this.listProjects());
         }
 
-        if(!service) {
+        if (!service) {
             service = await servicePicker('pick the service to expose...', await this.listServices(projectID));
         }
 
@@ -309,12 +278,12 @@ export class AkkaServerless {
         this.exposeService(service, flags, projectID);
     }
 
-    async unexposeServiceWizard(projectID?: string, service?:string) {
-        if(!projectID) {
+    async unexposeServiceWizard(projectID?: string, service?: string) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to unexpose your service from...', await this.listProjects());
         }
 
-        if(!service) {
+        if (!service) {
             service = await servicePicker('pick the service to unexpose...', await this.listServices(projectID));
         }
 
@@ -324,7 +293,7 @@ export class AkkaServerless {
     }
 
     async inviteUserWizard(projectID?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
         }
 
@@ -334,11 +303,11 @@ export class AkkaServerless {
     }
 
     async deleteInviteWizard(projectID?: string, emailAddress?: string) {
-        if(!projectID) {
+        if (!projectID) {
             projectID = await projectPicker('pick a project to invite a new person to...', await this.listProjects());
         }
 
-        if(!emailAddress) {
+        if (!emailAddress) {
             emailAddress = await invitePicker('pick the email address to uninvite...', await this.listInvites(projectID));
         }
 
