@@ -19,8 +19,6 @@ All notable changes to this project will be documented in this file. See [standa
 * update docker image user for local usage ([9dc3dd1](https://github.com/retgits/vscode-akkasls-tools/commit/9dc3dd139c722755ca2886da39ff6b6b1ed9819a))
 * update try catch logic ([ee54ddc](https://github.com/retgits/vscode-akkasls-tools/commit/ee54ddc385b61a5c98bed642a30b2b3e5805eb2d))
 
-# Change Log
-
 ## Version 0.0.11
 
 - Refactor to wrap Akka Serverless commands in a different way
