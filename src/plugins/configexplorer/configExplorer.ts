@@ -1,6 +1,7 @@
 import { AkkaServerless } from '../../akkasls';
 import { BaseConfigExplorerItem } from './baseConfigExplorerItem';
 import { getAuthTokenItems, TOKEN_ITEM_TYPE, getDefaultAuthTokenItem } from './authTokenItem';
+import { getCurrentLoginItem, getDefaultCurrentLoginItem, LOGIN_ITEM_TYPE } from './currentLoginItem';
 import { TreeDataProvider, EventEmitter, Event, TreeItem } from 'vscode';
 
 export class ConfigExplorer implements TreeDataProvider<BaseConfigExplorerItem> {
@@ -25,6 +26,8 @@ export class ConfigExplorer implements TreeDataProvider<BaseConfigExplorerItem> 
             switch (element.type) {
                 case TOKEN_ITEM_TYPE:
                     return Promise.resolve(getAuthTokenItems(this._akkasls));
+                case LOGIN_ITEM_TYPE:
+                    return Promise.resolve(getCurrentLoginItem(this._akkasls));
                 default:
                     break;
             }
@@ -38,6 +41,7 @@ export class ConfigExplorer implements TreeDataProvider<BaseConfigExplorerItem> 
     getDefaultCredentialItems(): Promise<BaseConfigExplorerItem[]> {
         const defaultTreeItems: BaseConfigExplorerItem[] = [];
         defaultTreeItems.push(getDefaultAuthTokenItem());
+        defaultTreeItems.push(getDefaultCurrentLoginItem());
         return Promise.resolve(defaultTreeItems);
     }
 
