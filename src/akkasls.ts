@@ -12,6 +12,7 @@ import { tokenPicker } from './plugins/wizards/tokenPicker';
 import { ProjectExplorer } from './plugins/projectexplorer/projectExplorer';
 import { ConfigExplorer } from './plugins/configexplorer/configExplorer';
 import { logger } from './utils/logger';
+import { functionPicker } from './plugins/wizards/functionPicker';
 
 export class AkkaServerless {
     private _projectExplorer: ProjectExplorer;
@@ -177,15 +178,25 @@ export class AkkaServerless {
     }
 
     async startLocalProxy(configfile: string): Promise<void> {
-        // TODO: Update this
         const asLocal = new ASLocal(configfile);
-        asLocal.startLocalProxy('');
+        try {
+            const func = await functionPicker('pick a function to start locally', asLocal.getServices());
+            asLocal.startLocalProxy(func);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+        }
     }
 
     async stopLocalProxy(configfile: string): Promise<void> {
-        // TODO: Update this
         const asLocal = new ASLocal(configfile);
-        asLocal.stopLocalProxy('');
+        try {
+            const func = await functionPicker('pick a function to stop', asLocal.getServices());
+            asLocal.stopLocalProxy(func);
+        } catch (e) {
+            window.showErrorMessage(e);
+            logger.error(e);
+        }
     }
 
     async addDockerCredentialsWizard(projectID?: string): Promise<void> {
