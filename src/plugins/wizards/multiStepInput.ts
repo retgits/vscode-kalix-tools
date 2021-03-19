@@ -15,7 +15,6 @@ interface InputBoxParameters {
 	totalSteps: number;
 	value: string;
 	prompt: string;
-	validate: (value: string) => Promise<string | undefined>;
 }
 
 class InputFlowAction {
@@ -101,7 +100,7 @@ export class MultiStepInput {
 		}
 	}
 
-	async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt, validate }: P) {
+	async showInputBox<P extends InputBoxParameters>({ title, step, totalSteps, value, prompt }: P) {
 		const disposables: Disposable[] = [];
 		try {
 			return await new Promise<string | (P extends { buttons: (infer I)[] } ? I : never)>((resolve, reject) => {
@@ -114,7 +113,6 @@ export class MultiStepInput {
 				input.buttons = [
 					...(this._steps.length > 1 ? [QuickInputButtons.Back] : []),
 				];
-				let validating = validate('');
 				disposables.push(
 					input.onDidTriggerButton(item => {
 						if (item === QuickInputButtons.Back) {
@@ -127,19 +125,9 @@ export class MultiStepInput {
 						const value = input.value;
 						input.enabled = false;
 						input.busy = true;
-						if (!(await validate(value))) {
 							resolve(value);
-						}
 						input.enabled = true;
 						input.busy = false;
-					}),
-					input.onDidChangeValue(async text => {
-						const current = validate(text);
-						validating = current;
-						const validationMessage = await current;
-						if (current === validating) {
-							input.validationMessage = validationMessage;
-						}
 					})
 				);
 				if (this._current) {

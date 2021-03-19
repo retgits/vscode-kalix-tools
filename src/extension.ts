@@ -12,7 +12,6 @@ import { ServiceItem } from './plugins/projectexplorer/serviceItem';
 import { InviteItem } from './plugins/projectexplorer/inviteItem';
 import { DockerCredentialItem } from './plugins/projectexplorer/dockerCredentialItem';
 import { AuthTokenItem } from './plugins/configexplorer/authTokenItem';
-import { templateWizard } from './plugins/wizards/templateWizard';
 
 export function activate(context: ExtensionContext): void {
 	const akkasls = new AkkaServerless();
@@ -64,7 +63,7 @@ export function activate(context: ExtensionContext): void {
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.invites.inviteuser', async () => { akkasls.inviteUserWizard(); }));
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.projects.local.start', async (uri: Uri) => { akkasls.startLocalProxy(uri.path); }));
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.projects.local.stop', async (uri: Uri) => { akkasls.stopLocalProxy(uri.path); }));
-	context.subscriptions.push(commands.registerCommand('as.commandpalette.templatewizard', async () => { templateWizard(); }));
+	context.subscriptions.push(commands.registerCommand('as.commandpalette.templatewizard', async () => { akkasls.runTemplateWizard(); }));
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.tokens.revoke', async () => { akkasls.revokeAuthTokenWizard(); }));
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.undeploy', async () => { akkasls.undeployServiceWizard(); }));
 	context.subscriptions.push(commands.registerCommand('as.commandpalette.unexpose', async () => { akkasls.unexposeServiceWizard(); }));

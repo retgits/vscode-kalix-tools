@@ -13,6 +13,7 @@ import { ProjectExplorer } from './plugins/projectexplorer/projectExplorer';
 import { ConfigExplorer } from './plugins/configexplorer/configExplorer';
 import { logger } from './utils/logger';
 import { functionPicker } from './plugins/wizards/functionPicker';
+import { templateWizard } from './plugins/wizards/templateWizard';
 
 export class AkkaServerless {
     private _projectExplorer: ProjectExplorer;
@@ -139,7 +140,8 @@ export class AkkaServerless {
     }
 
     async deployService(service: string, image: string, projectID: string): Promise<ShellResult> {
-        const result = await deployService(service, image, projectID, this._getCommandInput());
+        const envvars = await inputBox('', 'enter your environment variables...');
+        const result = await deployService(service, image, projectID, {vars: envvars.split(',')} ,this._getCommandInput());
         if (result.code !== 0) {
             window.showErrorMessage(result.stderr);
         }
@@ -365,5 +367,9 @@ export class AkkaServerless {
             window.showErrorMessage(e);
             logger.error(e);
         }
+    }
+
+    async runTemplateWizard(): Promise<void> {
+        templateWizard(this._getCommandInput());
     }
 }

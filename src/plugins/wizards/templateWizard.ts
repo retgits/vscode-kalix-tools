@@ -1,33 +1,28 @@
-import { copySync, emptyDirSync, ensureDirSync, existsSync, readdirSync } from 'fs-extra';
-import { replaceInFileSync } from 'replace-in-file';
-import { join } from 'path';
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import * as path from 'path';
+import { generateMavenJava, generateNpmJs, ShellResult } from '@retgits/akkasls-nodewrapper';
 import { workspace, QuickPickItem, window } from 'vscode';
-import { dirSync } from 'tmp';
-import { Command, shell } from '@retgits/akkasls-nodewrapper';
-import { logger } from '../../utils/logger';
 import { MultiStepInput } from './multiStepInput';
+import { logger } from '../../utils/logger';
 
-const WIZARD_TITLE = 'Create Application Template';
-const TOTAL_STEPS = 6;
-const TEMPLATE_REPO_NAME = 'https://github.com/retgits/akkasls-templates';
+const WIZARD_TITLE = 'Generate New Akka Serverless Project';
+const RUNTIMES = ["npm-js", "maven-java"];
 
-
-export async function templateWizard(): Promise<void> {
-	const tempFolder = dirSync();
-
-	const res = await shell.exec(new Command(`git clone --depth 1 ${TEMPLATE_REPO_NAME} ${tempFolder.name}`));
-	if (workspace.getConfiguration('akkaserverless').get('logOutput')) {
-		logger.log(res.stderr);
-		logger.log(res.stdout);
-	}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function templateWizard(commandInput: any): Promise<void> {
 
 	interface State {
 		runtime: QuickPickItem | string;
-		template: QuickPickItem | string;
-		protoPackage: string;
-		functionName: string;
-		functionVersion: string;
-		location: string;
+		name: string;
+		artifactID: string;
+		groupID: string;
+		packageName: string;
+		version: string;
+	}
+
+	if(workspace.workspaceFolders === undefined) {
+		window.showErrorMessage("Working folder not found, open a folder and try again");
+		return;	
 	}
 
 	async function collectInputs() {
@@ -37,149 +32,90 @@ export async function templateWizard(): Promise<void> {
 	}
 
 	async function pickMyRuntime(input: MultiStepInput, state: Partial<State>) {
-		const runtimes: QuickPickItem[] = getAvailableRuntimes().map(label => ({ label }));
+		const runtimes: QuickPickItem[] = RUNTIMES.map(label => ({ label }));
 		const pick = await input.showQuickPick({
 			title: WIZARD_TITLE,
 			step: 1,
-			totalSteps: TOTAL_STEPS,
-			placeholder: 'Choose your runtime',
+			totalSteps: 1,
+			placeholder: 'Choose your language and build tool',
 			items: runtimes,
 			activeItem: typeof state.runtime !== 'string' ? state.runtime : undefined
 		});
 		state.runtime = pick;
-		return (input: MultiStepInput) => pickMyTemplate(input, state);
+		
+		if (pick.label === "npm-js") {
+			return (input: MultiStepInput) => inputName(input, state);
+		}
+
+		return (input: MultiStepInput) => inputArtifactID(input, state);
 	}
 
-	async function pickMyTemplate(input: MultiStepInput, state: Partial<State>) {
-		const templates: QuickPickItem[] = getAvailableProjectTemplates(state.runtime!).map(label => ({ label }));
-		const pick = await input.showQuickPick({
+	async function inputName(input: MultiStepInput, state: Partial<State>) {
+		state.name = await input.showInputBox({
 			title: WIZARD_TITLE,
 			step: 2,
-			totalSteps: TOTAL_STEPS,
-			placeholder: 'Choose a project template',
-			items: templates,
-			activeItem: typeof state.template !== 'string' ? state.template : undefined
+			totalSteps: 2,
+			value: state.name || '',
+			prompt: 'Choose the name to use for the new project'
 		});
-		state.template = pick;
-		return (input: MultiStepInput) => inputMyPackageName(input, state);
 	}
 
-	async function inputMyPackageName(input: MultiStepInput, state: Partial<State>) {
-		state.protoPackage = await input.showInputBox({
+	async function inputArtifactID(input: MultiStepInput, state: Partial<State>) {
+		state.artifactID = await input.showInputBox({
+			title: WIZARD_TITLE,
+			step: 2,
+			totalSteps: 5,
+			value: state.artifactID || '',
+			prompt: 'Choose the artifactId to use for the new project'
+		});
+		return (input: MultiStepInput) => inputGroupID(input, state);
+	}
+
+	async function inputGroupID(input: MultiStepInput, state: Partial<State>) {
+		state.artifactID = await input.showInputBox({
 			title: WIZARD_TITLE,
 			step: 3,
-			totalSteps: TOTAL_STEPS,
-			value: state.protoPackage || '',
-			prompt: 'Choose a name for your protobuf package',
-			validate: validatePackagename
+			totalSteps: 5,
+			value: state.artifactID || '',
+			prompt: 'Choose the groupId to use for the new project'
 		});
-		return (input: MultiStepInput) => inputMyFunctionName(input, state);
+		return (input: MultiStepInput) => inputPackage(input, state);
 	}
 
-	async function inputMyFunctionName(input: MultiStepInput, state: Partial<State>) {
-		state.functionName = await input.showInputBox({
+	async function inputPackage(input: MultiStepInput, state: Partial<State>) {
+		state.artifactID = await input.showInputBox({
 			title: WIZARD_TITLE,
 			step: 4,
-			totalSteps: TOTAL_STEPS,
-			value: state.functionName || '',
-			prompt: 'Choose a name for your function',
-			validate: validateFunctionname
+			totalSteps: 5,
+			value: state.packageName || '',
+			prompt: 'Choose the Java package to use for the new project'
 		});
-		return (input: MultiStepInput) => inputMyFunctionVersion(input, state);
+		return (input: MultiStepInput) => inputVersion(input, state);
 	}
 
-	async function inputMyFunctionVersion(input: MultiStepInput, state: Partial<State>) {
-		state.functionVersion = await input.showInputBox({
+	async function inputVersion(input: MultiStepInput, state: Partial<State>) {
+		state.artifactID = await input.showInputBox({
 			title: WIZARD_TITLE,
-			step: 5,
-			totalSteps: TOTAL_STEPS,
-			value: state.functionVersion || '',
-			prompt: 'Choose a version number for your function',
-			validate: validateFunctionVersion
+			step: 4,
+			totalSteps: 5,
+			value: state.packageName || '',
+			prompt: 'Choose the initial version to use for the new project'
 		});
-		return (input: MultiStepInput) => inputMyLocation(input, state);
-	}
-
-	async function inputMyLocation(input: MultiStepInput, state: Partial<State>) {
-		state.location = await input.showInputBox({
-			title: WIZARD_TITLE,
-			step: 6,
-			totalSteps: TOTAL_STEPS,
-			value: state.location || '',
-			prompt: 'Choose a location to store your code',
-			validate: validateLocationExists
-		});
-	}
-
-	async function validatePackagename(name: string) {
-		const pass = name.match(/^([a-z][a-z\d_]*\.)*[a-z][a-z\d_]*$/i);
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		return pass === null ? 'Not a correct package name (com.abc.def)' : undefined;
-	}
-
-	async function validateFunctionname(name: string) {
-		const pass = name.match(/^[a-zA-Z]*$/i);
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		return pass === null ? 'Not a correct function name ([a-zA-Z])' : undefined;
-	}
-
-	async function validateFunctionVersion(name: string) {
-		const pass = name.match(/^(\d+\.)?(\d+\.)?(\d+)$/i);
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		return pass === null ? 'Not a correct function name (x.y.z)' : undefined;
-	}
-
-	async function validateLocationExists(name: string) {
-		await new Promise(resolve => setTimeout(resolve, 1000));
-		return !existsSync(name) ? 'Path does not exist' : undefined;
-	}
-
-	function getAvailableRuntimes(): string[] {
-		const runtimes: string[] = [];
-		const files = readdirSync(tempFolder.name, {withFileTypes: true });
-		for (const file of files) {
-			if(file.isDirectory() && !file.name.startsWith('.')) {
-				runtimes.push(file.name);
-			}
-		}
-		return runtimes;
-	}
-
-	function getAvailableProjectTemplates(runtime: QuickPickItem | string): string[] {
-		if (typeof runtime !== "string") {
-			return readdirSync(join(tempFolder.name, runtime.label));
-		}
-		return [];
 	}
 
 	const state = await collectInputs();
-	window.showInformationMessage(`Creating new template in '${state.location}'`);
+	const location = workspace.workspaceFolders[0].uri.path ;
 
-	if (typeof state.runtime !== "string" && typeof state.template !== "string") {
-		state.location = join(state.location, state.functionName);
-		ensureDirSync(state.location);
-		copySync(join(tempFolder.name, state.runtime.label, state.template.label), state.location);
+	if (typeof state.runtime !== "string") {
+		let result: ShellResult;
+		if (state.runtime.label === "npm-js") {
+			result = await generateNpmJs(path.join(location, `${state.name}.zip`), state.name, commandInput);
+		} else {
+			result = await generateMavenJava(path.join(location, `${state.name}.zip`), state.artifactID, state.groupID, state.packageName, state.version, commandInput);
+		}
+		if (result.code !== 0) {
+			window.showErrorMessage(result.stderr);
+		}
+		logger.log(result.stdout);
 	}
-
-	const replaceMap: Map<string, string> = new Map();
-	replaceMap.set('functionname', state.functionName);
-	replaceMap.set('functionversion', state.functionVersion);
-	replaceMap.set('protopackage', state.protoPackage);
-	replaceMap.set('dockerimageuser', workspace.getConfiguration('akkaserverless')!.get<string>('dockerImageUser')!);
-
-	for(const replaceKey of replaceMap.keys()) {
-		const regex = new RegExp('{{' + replaceKey + '}}','g');
-		replaceInFileSync({
-			files: [
-				`${state.location}/**`,
-				`${state.location}/.*`
-			],
-			from: regex,
-			to: replaceMap.get(replaceKey)!
-		});
-	}
-
-	// Clean up the temp folder
-	emptyDirSync(tempFolder.name);
-	tempFolder.removeCallback();
 }
