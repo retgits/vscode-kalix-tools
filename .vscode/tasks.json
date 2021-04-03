@@ -9,6 +9,11 @@
 			"command": "npm run test-compile"
 		},
 		{
+			"label": "compile",
+			"type": "shell",
+			"command": "npm run compile"
+		},
+		{
 			"type": "npm",
 			"script": "watch",
 			"problemMatcher": [

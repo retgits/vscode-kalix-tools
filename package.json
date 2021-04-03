@@ -1,582 +1,94 @@
 {
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
-	"version": "0.1.0",
 	"description": "Develop, deploy, and manage Akka Serverless apps",
+	"version": "0.1.0",
+	"publisher": "retgits",
+	"engines": {
+		"vscode": "^1.52.0"
+	},
+	"license": "MIT",
 	"categories": [
 		"Programming Languages",
 		"Other"
 	],
-	"homepage": "https://github.com/retgits/vscode-akkasls-tools",
-	"bugs": {
-		"url": "https://github.com/retgits/vscode-akkasls-tools/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/retgits/vscode-akkasls-tools"
-	},
-	"author": {
-		"name": "retgits",
-		"url": "https://retgits.com"
-	},
-	"publisher": "retgits",
+	"keywords": [
+		"akka",
+		"serverless",
+		"akka serverless",
+		"lightbend"
+	],
+	"icon": "resources/icon.png",
+	"activationEvents": [
+		"onCommand:as.commandpalette.browser.console",
+		"onCommand:as.commandpalette.browser.documentation",
+		"onCommand:as.commandpalette.browser.forum",
+		"onCommand:as.commandpalette.browser.ideas",
+		"onCommand:as.commandpalette.browser.statuspage"
+	],
 	"main": "./dist/extension.js",
-	"scripts": {
-		"compile": "webpack --devtool nosources-source-map --config ./utils/webpack.build.config.js",
-		"lint": "eslint src --ext ts",
-		"package": "webpack --mode production --config ./utils/webpack.build.config.js",
-		"pretest": "npm run test-compile && npm run lint",
-		"test": "node ./out/test/runTest.js",
-		"test-compile": "tsc -p ./",
-		"test-watch": "tsc -watch -p ./",
-		"utils:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
-		"utils:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
-		"vscode:prepublish": "npm run package",
-		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
-		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
-	},
 	"contributes": {
 		"commands": [
 			{
-				"command": "as.views.projects.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the project explorer view"
-			},
-			{
-				"command": "as.views.status.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the status explorer view"
-			},
-			{
-				"command": "as.views.tools.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the tools explorer view"
-			},
-			{
-				"command": "as.views.tokens.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the tokens explorer view"
-			},
-			{
-				"command": "as.commandpalette.templatewizard",
-				"title": "Generate a project",
+				"command": "as.commandpalette.browser.console",
+				"title": "Open console",
 				"category": "Akka Serverless",
-				"description": "Generate a new project"
+				"description": "Open the Akka Serverless Console in a browser window"
 			},
 			{
-				"command": "as.commandpalette.deploy",
-				"title": "Deploy",
+				"command": "as.commandpalette.browser.documentation",
+				"title": "Open docs",
 				"category": "Akka Serverless",
-				"description": "Deploy a service to Akka Serverless"
+				"description": "Open the Akka Serverless documentation in a browser window"
 			},
 			{
-				"command": "as.commandpalette.undeploy",
-				"title": "Undeploy",
+				"command": "as.commandpalette.browser.forum",
+				"title": "Open forum",
 				"category": "Akka Serverless",
-				"description": "Remove a service from Akka Serverless"
+				"description": "Open the Akka Serverless forum in a browser window"
 			},
 			{
-				"command": "as.commandpalette.expose",
-				"title": "Expose",
+				"command": "as.commandpalette.browser.ideas",
+				"title": "Open ideas portal",
 				"category": "Akka Serverless",
-				"description": "Expose a service for inbound traffic"
+				"description": "Open the Akka Serverless ideas portal in a browser window"
 			},
 			{
-				"command": "as.commandpalette.unexpose",
-				"title": "Unexpose",
+				"command": "as.commandpalette.browser.statuspage",
+				"title": "Open status page",
 				"category": "Akka Serverless",
-				"description": "Removes a service route from a service"
-			},
-			{
-				"command": "as.views.projects.dockercredentials.add",
-				"title": "Add credentials",
-				"description": "Add new Docker credentials to your project"
-			},
-			{
-				"command": "as.views.projects.dockercredentials.delete",
-				"title": "Delete credentials",
-				"description": "Remove Docker credentials from your project"
-			},
-			{
-				"command": "as.views.projects.services.deploy",
-				"title": "Deploy",
-				"description": "Deploy a service to Akka Serverless"
-			},
-			{
-				"command": "as.views.projects.services.undeploy",
-				"title": "Undeploy",
-				"description": "Remove a service from Akka Serverless"
-			},
-			{
-				"command": "as.views.projects.services.expose",
-				"title": "Expose",
-				"description": "Expose a service for inbound traffic"
-			},
-			{
-				"command": "as.views.projects.services.unexpose",
-				"title": "Unexpose",
-				"description": "Removes a service route from a service"
-			},
-			{
-				"command": "as.views.projects.openbrowser",
-				"title": "Open in browser",
-				"description": "Opens the selected resource in the Akka Serverless Web UI"
-			},
-			{
-				"command": "as.views.projects.details.projects",
-				"title": "View details",
-				"description": "Print the details of a project to the akkasls output window"
-			},
-			{
-				"command": "as.views.projects.details.services",
-				"title": "View details",
-				"description": "Print the details of a service to the akkasls output window"
-			},
-			{
-				"command": "as.views.projects.details.members",
-				"title": "View details",
-				"description": "Print the details of a project member to the akkasls output window"
-			},
-			{
-				"command": "as.views.projects.details.dockercredentials",
-				"title": "View details",
-				"description": "Print the details of Docker credentials to the akkasls output window (this option doesn't log the password)"
-			},
-			{
-				"command": "as.views.projects.details.invites",
-				"title": "View details",
-				"description": "Print the details of an invite to the akkasls output window"
-			},
-			{
-				"command": "as.views.projects.invites.inviteuser",
-				"title": "Send invite",
-				"description": "Invite a new user to your project on Akka Serverless"
-			},
-			{
-				"command": "as.views.projects.invites.deleteinvite",
-				"title": "Delete invite",
-				"description": "Removes the invitation of a user"
-			},
-			{
-				"command": "as.views.tokens.details.tokens",
-				"title": "View details",
-				"description": "Print the details of a token to the akkasls output window"
-			},
-			{
-				"command": "as.views.tokens.revoke",
-				"title": "Revoke",
-				"description": "Revoke a token"
-			},
-			{
-				"command": "as.commandpalette.projects.local.start",
-				"title": "Run local",
-				"category": "Akka Serverless",
-				"description": "Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)"
-			},
-			{
-				"command": "as.commandpalette.projects.local.stop",
-				"title": "Stop local",
-				"category": "Akka Serverless",
-				"description": "Stops the selected service and Cloudstate proxy"
-			},
-			{
-				"command": "as.views.projects.new",
-				"title": "New project",
-				"category": "Akka Serverless",
-				"description": "Create a new project on Akka Serverless"
-			},
-			{
-				"command": "as.views.status.view",
-				"title": "View Status",
-				"category": "Akka Serverless",
-				"description": "Open the Akka Serverless status page in your browser"
-			},
-			{
-				"command": "as.views.tools.info",
-				"title": "Get info",
-				"description": "Open a webpage with detailed information about the selected tool"
-			},
-			{
-				"command": "as.views.status.info",
-				"title": "Get info",
-				"description": "Open the Akka Serverless status page in your browser"
-			},
-			{
-				"command": "as.commandpalette.invites.inviteuser",
-				"title": "Send invite",
-				"category": "Akka Serverless",
-				"description": "Invite a new user to a project on Akka Serverless"
-			},
-			{
-				"command": "as.commandpalette.invites.deleteinvite",
-				"title": "Delete invite",
-				"category": "Akka Serverless",
-				"description": "Removes the invitation of a user for a project"
-			},
-			{
-				"command": "as.commandpalette.auth.login",
-				"title": "Login",
-				"category": "Akka Serverless",
-				"description": "Logs in to Akka Serverless by printing the login URL in the akkasls output window"
-			},
-			{
-				"command": "as.commandpalette.dockercredentials.add",
-				"title": "Add credentials",
-				"category": "Akka Serverless",
-				"description": "Add Docker registry credentials to an Akka Serverless project"
-			},
-			{
-				"command": "as.commandpalette.dockercredentials.delete",
-				"title": "Delete credentials",
-				"category": "Akka Serverless",
-				"description": "Remove Docker registry credentials from an Akka Serverless project"
-			},
-			{
-				"command": "as.commandpalette.auth.logout",
-				"title": "Logout",
-				"category": "Akka Serverless",
-				"description": "Logs out from Akka Serverless"
-			},
-			{
-				"command": "as.commandpalette.tokens.revoke",
-				"title": "Revoke token",
-				"category": "Akka Serverless",
-				"description": "Revokes a previously issues Akka Serverless authentication token"
+				"description": "Open the Akka Serverless status page in a browser window"
 			}
-		],
-		"configuration": {
-			"title": "Akka Serverless",
-			"properties": {
-				"akkaserverless.dryrun": {
-					"type": "boolean",
-					"default": false,
-					"description": "If true will print the commands in the log rather than execute them"
-				},
-				"akkaserverless.logOutput": {
-					"type": "boolean",
-					"default": false,
-					"description": "If true will log output from the Akka Serverless CLI in the akkasls output window"
-				},
-				"akkaserverless.dockerImageUser": {
-					"type": "string",
-					"default": null,
-					"description": "Image prefix for docker images ie 'docker.io/retgits'"
-				},
-				"akkaserverless.configFile": {
-					"type": "string",
-					"default": null,
-					"description": "Location of the config file if you want to override it"
-				},
-				"akkaserverless.context": {
-					"type": "string",
-					"default": null,
-					"description": "The context to use"
-				}
-			}
-		},
-		"menus": {
-			"view/title": [
-				{
-					"command": "as.views.projects.new",
-					"when": "view == as.views.projects",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.refresh",
-					"when": "view == as.views.projects",
-					"group": "navigation"
-				},
-				{
-					"command": "as.views.status.refresh",
-					"when": "view == as.views.status",
-					"group": "navigation"
-				},
-				{
-					"command": "as.views.tools.refresh",
-					"when": "view == as.views.tools",
-					"group": "navigation"
-				},
-				{
-					"command": "as.views.tokens.refresh",
-					"when": "view == as.views.tokens",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "as.views.projects.dockercredentials.add",
-					"when": "view == as.views.projects && viewItem == Credentials",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.dockercredentials.delete",
-					"when": "view == as.views.projects && viewItem == Credentials",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.services.deploy",
-					"when": "view == as.views.projects && viewItem == Services",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.services.undeploy",
-					"when": "view == as.views.projects && viewItem == Services",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.services.expose",
-					"when": "view == as.views.projects && viewItem == Services",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.services.unexpose",
-					"when": "view == as.views.projects && viewItem == Services",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.details.projects",
-					"when": "view == as.views.projects && viewItem == Projects",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.details.services",
-					"when": "view == as.views.projects && viewItem == Services",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.details.dockercredentials",
-					"when": "view == as.views.projects && viewItem == Credentials",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.details.members",
-					"when": "view == as.views.projects && viewItem == Members",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.details.invites",
-					"when": "view == as.views.projects && viewItem == Invites",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.invites.inviteuser",
-					"when": "view == as.views.projects && viewItem == Invites",
-					"group": "1"
-				},
-				{
-					"command": "as.views.projects.invites.deleteinvite",
-					"when": "view == as.views.projects && viewItem == Invites",
-					"group": "1"
-				},
-				{
-					"command": "as.views.tools.info",
-					"when": "view == as.views.tools && viewItem == Tools"
-				},
-				{
-					"command": "as.views.status.info",
-					"when": "view == as.views.status"
-				},
-				{
-					"command": "as.views.tokens.details.tokens",
-					"when": "view == as.views.tokens && viewItem == Tokens",
-					"group": "0"
-				},
-				{
-					"command": "as.views.tokens.revoke",
-					"when": "view == as.views.tokens && viewItem == Tokens",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.openbrowser",
-					"when": "view == as.views.projects",
-					"group": "99"
-				}
-			],
-			"commandPalette": [
-				{
-					"command": "as.views.projects.dockercredentials.add",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.dockercredentials.delete",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.services.deploy",
-					"when": "view == as.views.projects",
-					"group": "0"
-				},
-				{
-					"command": "as.views.projects.services.undeploy",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.services.expose",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.services.unexpose",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.details.projects",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.details.services",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.details.dockercredentials",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.details.members",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.details.invites",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.invites.inviteuser",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.projects.invites.deleteinvite",
-					"when": "view == as.views.projects"
-				},
-				{
-					"command": "as.views.tools.info",
-					"when": "view == as.views.tools"
-				},
-				{
-					"command": "as.views.status.info",
-					"when": "view == as.views.status"
-				},
-				{
-					"command": "as.views.tokens.details.tokens",
-					"when": "view == as.views.tokens"
-				},
-				{
-					"command": "as.views.tokens.revoke",
-					"when": "view == as.views.tokens"
-				},
-				{
-					"command": "as.views.projects.openbrowser",
-					"when": "view == as.views.projects"
-				}
-			],
-			"explorer/context": [
-				{
-					"when": "resourceFilename == serverless.yml",
-					"command": "as.commandpalette.projects.local.start"
-				},
-				{
-					"when": "resourceFilename == serverless.yml",
-					"command": "as.commandpalette.projects.local.stop"
-				}
-			]
-		},
-		"views": {
-			"as": [
-				{
-					"id": "as.views.projects",
-					"name": "Projects"
-				},
-				{
-					"id": "as.views.tokens",
-					"name": "Tokens"
-				},
-				{
-					"id": "as.views.status",
-					"name": "Status"
-				},
-				{
-					"id": "as.views.tools",
-					"name": "Tools"
-				}
-			]
-		},
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "as",
-					"title": "Akka Serverless",
-					"icon": "resources/akka-icon-reverse.svg"
-				}
-			]
-		}
+		]
 	},
-	"activationEvents": [
-		"onView:as.views.projects",
-		"onView:as.views.tools",
-		"onView:as.views.status",
-		"onView:as.views.credentials",
-		"onCommand:as.commandpalette.dockercredentials.add",
-		"onCommand:as.commandpalette.dockercredentials.delete",
-		"onCommand:as.commandpalette.auth.login",
-		"onCommand:as.commandpalette.auth.logout",
-		"onCommand:as.commandpalette.deploy",
-		"onCommand:as.commandpalette.undeploy",
-		"onCommand:as.commandpalette.expose",
-		"onCommand:as.commandpalette.unexpose",
-		"onCommand:as.commandpalette.invites.inviteuser",
-		"onCommand:as.commandpalette.projects.local.start",
-		"onCommand:as.commandpalette.projects.local.stop",
-		"onCommand:as.commandpalette.templatewizard"
-	],
-	"dependencies": {
-		"@retgits/akkasls-nodewrapper": "^0.1.6",
-		"axios": "^0.21.0",
-		"cli-table3": "^0.6.0",
-		"fs-extra": "^9.0.1",
-		"js-yaml": "^3.14.0",
-		"replace-in-file": "^6.1.0",
-		"shelljs": "^0.8.4",
-		"tmp": "^0.2.1"
+	"scripts": {
+		"vscode:prepublish": "webpack --mode production --config ./utils/webpack.build.config.js",
+		"compile": "webpack --devtool nosources-source-map --config ./utils/webpack.build.config.js",
+		"lint": "eslint src --ext ts",
+		"pretest": "npm run test-compile && npm run lint",
+		"test-compile": "tsc -p ./",
+		"test-watch": "tsc -watch -p ./",
+		"utils:depcheck": "npx depcheck",
+		"utils:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
+		"utils:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
+		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
+		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.2.14",
-		"@types/fs-extra": "^9.0.4",
-		"@types/js-yaml": "^3.12.5",
-		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
-		"@types/shelljs": "^0.8.8",
-		"@types/tmp": "^0.2.0",
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
+		"@typescript-eslint/eslint-plugin-tslint": "^4.20.0",
 		"@typescript-eslint/parser": "^4.1.1",
-		"chai": "^4.2.0",
 		"eslint": "^7.9.0",
-		"mocha": "^8.2.1",
-		"nyc": "^15.1.0",
 		"standard-version": "^9.0.0",
 		"ts-loader": "^8.0.11",
-		"ts-node": "^9.1.0",
 		"typescript": "^4.0.2",
-		"vscode-test": "^1.4.1",
 		"webpack": "4.44.2",
-		"webpack-cli": "^4.2.0"
+		"webpack-cli": "^4.6.0"
 	},
-	"engines": {
-		"vscode": "^1.51.0"
-	},
-	"icon": "resources/icon.png"
+	"homepage": "https://github.com/retgits/vscode-akkasls-tools",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/retgits/vscode-akkasls-tools"
+	}
 }
