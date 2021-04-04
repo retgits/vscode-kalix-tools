@@ -147,7 +147,7 @@ class UserProjectNode extends ProjectNode {
                 }
                 printTable.push(['Hostnames', names.join('\n')]);
             }
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Project Token details for: ${this.project.friendly_name}`);
         }
     }
 }
@@ -188,7 +188,7 @@ class ContainerRegistryCredentialNode extends ProjectNode {
             printTable.push(['Name', this.getName()]);
             printTable.push(['Server', this.credential.server]);
             printTable.push(['Username', this.credential.username]);
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Container Registry Credential details for: ${this.getName()}`);
         }
     }
 }
@@ -244,7 +244,7 @@ class InviteNode extends ProjectNode {
             printTable.push(['Email address', this.invite.email]);
             printTable.push(['Invited as', this.invite.role_id]);
             printTable.push(['Invited on', new Date(this.invite.created.seconds * 1000).toLocaleDateString()]);
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Invitation details for: ${this.getName()}`);
         }
     }
 }
@@ -303,7 +303,7 @@ class MemberNode extends ProjectNode {
             const printTable = new table({});
             printTable.push(['Name', this.member.user_full_name]);
             printTable.push(['Email address', this.member.user_email]);
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Member details for: ${this.getName()}`);
         }
     }
 }
@@ -358,7 +358,7 @@ class ServiceNode extends ProjectNode {
                 printTable.push(['Container images', containers.join('\n')]);
             }
             printTable.push(['Replicas', this.service.spec?.replicas]);
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Service details for: ${this.service.metadata.name}`);
         }
     }
 }

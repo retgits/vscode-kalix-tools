@@ -74,7 +74,7 @@ export class AuthTokenNode extends AccountNode {
             printTable.push(['Description', this.token.description]);
             printTable.push(['Created on', new Date(this.token.created_time.seconds * 1000).toLocaleDateString()]);
             printTable.push(['Type', this.getType()]);
-            logger.log(printTable.toString());
+            logger.log(printTable.toString(), `Authentication Token details for: ${this.getName()}`);
         }
     }
 }
