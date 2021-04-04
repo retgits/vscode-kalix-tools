@@ -8,9 +8,11 @@ import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
 import { AccountExplorer, AccountNode, AuthTokenNode } from './components/accountexplorer/accountexplorer';
 import { revokeAuthTokenNode, createAuthTokenNode } from './components/accountexplorer/tokenhandler';
-import { ProjectExplorer, ProjectNode, ServiceNode } from './components/projectexplorer/projectexplorer';
+import { InviteNode, ProjectExplorer, ProjectNode, ServiceNode, ContainerRegistryCredentialNode } from './components/projectexplorer/projectexplorer';
 import { createNewProject } from './components/projectexplorer/projecthandler';
-import { showServiceLogs } from './components/projectexplorer/servicelogs';
+import { showServiceLogs, createService, serviceDelete, serviceExpose, serviceUnexpose } from './components/projectexplorer/serviceshandler';
+import { addRegistryCredentials, deleteRegistryCredentials } from './components/projectexplorer/credentialshandler';
+import { sendInvitation, deleteInvitation } from './components/projectexplorer/inviteshandler';
 import { openBrowser } from './browser';
 import { logger } from './logger';
 
@@ -59,6 +61,54 @@ export function activate(context: vscode.ExtensionContext): void {
 	vscode.commands.registerCommand('as.projectExplorer.serviceLogs',  (item: ServiceNode) => showServiceLogs(item));
 	vscode.commands.registerCommand('as.projectExplorer.projectCreate', async () => {
 		const res = await createNewProject();
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.serviceCreate', async (item: ProjectNode) => {
+		const res = await createService(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.serviceDelete', async (item: ServiceNode) => {
+		const res = await serviceDelete(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.serviceExpose', async (item: ServiceNode) => {
+		const res = await serviceExpose(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.serviceUnexpose', async (item: ServiceNode) => {
+		const res = await serviceUnexpose(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.registryCredentialsCreate', async (item: ProjectNode) => {
+		const res = await addRegistryCredentials(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.registryCredentialsDelete', async (item: ContainerRegistryCredentialNode) => {
+		const res = await deleteRegistryCredentials(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.inviteCreate', async (item: ProjectNode) => {
+		const res = await sendInvitation(item);
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.projectExplorer.inviteDelete', async (item: InviteNode) => {
+		const res = await deleteInvitation(item);
 		if (res !== undefined) {
 			projectExplorer.refresh();
 		}

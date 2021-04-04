@@ -104,7 +104,7 @@ export class ProjectExplorer implements vscode.TreeDataProvider<ProjectNode> {
  * @class UserProjectNode
  * @extends {ProjectNode}
  */
-class UserProjectNode extends ProjectNode {
+export class UserProjectNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly project: Project,
@@ -130,6 +130,8 @@ class UserProjectNode extends ProjectNode {
 
     id = this.getName().substring(9);
 
+    parentProjectID = this.id;
+
     tooltip = this.getStatus();
 
     contextValue = PROJECT_ITEM_TYPE;
@@ -151,7 +153,7 @@ class UserProjectNode extends ProjectNode {
                 }
                 printTable.push(['Hostnames', names.join('\n')]);
             }
-            logger.log(printTable.toString(), `Project Token details for: ${this.project.friendly_name}`);
+            logger.log(printTable.toString(), `Project details for: ${this.project.friendly_name}`);
         }
     }
 }
@@ -163,7 +165,7 @@ class UserProjectNode extends ProjectNode {
  * @class ContainerRegistryCredentialNode
  * @extends {ProjectNode}
  */
-class ContainerRegistryCredentialNode extends ProjectNode {
+export class ContainerRegistryCredentialNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -203,7 +205,7 @@ class ContainerRegistryCredentialNode extends ProjectNode {
  * @class InviteNode
  * @extends {ProjectNode}
  */
-class InviteNode extends ProjectNode {
+export class InviteNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -307,7 +309,7 @@ class MemberNode extends ProjectNode {
             const printTable = new table({});
             printTable.push(['Name', this.member.user_full_name]);
             printTable.push(['Email address', this.member.user_email]);
-            logger.log(printTable.toString(), `Member details for: ${this.getName()}`);
+            logger.log(printTable.toString(), `Member details for: ${this.label}`);
         }
     }
 }

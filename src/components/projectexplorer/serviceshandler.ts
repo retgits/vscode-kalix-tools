@@ -6,10 +6,11 @@ import * as vscode from 'vscode';
 import { ChildProcess } from 'child_process';
 
 // Internal dependencies
-import { ServiceNode } from './projectexplorer';
+import { ServiceNode, ProjectNode } from './projectexplorer';
 import { LogTypes, getCurrentCommandConfig } from '../cli/commands';
-import { getServiceLogs } from '../cli/service';
+import { getServiceLogs, deployService, exposeService, unexposeService, deleteService } from '../cli/service';
 import { logger } from '../../logger';
+import { ShellResult } from '../../shell';
 
 // Counter
 let counter: number = 1;
@@ -117,4 +118,102 @@ function servicelogsFollowHandler(cp: ChildProcess) {
 			writeEmitter.fire(`${element}\r\n`);
 		});
 	});
+}
+
+export async function createService(p: ProjectNode): Promise<ShellResult | undefined> {
+    const name = await vscode.window.showInputBox({
+        prompt: 'The name of the service',
+        ignoreFocusOut: true,
+        password: false,
+    });
+
+    if (name === undefined) {
+        return undefined;
+    }
+
+    const image = await vscode.window.showInputBox({
+        prompt: 'The container image URL',
+        ignoreFocusOut: true,
+        password: false,
+    });
+
+    if (image === undefined) {
+        return undefined;
+    }
+
+    const vars = await vscode.window.showInputBox({
+        prompt: 'The environment variables separated by commas, for example MY_VAR1=value1,MY_VAR2="value2 with spaces"',
+        ignoreFocusOut: true,
+        password: false,
+    });
+
+    if (vars === undefined) {
+        return undefined;
+    }
+
+    try {
+        const result = await deployService(name, image, p.parentProjectID, {vars: vars.split(',')}, getCurrentCommandConfig());
+        logger.log(result!.stdout);
+        logger.log(result!.stderr);
+        return result;
+    } catch (ex) {
+        vscode.window.showErrorMessage(ex);
+        return undefined;
+    }
+}
+
+export async function serviceDelete(s: ServiceNode): Promise<ShellResult | undefined> {
+    try {
+        const result = await deleteService(s.id, s.parentProjectID, getCurrentCommandConfig());
+        logger.log(result!.stdout);
+        logger.log(result!.stderr);
+        return result;
+    } catch (ex) {
+        vscode.window.showErrorMessage(ex);
+        return undefined;
+    }
+}
+
+export async function serviceExpose(s: ServiceNode): Promise<ShellResult | undefined> {
+    const flags = await vscode.window.showInputBox({
+        prompt: 'Any additional flags for the expose service, like --enable-cors',
+        ignoreFocusOut: true,
+        password: false,
+    });
+
+    if (flags === undefined) {
+        return undefined;
+    }
+
+    try {
+        const result = await exposeService(s.id, flags, s.parentProjectID, getCurrentCommandConfig());
+        logger.log(result!.stdout);
+        logger.log(result!.stderr);
+        return result;
+    } catch (ex) {
+        vscode.window.showErrorMessage(ex);
+        return undefined;
+    }
+}
+
+export async function serviceUnexpose(s: ServiceNode): Promise<ShellResult | undefined> {
+    const host = await vscode.window.showInputBox({
+        prompt: 'The hostname to remove from the service',
+        ignoreFocusOut: true,
+        password: false,
+    });
+
+    if (host === undefined) {
+        return undefined;
+    }
+
+    try {
+        const result = await unexposeService(s.id, host, s.parentProjectID, getCurrentCommandConfig());
+        logger.log(result!.stdout);
+        logger.log(result!.stderr);
+        return result;
+    } catch (ex) {
+        vscode.window.showErrorMessage(ex);
+        return undefined;
+    }
 }

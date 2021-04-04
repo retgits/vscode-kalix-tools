@@ -7,6 +7,7 @@ import { ChildProcess } from 'child_process';
 
 // Internal dependencies
 import { shell, ShellResult } from '../../shell';
+import { logger } from '../../logger';
 
 export const config = {
     auth: {
@@ -172,6 +173,7 @@ export class Command {
 
     dryRun(): Promise<ShellResult> {
         return new Promise<ShellResult>((resolve) => {
+            logger.log(this.toString());
             resolve({ code: 0, stdout: this.toString(), stderr: '' });
         });
     }
