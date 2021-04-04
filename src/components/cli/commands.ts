@@ -2,6 +2,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+// Standard node imports
+import { ChildProcess } from 'child_process';
+
 // Internal dependencies
 import { shell, ShellResult } from '../../shell';
 
@@ -71,7 +74,37 @@ export interface Parameter {
     name: string;
     value: string;
     addNameToCommand: boolean;
-};
+}
+
+/**
+ * An interface for flags of `akkasls services logs`
+ * * `cloudstateLogs`: Whether cloudstate sidecar logs should be included
+ * * `lifecycleLogs`: Whether lifecycle logs should be included
+ * * `proxyLogs`: Whether HTTP proxy logs should be included
+ * * `serviceLogs`: Whether service logs should be included
+ * * `tail`: The maximum number of lines to fetch
+ *
+ * @interface LogTypes
+ */
+export interface LogTypes {
+    cloudstateLogs?: boolean;
+    lifecycleLogs?: boolean;
+    proxyLogs?: boolean;
+    serviceLogs?: boolean;
+    tail?: number;
+    follow?: boolean;
+    callback: ((proc: ChildProcess) => void);
+}
+
+/**
+ * An interface for environment variables in `akkasls service` commands
+ *  * `vars`: an optional array of strings representing key value pairs (like MSG=Hello)
+ *
+ * @interface EnvVars
+ */
+export interface EnvVars {
+    vars?: string[];
+}
 
 export class Command {
     public readonly command: string;
@@ -141,6 +174,20 @@ export class Command {
         return new Promise<ShellResult>((resolve) => {
             resolve({ code: 0, stdout: this.toString(), stderr: '' });
         });
+    }
+
+    stream(callback: ((proc: ChildProcess) => void)): Promise<ShellResult | undefined> {
+        // When no working directory is provided the default dir is used
+        const wd = (this.workingDir) ? this.workingDir : '.';
+
+        const shellOpts = {
+            env: process.env,
+            async: true,
+            cwd: wd,
+            silent: this.isSilent()
+        };
+
+        return shell.execStreaming(this.toString(), callback, shellOpts);
     }
 
     run(): Promise<ShellResult | undefined> {

@@ -27,13 +27,18 @@
 		"onCommand:as.commandpalette.browser.statuspage",
 		"onView:as.toolsExplorer",
 		"onView:as.statusExplorer",
-		"onView:as.accountExplorer"
+		"onView:as.accountExplorer",
+		"onView:as.projectExplorer"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"configuration": {},
 		"views": {
 			"as": [
+				{
+					"id": "as.projectExplorer",
+					"name": "Projects"
+				},
 				{
 					"id": "as.accountExplorer",
 					"name": "Account & Tokens"
@@ -73,6 +78,11 @@
 					"command": "as.accountExplorer.refresh",
 					"when": "view == as.accountExplorer",
 					"group": "navigation"
+				},
+				{
+					"command": "as.projectExplorer.refresh",
+					"when": "view == as.projectExplorer",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -87,6 +97,10 @@
 				{
 					"command": "as.accountExplorer.tokenInfo",
 					"when": "view == as.accountExplorer && viewItem == Tokens"
+				},
+				{
+					"command": "as.projectExplorer.info",
+					"when": "view == as.projectExplorer"
 				}
 			],
 			"commandPalette": [
@@ -97,6 +111,10 @@
 				{
 					"command": "as.accountExplorer.tokenInfo",
 					"when": "view == as.accountExplorer"
+				},
+				{
+					"command": "as.projectExplorer.info",
+					"when": "view == as.projectExplorer"
 				}
 			]
 		},
@@ -172,6 +190,20 @@
 				"command": "as.accountExplorer.tokenInfo",
 				"title": "Print",
 				"description": "Print the details of the authentication token"
+			},
+			{
+				"command": "as.projectExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the project explorer"
+			},
+			{
+				"command": "as.projectExplorer.info",
+				"title": "Print",
+				"description": "Print the details of the current selected item"
 			}
 		]
 	},

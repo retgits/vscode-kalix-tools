@@ -81,7 +81,7 @@ async function currentUserDetails(): Promise<CurrentLoginNode[] | undefined> {
  * @return {*}  {CurrentLoginNode}
  */
 function getDefaultCurrentLoginNode(): CurrentLoginNode {
-    return new CurrentLoginNode('Current login', '', 'account', vscode.TreeItemCollapsibleState.Collapsed);
+    return new CurrentLoginNode('User', '', 'account', vscode.TreeItemCollapsibleState.Collapsed);
 }
 
 /**

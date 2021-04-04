@@ -7,6 +7,7 @@ import { config } from './config';
 import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
 import { AccountExplorer, AccountNode } from './components/accountexplorer/accountexplorer';
+import { ProjectExplorer, BaseProjectNode } from './components/projectexplorer/projectexplorer';
 import { openBrowser } from './browser';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -34,6 +35,12 @@ export function activate(context: vscode.ExtensionContext): void {
 	vscode.window.registerTreeDataProvider('as.accountExplorer', accountExplorer);
 	vscode.commands.registerCommand('as.accountExplorer.tokenInfo',  (item: AccountNode) => accountExplorer.printTreeItemDetails(item));
 	vscode.commands.registerCommand('as.accountExplorer.refresh', () => accountExplorer.refresh());
+
+	// Project Explorer
+	const projectExplorer = new ProjectExplorer();
+	vscode.window.registerTreeDataProvider('as.projectExplorer', projectExplorer);
+	vscode.commands.registerCommand('as.projectExplorer.info',  (item: BaseProjectNode) => projectExplorer.printTreeItemDetails(item));
+	vscode.commands.registerCommand('as.projectExplorer.refresh', () => projectExplorer.refresh());
 }
 
 export function deactivate(): void {

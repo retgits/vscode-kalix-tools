@@ -41,7 +41,7 @@ interface Shell {
     fileUri(filePath: string): vscode.Uri;
     execOpts(): any;
     exec(cmd: string, opts?: any): Promise<ShellResult | undefined>;
-    execStreaming(cmd: string, callback: ((proc: ChildProcess) => void) | undefined): Promise<ShellResult | undefined>;
+    execStreaming(cmd: string, callback: ((proc: ChildProcess) => void) | undefined, opts?: any): Promise<ShellResult | undefined>;
     execCore(cmd: string, opts: any, callback?: (proc: ChildProcess) => void, stdin?: string): Promise<ShellResult>;
     which(bin: string): string | null;
 }
@@ -170,9 +170,12 @@ async function exec(cmd: string, opts?: any): Promise<ShellResult | undefined> {
  * @param {(proc: ChildProcess) => void} callback The function that handles data from the executed process
  * @return {(Promise<ShellResult | undefined>)} A ShellResult or undefined when an error occurs
  */
-async function execStreaming(cmd: string, callback: (proc: ChildProcess) => void): Promise<ShellResult | undefined> {
+async function execStreaming(cmd: string, callback: (proc: ChildProcess) => void, opts?: any): Promise<ShellResult | undefined> {
     console.log(cmd);
     try {
+        if (opts) {
+            return await execCore(cmd, opts, callback);
+        }
         return await execCore(cmd, execOpts(), callback);
     } catch (ex) {
         vscode.window.showErrorMessage(ex);
