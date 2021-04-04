@@ -24,10 +24,64 @@
 		"onCommand:as.commandpalette.browser.documentation",
 		"onCommand:as.commandpalette.browser.forum",
 		"onCommand:as.commandpalette.browser.ideas",
-		"onCommand:as.commandpalette.browser.statuspage"
+		"onCommand:as.commandpalette.browser.statuspage",
+		"onView:as.toolsExplorer",
+		"onView:as.statusExplorer"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {},
+		"views": {
+			"as": [
+                {
+                    "id": "as.statusExplorer",
+                    "name": "Status"
+                },
+				{
+                    "id": "as.toolsExplorer",
+                    "name": "Tools"
+                }
+            ]
+		},
+		"viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "as",
+                    "title": "Akka Serverless",
+                    "icon": "resources/akka-icon-reverse.svg"
+                }
+            ]
+        },
+		"menus": {
+			"view/title": [
+				{
+                    "command": "as.toolsExplorer.refresh",
+                    "when": "view == as.toolsExplorer",
+                    "group": "navigation"
+                },
+				{
+                    "command": "as.statusExplorer.refresh",
+                    "when": "view == as.statusExplorer",
+                    "group": "navigation"
+                }
+			],
+			"view/item/context": [
+				{
+                    "command": "as.toolsExplorer.info",
+                    "when": "view == as.toolsExplorer && viewItem == Tools"
+                },
+				{
+                    "command": "as.statusExplorer.info",
+                    "when": "view == as.statusExplorer"
+                }
+			],
+			"commandPalette": [
+				{
+                    "command": "as.toolsExplorer.info",
+                    "when": "view == as.toolsExplorer"
+                }
+			]
+		},
 		"commands": [
 			{
 				"command": "as.commandpalette.browser.console",
@@ -58,7 +112,35 @@
 				"title": "Open status page",
 				"category": "Akka Serverless",
 				"description": "Open the Akka Serverless status page in a browser window"
-			}
+			},
+			{
+                "command": "as.toolsExplorer.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                },
+                "description": "Refresh the tools explorer"
+            },
+			{
+                "command": "as.toolsExplorer.info",
+                "title": "Get info",
+                "description": "Open the info page for a tool in a browser window"
+            },
+			{
+                "command": "as.statusExplorer.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                },
+                "description": "Refresh the status explorer"
+            },
+			{
+                "command": "as.statusExplorer.info",
+                "title": "Get info",
+                "description": "Open the Akka Serverless status page in your browser"
+            }
 		]
 	},
 	"scripts": {
@@ -75,6 +157,7 @@
 		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
 	},
 	"devDependencies": {
+		"@types/shelljs": "^0.8.8",
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/eslint-plugin-tslint": "^4.20.0",
@@ -90,5 +173,9 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/retgits/vscode-akkasls-tools"
+	},
+	"dependencies": {
+		"axios": "^0.21.1",
+		"shelljs": "^0.8.4"
 	}
 }
