@@ -18,8 +18,7 @@ export class Logger {
      */
     public log(message: string, title?: string): void {
         if (title) {
-            const simplifiedTime = (new Date()).toISOString().replace(/z|t/gi, ' ').trim(); // YYYY-MM-DD HH:mm:ss.sss
-            const hightlightingTitle = `[${title} ${simplifiedTime}]`;
+            const hightlightingTitle = `[${title}]\n`;
             this._channel.appendLine(hightlightingTitle);
         }
         this._channel.appendLine(message);
