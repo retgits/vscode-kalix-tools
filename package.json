@@ -38,17 +38,17 @@
 				"akkaserverless.dryrun": {
 					"type": "boolean",
 					"default": false,
-					"description": "If true will print the commands in the log rather than execute them"
+					"description": "Whether commands will be printed in the logs rather than execute them"
 				},
 				"akkaserverless.logOutput": {
 					"type": "boolean",
 					"default": false,
-					"description": "If true will log output from the Akka Serverless CLI in the akkasls output window"
+					"description": "Whether the result of the akkasls command is shown in the logs"
 				},
 				"akkaserverless.configFile": {
 					"type": "string",
 					"default": null,
-					"description": "Location of the config file if you want to override it"
+					"description": "Location of the config file to use (default ~/.akkaserverless/config.yaml)"
 				},
 				"akkaserverless.context": {
 					"type": "string",

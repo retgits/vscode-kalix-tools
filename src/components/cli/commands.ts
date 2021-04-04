@@ -208,7 +208,8 @@ export class Command {
 export function getCurrentCommandConfig(): commandConfig {
     return {
         dryrun: vscode.workspace.getConfiguration('akkaserverless').get<boolean>('dryrun'),
-        silent: vscode.workspace.getConfiguration('akkaserverless').get<boolean>('logOutput'),
+        // The log output asks a positive question so the inverse should be used to determine the result
+        silent: !vscode.workspace.getConfiguration('akkaserverless').get<boolean>('logOutput'),
         configFile: vscode.workspace.getConfiguration('akkaserverless').get<string>('configFile'),
         context: vscode.workspace.getConfiguration('akkaserverless').get<string>('context')
     };
