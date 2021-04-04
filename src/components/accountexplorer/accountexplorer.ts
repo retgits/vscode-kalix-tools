@@ -40,7 +40,7 @@ export abstract class AccountNode extends vscode.TreeItem {
  * @extends {AccountNode}
  */
 export class AuthTokenNode extends AccountNode {
-    private readonly _tokenElements: string[] = [];
+    readonly _tokenElements: string[] = [];
 
     constructor(
         public readonly label: string,

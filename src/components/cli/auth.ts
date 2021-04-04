@@ -177,10 +177,10 @@ export async function revokeAuthToken(tokenID: string, cc: commandConfig): Promi
  */
 export async function createAuthToken(type: string, scopes: string, description: string, cc: commandConfig): Promise<ShellResult | undefined> {
     // Create the command
-    const command = new Command(config.auth.revokeAuthToken);
+    const command = new Command(config.auth.createAuthToken);
     command.addParameter({name: 'type', value: type, addNameToCommand: true});
     command.addParameter({name: 'scopes', value: scopes, addNameToCommand: true});
-    command.addParameter({name: 'description', value: description, addNameToCommand: true});
+    command.addParameter({name: 'description', value: `"${description}"`, addNameToCommand: true});
 
     // Set parameters
     command.setSilent(cc.silent);

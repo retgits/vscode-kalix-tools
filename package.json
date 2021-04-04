@@ -107,7 +107,12 @@
 					"command": "as.projectExplorer.refresh",
 					"when": "view == as.projectExplorer",
 					"group": "navigation"
-				}
+				},
+				{
+                    "command": "as.accountExplorer.tokenCreate",
+					"when": "view == as.accountExplorer",
+                    "group": "0"
+                }
 			],
 			"view/item/context": [
 				{
@@ -120,7 +125,13 @@
 				},
 				{
 					"command": "as.accountExplorer.tokenInfo",
-					"when": "view == as.accountExplorer && viewItem == Tokens"
+					"when": "view == as.accountExplorer && viewItem == Tokens",
+					"group": "0"
+				},
+				{
+					"command": "as.accountExplorer.tokenRevoke",
+					"when": "view == as.accountExplorer && viewItem == Tokens",
+					"group": "1"
 				},
 				{
 					"command": "as.projectExplorer.info",
@@ -138,6 +149,14 @@
 				},
 				{
 					"command": "as.accountExplorer.tokenInfo",
+					"when": "view == as.accountExplorer"
+				},
+				{
+					"command": "as.accountExplorer.tokenRevoke",
+					"when": "view == as.accountExplorer"
+				},
+				{
+					"command": "as.accountExplorer.tokenCreate",
 					"when": "view == as.accountExplorer"
 				},
 				{
@@ -220,8 +239,18 @@
 			},
 			{
 				"command": "as.accountExplorer.tokenInfo",
-				"title": "Print",
-				"description": "Print the details of the authentication token"
+				"title": "Show details",
+				"description": "Show the details of the authentication token"
+			},
+			{
+				"command": "as.accountExplorer.tokenRevoke",
+				"title": "Revoke",
+				"description": "Revoke a selected authentication token"
+			},
+			{
+				"command": "as.accountExplorer.tokenCreate",
+				"title": "Create a new token",
+				"description": "Create a new authentication token"
 			},
 			{
 				"command": "as.projectExplorer.refresh",
@@ -234,13 +263,13 @@
 			},
 			{
 				"command": "as.projectExplorer.info",
-				"title": "Print",
-				"description": "Print the details of the current selected item"
+				"title": "Show details",
+				"description": "Show the details of the current selected item"
 			},
 			{
 				"command": "as.projectExplorer.serviceLogs",
 				"title": "Logs",
-				"description": "Print the logs of a service based on selected parameters"
+				"description": "Show the logs of a service based on selected parameters"
 			}
 		]
 	},

@@ -6,7 +6,8 @@ import * as vscode from 'vscode';
 import { config } from './config';
 import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
-import { AccountExplorer, AccountNode } from './components/accountexplorer/accountexplorer';
+import { AccountExplorer, AccountNode, AuthTokenNode } from './components/accountexplorer/accountexplorer';
+import { revokeAuthTokenNode, createAuthTokenNode } from './components/accountexplorer/tokenhandler';
 import { ProjectExplorer, ProjectNode, ServiceNode } from './components/projectexplorer/projectexplorer';
 import { showServiceLogs } from './components/projectexplorer/servicelogs';
 import { openBrowser } from './browser';
@@ -36,6 +37,18 @@ export function activate(context: vscode.ExtensionContext): void {
 	const accountExplorer = new AccountExplorer();
 	vscode.window.registerTreeDataProvider('as.accountExplorer', accountExplorer);
 	vscode.commands.registerCommand('as.accountExplorer.tokenInfo',  (item: AccountNode) => accountExplorer.print(item));
+	vscode.commands.registerCommand('as.accountExplorer.tokenRevoke',  async (item: AuthTokenNode) => {
+		const res = await revokeAuthTokenNode(item);
+		if (res !== undefined) {
+			accountExplorer.refresh();
+		}
+	});
+	vscode.commands.registerCommand('as.accountExplorer.tokenCreate', async () => {
+		const res = await createAuthTokenNode();
+		if (res !== undefined) {
+			accountExplorer.refresh();
+		}
+	});
 	vscode.commands.registerCommand('as.accountExplorer.refresh', () => accountExplorer.refresh());
 
 	// Project Explorer
