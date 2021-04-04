@@ -9,6 +9,7 @@ import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplore
 import { AccountExplorer, AccountNode, AuthTokenNode } from './components/accountexplorer/accountexplorer';
 import { revokeAuthTokenNode, createAuthTokenNode } from './components/accountexplorer/tokenhandler';
 import { ProjectExplorer, ProjectNode, ServiceNode } from './components/projectexplorer/projectexplorer';
+import { createNewProject } from './components/projectexplorer/projecthandler';
 import { showServiceLogs } from './components/projectexplorer/servicelogs';
 import { openBrowser } from './browser';
 import { logger } from './logger';
@@ -56,6 +57,12 @@ export function activate(context: vscode.ExtensionContext): void {
 	vscode.window.registerTreeDataProvider('as.projectExplorer', projectExplorer);
 	vscode.commands.registerCommand('as.projectExplorer.info',  (item: ProjectNode) => projectExplorer.print(item));
 	vscode.commands.registerCommand('as.projectExplorer.serviceLogs',  (item: ServiceNode) => showServiceLogs(item));
+	vscode.commands.registerCommand('as.projectExplorer.projectCreate', async () => {
+		const res = await createNewProject();
+		if (res !== undefined) {
+			projectExplorer.refresh();
+		}
+	});
 	vscode.commands.registerCommand('as.projectExplorer.refresh', () => projectExplorer.refresh());
 }
 

@@ -104,13 +104,18 @@
 					"group": "navigation"
 				},
 				{
+                    "command": "as.accountExplorer.tokenCreate",
+					"when": "view == as.accountExplorer",
+                    "group": "0"
+                },
+				{
 					"command": "as.projectExplorer.refresh",
 					"when": "view == as.projectExplorer",
 					"group": "navigation"
 				},
 				{
-                    "command": "as.accountExplorer.tokenCreate",
-					"when": "view == as.accountExplorer",
+                    "command": "as.projectExplorer.projectCreate",
+					"when": "view == as.projectExplorer",
                     "group": "0"
                 }
 			],
@@ -165,6 +170,10 @@
 				},
 				{
 					"command": "as.projectExplorer.serviceLogs",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.projectCreate",
 					"when": "view == as.projectExplorer"
 				}
 			]
@@ -270,6 +279,11 @@
 				"command": "as.projectExplorer.serviceLogs",
 				"title": "Logs",
 				"description": "Show the logs of a service based on selected parameters"
+			},
+			{
+				"command": "as.projectExplorer.projectCreate",
+				"title": "Create a new project",
+				"description": "Create a new project"
 			}
 		]
 	},
