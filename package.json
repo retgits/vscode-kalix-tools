@@ -32,7 +32,31 @@
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
-		"configuration": {},
+		"configuration": {
+			"title": "Akka Serverless",
+			"properties": {
+				"akkaserverless.dryrun": {
+					"type": "boolean",
+					"default": false,
+					"description": "If true will print the commands in the log rather than execute them"
+				},
+				"akkaserverless.logOutput": {
+					"type": "boolean",
+					"default": false,
+					"description": "If true will log output from the Akka Serverless CLI in the akkasls output window"
+				},
+				"akkaserverless.configFile": {
+					"type": "string",
+					"default": null,
+					"description": "Location of the config file if you want to override it"
+				},
+				"akkaserverless.context": {
+					"type": "string",
+					"default": null,
+					"description": "The context to use"
+				}
+			}
+		},
 		"views": {
 			"as": [
 				{

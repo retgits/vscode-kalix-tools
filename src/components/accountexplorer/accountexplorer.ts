@@ -8,7 +8,7 @@ import * as vscode from 'vscode';
 import * as table from 'cli-table3';
 
 // Internal dependencies
-import { currentLogin, CurrentLogin, Token, listAuthTokens } from '../cli/auth/auth';
+import { currentLogin, CurrentLogin, Token, listAuthTokens } from '../cli/auth';
 import { getCurrentCommandConfig } from '../cli/commands';
 import { logger } from '../../logger';
 

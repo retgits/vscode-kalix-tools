@@ -6,10 +6,10 @@ import * as vscode from 'vscode';
 import * as table from 'cli-table3';
 
 // Internal dependencies
-import { Credential, listDockerCredentials } from '../cli/docker/docker';
-import { Invite, listInvites, Member, listMembers } from '../cli/roles/roles';
-import { Project, listProjects } from '../cli/project/project';
-import { Service, listServices } from '../cli/service/service';
+import { Credential, listDockerCredentials } from '../cli/docker';
+import { Invite, listInvites, Member, listMembers } from '../cli/roles';
+import { Project, listProjects } from '../cli/project';
+import { Service, listServices } from '../cli/service';
 import { getCurrentCommandConfig } from '../cli/commands';
 import { logger } from '../../logger';
 

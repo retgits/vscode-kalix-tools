@@ -1,6 +1,6 @@
 // Internal dependencies
-import { config, commandConfig, Command } from '../commands';
-import { ShellResult } from '../../../shell';
+import { config, commandConfig, Command } from './commands';
+import { ShellResult } from '../../shell';
 
 export interface Credential {
     name:     string;

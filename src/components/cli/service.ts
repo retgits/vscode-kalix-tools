@@ -1,6 +1,6 @@
 // Internal dependencies
-import { config, commandConfig, Command, EnvVars, LogTypes } from '../commands';
-import { ShellResult } from '../../../shell';
+import { config, commandConfig, Command, EnvVars, LogTypes } from './commands';
+import { ShellResult } from '../../shell';
 
 export interface Condition {
     type?: string;

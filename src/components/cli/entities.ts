@@ -1,6 +1,6 @@
 // Internal dependencies
-import { config, commandConfig, Command } from '../commands';
-import { ShellResult } from '../../../shell';
+import { config, commandConfig, Command } from './commands';
+import { ShellResult } from '../../shell';
 
 /**
  * The generateNpmJs command generates an initial Akka Serverless Javascript codebase using NPM
