@@ -22,10 +22,11 @@ enum OS {
  * The interface ShellResult encapsulates the result returned by the external command.
  * Both the standard output and standard error as well as the result code are returned.
  */
-interface ShellResult {
+export interface ShellResult {
     readonly code: number;
     readonly stdout: string;
     readonly stderr: string;
+    response?: any;
 }
 
 /**
@@ -39,7 +40,7 @@ interface Shell {
     combinePath(basePath: string, relativePath: string): string;
     fileUri(filePath: string): vscode.Uri;
     execOpts(): any;
-    exec(cmd: string, stdin?: string): Promise<ShellResult | undefined>;
+    exec(cmd: string, opts?: any): Promise<ShellResult | undefined>;
     execStreaming(cmd: string, callback: ((proc: ChildProcess) => void) | undefined): Promise<ShellResult | undefined>;
     execCore(cmd: string, opts: any, callback?: (proc: ChildProcess) => void, stdin?: string): Promise<ShellResult>;
     which(bin: string): string | null;
@@ -147,10 +148,14 @@ function execOpts(): any {
  * The exec command runs the command passed in and returns a ShellResult
  *
  * @param {string} cmd The command to execute
+ * @param {*} opts The execution options to pass in (if none are provided, the default is used)
  * @return {(Promise<ShellResult | undefined>)} A ShellResult or undefined when an error occurs
  */
-async function exec(cmd: string): Promise<ShellResult | undefined> {
+async function exec(cmd: string, opts?: any): Promise<ShellResult | undefined> {
     try {
+        if (opts) {
+            return await execCore(cmd, opts, null);
+        }
         return await execCore(cmd, execOpts(), null);
     } catch (ex) {
         vscode.window.showErrorMessage(ex);

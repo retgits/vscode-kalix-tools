@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { config } from './config';
 import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
+import { AccountExplorer, AccountNode } from './components/accountexplorer/accountexplorer';
 import { openBrowser } from './browser';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -27,6 +28,12 @@ export function activate(context: vscode.ExtensionContext): void {
 	vscode.window.registerTreeDataProvider('as.statusExplorer', statusExplorer);
 	vscode.commands.registerCommand('as.statusExplorer.info',  () => statusExplorer.openStatusInfoPage());
 	vscode.commands.registerCommand('as.statusExplorer.refresh', () => statusExplorer.refresh());
+
+	// Account Explorer
+	const accountExplorer = new AccountExplorer();
+	vscode.window.registerTreeDataProvider('as.accountExplorer', accountExplorer);
+	vscode.commands.registerCommand('as.accountExplorer.tokenInfo',  (item: AccountNode) => accountExplorer.printTreeItemDetails(item));
+	vscode.commands.registerCommand('as.accountExplorer.refresh', () => accountExplorer.refresh());
 }
 
 export function deactivate(): void {

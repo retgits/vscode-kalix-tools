@@ -26,60 +26,78 @@
 		"onCommand:as.commandpalette.browser.ideas",
 		"onCommand:as.commandpalette.browser.statuspage",
 		"onView:as.toolsExplorer",
-		"onView:as.statusExplorer"
+		"onView:as.statusExplorer",
+		"onView:as.accountExplorer"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"configuration": {},
 		"views": {
 			"as": [
-                {
-                    "id": "as.statusExplorer",
-                    "name": "Status"
-                },
 				{
-                    "id": "as.toolsExplorer",
-                    "name": "Tools"
-                }
-            ]
+					"id": "as.accountExplorer",
+					"name": "Account & Tokens"
+				},
+				{
+					"id": "as.statusExplorer",
+					"name": "Status"
+				},
+				{
+					"id": "as.toolsExplorer",
+					"name": "Tools"
+				}
+			]
 		},
 		"viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "as",
-                    "title": "Akka Serverless",
-                    "icon": "resources/akka-icon-reverse.svg"
-                }
-            ]
-        },
+			"activitybar": [
+				{
+					"id": "as",
+					"title": "Akka Serverless",
+					"icon": "resources/akka-icon-reverse.svg"
+				}
+			]
+		},
 		"menus": {
 			"view/title": [
 				{
-                    "command": "as.toolsExplorer.refresh",
-                    "when": "view == as.toolsExplorer",
-                    "group": "navigation"
-                },
+					"command": "as.toolsExplorer.refresh",
+					"when": "view == as.toolsExplorer",
+					"group": "navigation"
+				},
 				{
-                    "command": "as.statusExplorer.refresh",
-                    "when": "view == as.statusExplorer",
-                    "group": "navigation"
-                }
+					"command": "as.statusExplorer.refresh",
+					"when": "view == as.statusExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "as.accountExplorer.refresh",
+					"when": "view == as.accountExplorer",
+					"group": "navigation"
+				}
 			],
 			"view/item/context": [
 				{
-                    "command": "as.toolsExplorer.info",
-                    "when": "view == as.toolsExplorer && viewItem == Tools"
-                },
+					"command": "as.toolsExplorer.info",
+					"when": "view == as.toolsExplorer && viewItem == Tools"
+				},
 				{
-                    "command": "as.statusExplorer.info",
-                    "when": "view == as.statusExplorer"
-                }
+					"command": "as.statusExplorer.info",
+					"when": "view == as.statusExplorer"
+				},
+				{
+					"command": "as.accountExplorer.tokenInfo",
+					"when": "view == as.accountExplorer && viewItem == Tokens"
+				}
 			],
 			"commandPalette": [
 				{
-                    "command": "as.toolsExplorer.info",
-                    "when": "view == as.toolsExplorer"
-                }
+					"command": "as.toolsExplorer.info",
+					"when": "view == as.toolsExplorer"
+				},
+				{
+					"command": "as.accountExplorer.tokenInfo",
+					"when": "view == as.accountExplorer"
+				}
 			]
 		},
 		"commands": [
@@ -114,33 +132,47 @@
 				"description": "Open the Akka Serverless status page in a browser window"
 			},
 			{
-                "command": "as.toolsExplorer.refresh",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                },
-                "description": "Refresh the tools explorer"
-            },
+				"command": "as.toolsExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the tools explorer"
+			},
 			{
-                "command": "as.toolsExplorer.info",
-                "title": "Get info",
-                "description": "Open the info page for a tool in a browser window"
-            },
+				"command": "as.toolsExplorer.info",
+				"title": "Get info",
+				"description": "Open the info page for a tool in a browser window"
+			},
 			{
-                "command": "as.statusExplorer.refresh",
-                "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                },
-                "description": "Refresh the status explorer"
-            },
+				"command": "as.statusExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the status explorer"
+			},
 			{
-                "command": "as.statusExplorer.info",
-                "title": "Get info",
-                "description": "Open the Akka Serverless status page in your browser"
-            }
+				"command": "as.statusExplorer.info",
+				"title": "Get info",
+				"description": "Open the Akka Serverless status page in your browser"
+			},
+			{
+				"command": "as.accountExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the account explorer"
+			},
+			{
+				"command": "as.accountExplorer.tokenInfo",
+				"title": "Print",
+				"description": "Print the details of the authentication token"
+			}
 		]
 	},
 	"scripts": {
@@ -176,6 +208,7 @@
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
+		"cli-table3": "^0.6.0",
 		"shelljs": "^0.8.4"
 	}
 }
