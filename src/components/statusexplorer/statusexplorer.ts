@@ -9,7 +9,7 @@ import axios from 'axios';
 import { config } from '../../config';
 import { openBrowser } from '../../browser';
 
-const CHECK_CODICON = 'check';
+const CHECK_CODICON = 'pass';
 const ERROR_CODICON = 'error';
 
 /**
