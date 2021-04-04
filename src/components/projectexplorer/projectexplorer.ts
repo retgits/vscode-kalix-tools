@@ -113,6 +113,10 @@ class UserProjectNode extends ProjectNode {
         super(label, collapsibleState, PROJECT_ITEM_TYPE);
     }
 
+    toString(): string {
+        return this.label;
+    }
+
     getName(): string {
         return this.project.name;
     }
@@ -383,7 +387,7 @@ async function getUserProjects(): Promise<UserProjectNode[] | undefined> {
         projects.push(new UserProjectNode(project.friendly_name, project, vscode.TreeItemCollapsibleState.Collapsed));
     }
 
-    return projects;
+    return projects.sort();
 }
 
 /**
