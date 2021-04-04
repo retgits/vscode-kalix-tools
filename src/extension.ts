@@ -7,7 +7,8 @@ import { config } from './config';
 import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
 import { AccountExplorer, AccountNode } from './components/accountexplorer/accountexplorer';
-import { ProjectExplorer, ProjectNode } from './components/projectexplorer/projectexplorer';
+import { ProjectExplorer, ProjectNode, ServiceNode } from './components/projectexplorer/projectexplorer';
+import { showServiceLogs } from './components/projectexplorer/servicelogs';
 import { openBrowser } from './browser';
 import { logger } from './logger';
 
@@ -41,6 +42,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	const projectExplorer = new ProjectExplorer();
 	vscode.window.registerTreeDataProvider('as.projectExplorer', projectExplorer);
 	vscode.commands.registerCommand('as.projectExplorer.info',  (item: ProjectNode) => projectExplorer.print(item));
+	vscode.commands.registerCommand('as.projectExplorer.serviceLogs',  (item: ServiceNode) => showServiceLogs(item));
 	vscode.commands.registerCommand('as.projectExplorer.refresh', () => projectExplorer.refresh());
 }
 

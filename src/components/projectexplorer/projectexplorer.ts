@@ -314,7 +314,7 @@ class MemberNode extends ProjectNode {
  * @class ServiceNode
  * @extends {ProjectNode}
  */
-class ServiceNode extends ProjectNode {
+export class ServiceNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,

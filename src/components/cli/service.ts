@@ -244,6 +244,10 @@ export async function getServiceLogs(service: string, projectID: string, lt: Log
         command.addParameter({ name: 'tail', value: `${lt.tail}`, addNameToCommand: true });
     }
 
+    if (lt.follow) {
+        command.addParameter({ name: 'follow', value: '--follow', addNameToCommand: false });
+    }
+
     // Set parameters
     command.setSilent(cc.silent);
     command.setConfigFile(cc.configFile);
@@ -254,7 +258,7 @@ export async function getServiceLogs(service: string, projectID: string, lt: Log
         return command.dryRun();
     }
 
-    if (lt.follow) {
+    if (lt.follow && lt.callback) {
         return command.stream(lt.callback);
     }
 

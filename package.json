@@ -125,6 +125,10 @@
 				{
 					"command": "as.projectExplorer.info",
 					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.serviceLogs",
+					"when": "view == as.projectExplorer && viewItem == Services"
 				}
 			],
 			"commandPalette": [
@@ -138,6 +142,10 @@
 				},
 				{
 					"command": "as.projectExplorer.info",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.serviceLogs",
 					"when": "view == as.projectExplorer"
 				}
 			]
@@ -228,6 +236,11 @@
 				"command": "as.projectExplorer.info",
 				"title": "Print",
 				"description": "Print the details of the current selected item"
+			},
+			{
+				"command": "as.projectExplorer.serviceLogs",
+				"title": "Logs",
+				"description": "Print the logs of a service based on selected parameters"
 			}
 		]
 	},

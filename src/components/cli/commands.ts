@@ -93,7 +93,7 @@ export interface LogTypes {
     serviceLogs?: boolean;
     tail?: number;
     follow?: boolean;
-    callback: ((proc: ChildProcess) => void);
+    callback?: ((proc: ChildProcess) => void);
 }
 
 /**
