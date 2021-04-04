@@ -7,8 +7,9 @@ import { config } from './config';
 import { StatusExplorer } from './components/statusexplorer/statusexplorer';
 import { ToolsExplorer, ToolNode } from './components/toolsexplorer/toolsexplorer';
 import { AccountExplorer, AccountNode } from './components/accountexplorer/accountexplorer';
-import { ProjectExplorer, BaseProjectNode } from './components/projectexplorer/projectexplorer';
+import { ProjectExplorer, ProjectNode } from './components/projectexplorer/projectexplorer';
 import { openBrowser } from './browser';
+import { logger } from './logger';
 
 export function activate(context: vscode.ExtensionContext): void {
 	// Menu Items
@@ -33,16 +34,17 @@ export function activate(context: vscode.ExtensionContext): void {
 	// Account Explorer
 	const accountExplorer = new AccountExplorer();
 	vscode.window.registerTreeDataProvider('as.accountExplorer', accountExplorer);
-	vscode.commands.registerCommand('as.accountExplorer.tokenInfo',  (item: AccountNode) => accountExplorer.printTreeItemDetails(item));
+	vscode.commands.registerCommand('as.accountExplorer.tokenInfo',  (item: AccountNode) => accountExplorer.print(item));
 	vscode.commands.registerCommand('as.accountExplorer.refresh', () => accountExplorer.refresh());
 
 	// Project Explorer
 	const projectExplorer = new ProjectExplorer();
 	vscode.window.registerTreeDataProvider('as.projectExplorer', projectExplorer);
-	vscode.commands.registerCommand('as.projectExplorer.info',  (item: BaseProjectNode) => projectExplorer.printTreeItemDetails(item));
+	vscode.commands.registerCommand('as.projectExplorer.info',  (item: ProjectNode) => projectExplorer.print(item));
 	vscode.commands.registerCommand('as.projectExplorer.refresh', () => projectExplorer.refresh());
 }
 
 export function deactivate(): void {
-
+	// Dispose of the logger
+	logger.dispose();
 }

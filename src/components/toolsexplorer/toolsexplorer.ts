@@ -10,6 +10,7 @@ import { config } from '../../config';
 import { shell } from '../../shell';
 import { openBrowser } from '../../browser';
 
+// Constants
 const EXISTS_CODICON = 'pass';
 const NOT_EXISTS_CODICON = 'error';
 const TOOLS_CONTEXT_VALUE = 'Tools';
@@ -18,7 +19,7 @@ const TOOLS_CONTEXT_VALUE = 'Tools';
  * The interface Tool is a representation of a command line tool that can be used by the
  * Akka Serverless VS Code extension.
  */
-export interface Tool {
+interface Tool {
     name: string;
     versionCmd: string;
     toolTip?: string;
@@ -58,63 +59,6 @@ export class ToolNode extends vscode.TreeItem {
 }
 
 /**
- * The getToolNodes command reads the required tools from the config module and
- * returns an array of ToolNodes to be presented in the ToolTree
- *
- * @return {*}  {Promise<ToolNode[]>}
- */
-export async function getToolNodes(): Promise<ToolNode[]> {
-    const tools: ToolNode[] = [];
-
-    for (const tool of config.tools) {
-        const version = await getVersion(tool);
-        if (version) {
-            tool.currentVersion = version;
-        }
-        tools.push(new ToolNode(tool.name, tool, vscode.TreeItemCollapsibleState.None));
-    }
-
-    return tools;
-}
-
-/**
- * The getVersion command tries to get the version of a tool and checks whether updates
- * are available.
- *
- * @param {Tool} tool The tool to get the version for
- * @return {*}  {Promise<string>} A promise of the tool version as a string
- */
-async function getVersion(tool: Tool): Promise<string | undefined> {
-    // Get the version
-    const result = await shell.exec(`${tool.name} ${tool.versionCmd}`);
-    if (result) {
-        tool.currentVersion = result.stdout;
-        if (tool.updateURL) {
-            checkUpdatesAvailable(tool);
-        }
-        return tool.currentVersion;
-    }
-
-    return undefined;
-}
-
-/**
- * The checkUpdatesAvailable checks whether the current version of the tool is the latest
- * available version. If not, a warning message will be displayed that a nwer version is
- * avaialble.
- *
- * @param {Tool} tool The tool to check updates for
- * @param {string} version The current version of the tool
- */
-function checkUpdatesAvailable(tool: Tool) {
-    axios.get(tool.updateURL!).then((response) => {
-        if (response.data !== tool.currentVersion) {
-            vscode.window.showErrorMessage(`There is a newer version of ${tool.name} available! You have ${tool.currentVersion} and ${response.data} is the latest version`);
-        }
-    });
-}
-
-/**
  * The ToolExplorer represents a tree of tools that can be shown and interacted with
  *
  * @class ToolsExplorer
@@ -141,4 +85,61 @@ export class ToolsExplorer implements vscode.TreeDataProvider<ToolNode> {
             openBrowser(item.tool.infoURL);
         }
     }
+}
+
+/**
+ * The getToolNodes command reads the required tools from the config module and
+ * returns an array of ToolNodes to be presented in the ToolTree
+ *
+ * @return {*}  {Promise<ToolNode[]>}
+ */
+async function getToolNodes(): Promise<ToolNode[]> {
+    const tools: ToolNode[] = [];
+
+    for (const tool of config.tools) {
+        const version = await getToolVersion(tool);
+        if (version) {
+            tool.currentVersion = version;
+        }
+        tools.push(new ToolNode(tool.name, tool, vscode.TreeItemCollapsibleState.None));
+    }
+
+    return tools;
+}
+
+/**
+ * The getToolVersion command tries to get the version of a tool and checks whether updates
+ * are available.
+ *
+ * @param {Tool} tool The tool to get the version for
+ * @return {*}  {Promise<string>} A promise of the tool version as a string
+ */
+async function getToolVersion(tool: Tool): Promise<string | undefined> {
+    // Get the version
+    const result = await shell.exec(`${tool.name} ${tool.versionCmd}`);
+    if (result) {
+        tool.currentVersion = result.stdout;
+        if (tool.updateURL) {
+            checkToolUpdates(tool);
+        }
+        return tool.currentVersion;
+    }
+
+    return undefined;
+}
+
+/**
+ * The checkToolUpdates checks whether the current version of the tool is the latest
+ * available version. If not, a warning message will be displayed that a nwer version is
+ * avaialble.
+ *
+ * @param {Tool} tool The tool to check updates for
+ * @param {string} version The current version of the tool
+ */
+function checkToolUpdates(tool: Tool) {
+    axios.get(tool.updateURL!).then((response) => {
+        if (response.data !== tool.currentVersion) {
+            vscode.window.showWarningMessage(`There is a newer version of ${tool.name} available! You have ${tool.currentVersion} and ${response.data} is the latest version`);
+        }
+    });
 }

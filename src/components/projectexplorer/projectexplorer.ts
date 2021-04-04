@@ -13,6 +13,7 @@ import { Service, listServices } from '../cli/service';
 import { getCurrentCommandConfig } from '../cli/commands';
 import { logger } from '../../logger';
 
+// Constants
 const DOCKER_ITEM_TYPE = 'Credentials';
 const INVITE_ITEM_TYPE = 'Invites';
 const MEMBER_ITEM_TYPE = 'Members';
@@ -22,10 +23,11 @@ const SERVICE_ITEM_TYPE = 'Services';
 /**
  * The BaseProjectNode is the base node for all project explorer nodes
  *
+ * @export
  * @class BaseProjectNode
  * @extends {vscode.TreeItem}
  */
-export abstract class BaseProjectNode extends vscode.TreeItem {
+export abstract class ProjectNode extends vscode.TreeItem {
     public readonly type: string;
     public readonly parentProjectID: string;
 
@@ -35,17 +37,129 @@ export abstract class BaseProjectNode extends vscode.TreeItem {
         this.parentProjectID = (parentProjectID) ? parentProjectID : 'none';
     }
 
-    abstract printDetails(): void;
+    abstract print(): void;
 }
 
 /**
- *
+ * The ProjectExplorer represents a tree of projects and related items that can be shown
+ * and interacted with
  *
  * @export
- * @class ContainerCredentialNode
- * @extends {BaseProjectNode}
+ * @class ProjectExplorer
+ * @implements {vscode.TreeDataProvider<ProjectNode>}
  */
-class ContainerCredentialNode extends BaseProjectNode {
+export class ProjectExplorer implements vscode.TreeDataProvider<ProjectNode> {
+    private _onDidChangeTreeData: vscode.EventEmitter<ProjectNode | undefined | void> = new vscode.EventEmitter<ProjectNode | undefined | void>();
+    readonly onDidChangeTreeData: vscode.Event<ProjectNode | undefined | void> = this._onDidChangeTreeData.event;
+
+    refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
+
+    getTreeItem(element: ProjectNode): vscode.TreeItem {
+        return element;
+    }
+
+    getChildren(element?: ProjectNode): Thenable<ProjectNode[] | undefined> {
+        if (element) {
+            switch (element.type) {
+                case PROJECT_ITEM_TYPE:
+                    return Promise.resolve(this.getDefaultProjectItems(element.id!));
+                case SERVICE_ITEM_TYPE:
+                    return Promise.resolve(getServices(element.parentProjectID));
+                case MEMBER_ITEM_TYPE:
+                    return Promise.resolve(getMembers(element.parentProjectID));
+                case INVITE_ITEM_TYPE:
+                    return Promise.resolve(getInvites(element.parentProjectID));
+                case DOCKER_ITEM_TYPE:
+                    return Promise.resolve(getContainerRegistryCredentials(element.parentProjectID));
+                default:
+                    break;
+            }
+            return Promise.resolve([]);
+        }
+
+        // if there is no element present, get all projects and populate a new tree
+        return Promise.resolve(getUserProjects());
+    }
+
+    getDefaultProjectItems(parentProjectID: string): Promise<ProjectNode[]> {
+        const defaultTreeItems: ProjectNode[] = [];
+        defaultTreeItems.push(getServicePlaceholder(parentProjectID));
+        defaultTreeItems.push(getContainerRegistryCredentialPlaceholder(parentProjectID));
+        defaultTreeItems.push(getMemberPlaceholder(parentProjectID));
+        defaultTreeItems.push(getInvitePlaceholder(parentProjectID));
+        return Promise.resolve(defaultTreeItems);
+    }
+
+    async print(base: ProjectNode): Promise<void> {
+        base.print();
+    }
+}
+
+/**
+ * The UserProjectNode is a node that captures the information of projects created by
+ * users and acts as the parent node for all other nodes in this file
+ *
+ * @class UserProjectNode
+ * @extends {ProjectNode}
+ */
+class UserProjectNode extends ProjectNode {
+    constructor(
+        public readonly label: string,
+        public readonly project: Project,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    ) {
+        super(label, collapsibleState, PROJECT_ITEM_TYPE);
+    }
+
+    getName(): string {
+        return this.project.name;
+    }
+
+    getStatus(): string {
+        if (this.project.status === 1) {
+            return 'pending';
+        }
+        return 'active';
+    }
+
+    id = this.getName().substring(9);
+
+    tooltip = this.getStatus();
+
+    contextValue = PROJECT_ITEM_TYPE;
+
+    iconPath = new vscode.ThemeIcon('project');
+
+    print(): void {
+        if (this.label !== PROJECT_ITEM_TYPE) {
+            const printTable = new table({});
+            printTable.push(['Name', this.project.friendly_name]);
+            if (this.project.description) {
+                printTable.push(['Description', this.project.description]);
+            }
+            printTable.push(['Status', this.getStatus()]);
+            if (this.project.hostnames) {
+                const names: string[] = [];
+                for (const hostname of this.project.hostnames) {
+                    names.push(hostname.name);
+                }
+                printTable.push(['Hostnames', names.join('\n')]);
+            }
+            logger.log(printTable.toString());
+        }
+    }
+}
+
+/**
+ * The ContainerRegistryCredentialNode is a node that captures the information of
+ * container registry account (called docker credentials in Akka Serverless)
+ *
+ * @class ContainerRegistryCredentialNode
+ * @extends {ProjectNode}
+ */
+class ContainerRegistryCredentialNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -68,7 +182,7 @@ class ContainerCredentialNode extends BaseProjectNode {
 
     contextValue = DOCKER_ITEM_TYPE;
 
-    printDetails(): void {
+    print(): void {
         if (this.label !== DOCKER_ITEM_TYPE) {
             const printTable = new table({});
             printTable.push(['Name', this.getName()]);
@@ -79,29 +193,13 @@ class ContainerCredentialNode extends BaseProjectNode {
     }
 }
 
-async function getContainerCredentialItems(parentProjectID: string): Promise<ContainerCredentialNode[] | undefined> {
-    const items: ContainerCredentialNode[] = [];
-
-    const creds = await listDockerCredentials(parentProjectID, getCurrentCommandConfig());
-
-    if (creds === undefined) {
-        return undefined;
-    }
-
-    const credentialList = creds.response as Credential[];
-
-    for (const credential of credentialList) {
-        items.push(new ContainerCredentialNode(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
-    }
-
-    return items;
-}
-
-function getDefaultDockerCredentialItem(parentProjectID: string): ContainerCredentialNode {
-    return new ContainerCredentialNode(DOCKER_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${DOCKER_ITEM_TYPE}`, server: '', username: '' }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-
-class InviteNode extends BaseProjectNode {
+/**
+ * The InviteNode is a node that captures the information of invitations sent to other users
+ *
+ * @class InviteNode
+ * @extends {ProjectNode}
+ */
+class InviteNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -140,7 +238,7 @@ class InviteNode extends BaseProjectNode {
 
     contextValue = INVITE_ITEM_TYPE;
 
-    printDetails(): void {
+    print(): void {
         if (this.label !== INVITE_ITEM_TYPE) {
             const printTable = new table({});
             printTable.push(['Email address', this.invite.email]);
@@ -151,30 +249,13 @@ class InviteNode extends BaseProjectNode {
     }
 }
 
-async function getInviteItems(parentProjectID: string): Promise<InviteNode[] | undefined> {
-    const invites: InviteNode[] = [];
-
-    const result = await listInvites(parentProjectID, getCurrentCommandConfig());
-
-    if (result === undefined) {
-        return undefined;
-    }
-
-    const invitesList = result.response as Invite[];
-
-    for (const invite of invitesList) {
-        invites.push(new InviteNode(invite.email, parentProjectID, invite, vscode.TreeItemCollapsibleState.None));
-    }
-
-    return invites;
-}
-
-function getDefaultInviteItem(parentProjectID: string): InviteNode {
-    // eslint-disable-next-line camelcase
-    return new InviteNode(INVITE_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${INVITE_ITEM_TYPE}`, role_id: '', email: '', created: { seconds: 0 } }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-
-class MemberNode extends BaseProjectNode {
+/**
+ * The MemberNode is a node that captures the information of members of a project
+ *
+ * @class MemberNode
+ * @extends {ProjectNode}
+ */
+class MemberNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -217,7 +298,7 @@ class MemberNode extends BaseProjectNode {
 
     contextValue = MEMBER_ITEM_TYPE;
 
-    printDetails(): void {
+    print(): void {
         if (this.label !== MEMBER_ITEM_TYPE) {
             const printTable = new table({});
             printTable.push(['Name', this.member.user_full_name]);
@@ -227,97 +308,13 @@ class MemberNode extends BaseProjectNode {
     }
 }
 
-async function getMemberItems(parentProjectID: string): Promise<MemberNode[] | undefined> {
-    const members: MemberNode[] = [];
-
-    const result = await listMembers(parentProjectID, getCurrentCommandConfig());
-
-    if (result === undefined) {
-        return undefined;
-    }
-
-    const membersList = result.response as Member[];
-
-    for (const member of membersList) {
-        members.push(new MemberNode(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None));
-    }
-
-    return members;
-}
-
-export function getDefaultMemberItem(parentProjectID: string): MemberNode {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    // eslint-disable-next-line camelcase
-    return new MemberNode(MEMBER_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${MEMBER_ITEM_TYPE}`, user_name: '', user_email: '', user_full_name: '', user_friendly_name: '' }, vscode.TreeItemCollapsibleState.Collapsed);
-}
-
-class ProjectNode extends BaseProjectNode {
-    constructor(
-        public readonly label: string,
-        public readonly project: Project,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    ) {
-        super(label, collapsibleState, PROJECT_ITEM_TYPE);
-    }
-
-    getName(): string {
-        return this.project.name;
-    }
-
-    getStatus(): string {
-        if (this.project.status === 1) {
-            return 'pending';
-        }
-        return 'active';
-    }
-
-    id = this.getName().substring(9);
-
-    tooltip = this.getStatus();
-
-    contextValue = PROJECT_ITEM_TYPE;
-
-    iconPath = new vscode.ThemeIcon('project');
-
-    printDetails(): void {
-        if (this.label !== PROJECT_ITEM_TYPE) {
-            const printTable = new table({});
-            printTable.push(['Name', this.project.friendly_name]);
-            if (this.project.description) {
-                printTable.push(['Description', this.project.description]);
-            }
-            printTable.push(['Status', this.getStatus()]);
-            if (this.project.hostnames) {
-                const names: string[] = [];
-                for (const hostname of this.project.hostnames) {
-                    names.push(hostname.name);
-                }
-                printTable.push(['Hostnames', names.join('\n')]);
-            }
-            logger.log(printTable.toString());
-        }
-    }
-}
-
-async function getProjectItems(): Promise<ProjectNode[] | undefined> {
-    const projects: ProjectNode[] = [];
-
-    const result = await listProjects(getCurrentCommandConfig());
-
-    if (result === undefined) {
-        return undefined;
-    }
-
-    const projectList = result.response as Project[];
-
-    for (const project of projectList) {
-        projects.push(new ProjectNode(project.friendly_name, project, vscode.TreeItemCollapsibleState.Collapsed));
-    }
-
-    return projects;
-}
-
-class ServiceNode extends BaseProjectNode {
+/**
+ * The ServiceNode is a node that captures the information of services in a project
+ *
+ * @class ServiceNode
+ * @extends {ProjectNode}
+ */
+class ServiceNode extends ProjectNode {
     constructor(
         public readonly label: string,
         public readonly parentProjectID: string,
@@ -344,7 +341,7 @@ class ServiceNode extends BaseProjectNode {
 
     contextValue = SERVICE_ITEM_TYPE;
 
-    printDetails(): void {
+    print(): void {
         if (this.label !== SERVICE_ITEM_TYPE) {
             const printTable = new table({
                 head: ['Item', 'Description']
@@ -366,7 +363,112 @@ class ServiceNode extends BaseProjectNode {
     }
 }
 
-async function getServiceItems(parentProjectID: string): Promise<ServiceNode[] | undefined> {
+/**
+ * The getUserProjects retrieves all projects that the current user is part of
+ *
+ * @return {*}  {(Promise<UserProjectNode[] | undefined>)}
+ */
+async function getUserProjects(): Promise<UserProjectNode[] | undefined> {
+    const projects: UserProjectNode[] = [];
+
+    const result = await listProjects(getCurrentCommandConfig());
+
+    if (result === undefined) {
+        return undefined;
+    }
+
+    const projectList = result.response as Project[];
+
+    for (const project of projectList) {
+        projects.push(new UserProjectNode(project.friendly_name, project, vscode.TreeItemCollapsibleState.Collapsed));
+    }
+
+    return projects;
+}
+
+/**
+ * The getContainerRegistryCredentials command retrieves all current configured
+ * container registry credentials for a single project based on the projectID
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {(Promise<ContainerRegistryCredentialNode[] | undefined>)}
+ */
+async function getContainerRegistryCredentials(parentProjectID: string): Promise<ContainerRegistryCredentialNode[] | undefined> {
+    const items: ContainerRegistryCredentialNode[] = [];
+
+    const creds = await listDockerCredentials(parentProjectID, getCurrentCommandConfig());
+
+    if (creds === undefined) {
+        return undefined;
+    }
+
+    const credentialList = creds.response as Credential[];
+
+    for (const credential of credentialList) {
+        items.push(new ContainerRegistryCredentialNode(credential.server, parentProjectID, credential, vscode.TreeItemCollapsibleState.None));
+    }
+
+    return items;
+}
+
+/**
+ * The getInvites command retrieves all current outstanding invites for a single project
+ * based on the projectID
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {(Promise<InviteNode[] | undefined>)}
+ */
+async function getInvites(parentProjectID: string): Promise<InviteNode[] | undefined> {
+    const invites: InviteNode[] = [];
+
+    const result = await listInvites(parentProjectID, getCurrentCommandConfig());
+
+    if (result === undefined) {
+        return undefined;
+    }
+
+    const invitesList = result.response as Invite[];
+
+    for (const invite of invitesList) {
+        invites.push(new InviteNode(invite.email, parentProjectID, invite, vscode.TreeItemCollapsibleState.None));
+    }
+
+    return invites;
+}
+
+/**
+ * The getMembers command retrieves all current members for a single project based on
+ * the projectID
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {(Promise<MemberNode[] | undefined>)}
+ */
+async function getMembers(parentProjectID: string): Promise<MemberNode[] | undefined> {
+    const members: MemberNode[] = [];
+
+    const result = await listMembers(parentProjectID, getCurrentCommandConfig());
+
+    if (result === undefined) {
+        return undefined;
+    }
+
+    const membersList = result.response as Member[];
+
+    for (const member of membersList) {
+        members.push(new MemberNode(member.user_full_name, parentProjectID, member, vscode.TreeItemCollapsibleState.None));
+    }
+
+    return members;
+}
+
+/**
+ * The getServices command retrieves all services for a single project based on the
+ * projectID
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {(Promise<ServiceNode[] | undefined>)}
+ */
+async function getServices(parentProjectID: string): Promise<ServiceNode[] | undefined> {
     const services: ServiceNode[] = [];
 
     const result = await listServices(parentProjectID, getCurrentCommandConfig());
@@ -384,55 +486,49 @@ async function getServiceItems(parentProjectID: string): Promise<ServiceNode[] |
     return services;
 }
 
-export function getDefaultServiceItem(parentProjectID: string): ServiceNode {
-    return new ServiceNode(SERVICE_ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${SERVICE_ITEM_TYPE}` } }, vscode.TreeItemCollapsibleState.Collapsed);
+/**
+ * The getContainerRegistryCredentialPlaceholder creates a placeholder that can be
+ * shown in the tree for ContainerRegistryCredential nodes
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {ContainerRegistryCredentialNode}
+ */
+function getContainerRegistryCredentialPlaceholder(parentProjectID: string): ContainerRegistryCredentialNode {
+    return new ContainerRegistryCredentialNode(DOCKER_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${DOCKER_ITEM_TYPE}`, server: '', username: '' }, vscode.TreeItemCollapsibleState.Collapsed);
 }
 
-export class ProjectExplorer implements vscode.TreeDataProvider<BaseProjectNode> {
-    private _onDidChangeTreeData: vscode.EventEmitter<BaseProjectNode | undefined | void> = new vscode.EventEmitter<BaseProjectNode | undefined | void>();
-    readonly onDidChangeTreeData: vscode.Event<BaseProjectNode | undefined | void> = this._onDidChangeTreeData.event;
+/**
+ * The getInvitePlaceholder creates a placeholder that can be shown in the tree for Invite
+ * nodes
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {InviteNode}
+ */
+function getInvitePlaceholder(parentProjectID: string): InviteNode {
+    // eslint-disable-next-line camelcase
+    return new InviteNode(INVITE_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${INVITE_ITEM_TYPE}`, role_id: '', email: '', created: { seconds: 0 } }, vscode.TreeItemCollapsibleState.Collapsed);
+}
 
-    refresh(): void {
-        this._onDidChangeTreeData.fire();
-    }
+/**
+ * The getMemberPlaceholder creates a placeholder that can be shown in the tree for
+ * Member nodes
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {MemberNode}
+ */
+function getMemberPlaceholder(parentProjectID: string): MemberNode {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // eslint-disable-next-line camelcase
+    return new MemberNode(MEMBER_ITEM_TYPE, parentProjectID, { name: `${parentProjectID}-${MEMBER_ITEM_TYPE}`, user_name: '', user_email: '', user_full_name: '', user_friendly_name: '' }, vscode.TreeItemCollapsibleState.Collapsed);
+}
 
-    getTreeItem(element: BaseProjectNode): vscode.TreeItem {
-        return element;
-    }
-
-    getChildren(element?: BaseProjectNode): Thenable<BaseProjectNode[] | undefined> {
-        if (element) {
-            switch (element.type) {
-                case PROJECT_ITEM_TYPE:
-                    return Promise.resolve(this.getDefaultProjectItems(element.id!));
-                case SERVICE_ITEM_TYPE:
-                    return Promise.resolve(getServiceItems(element.parentProjectID));
-                case MEMBER_ITEM_TYPE:
-                    return Promise.resolve(getMemberItems(element.parentProjectID));
-                case INVITE_ITEM_TYPE:
-                    return Promise.resolve(getInviteItems(element.parentProjectID));
-                case DOCKER_ITEM_TYPE:
-                    return Promise.resolve(getContainerCredentialItems(element.parentProjectID));
-                default:
-                    break;
-            }
-            return Promise.resolve([]);
-        }
-
-        // if there is no element present, get all projects and populate a new tree
-        return Promise.resolve(getProjectItems());
-    }
-
-    getDefaultProjectItems(parentProjectID: string): Promise<BaseProjectNode[]> {
-        const defaultTreeItems: BaseProjectNode[] = [];
-        defaultTreeItems.push(getDefaultServiceItem(parentProjectID));
-        defaultTreeItems.push(getDefaultDockerCredentialItem(parentProjectID));
-        defaultTreeItems.push(getDefaultMemberItem(parentProjectID));
-        defaultTreeItems.push(getDefaultInviteItem(parentProjectID));
-        return Promise.resolve(defaultTreeItems);
-    }
-
-    async printTreeItemDetails(base: BaseProjectNode): Promise<void> {
-        base.printDetails();
-    }
+/**
+ * The getServicePlaceholder creates a placeholder that can be shown in the tree for
+ * Service nodes
+ *
+ * @param {string} parentProjectID
+ * @return {*}  {ServiceNode}
+ */
+function getServicePlaceholder(parentProjectID: string): ServiceNode {
+    return new ServiceNode(SERVICE_ITEM_TYPE, parentProjectID, { metadata: { name: '', uid: `${parentProjectID}-${SERVICE_ITEM_TYPE}` } }, vscode.TreeItemCollapsibleState.Collapsed);
 }

@@ -2,8 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// Standard node imports
-
 // External dependencies
 import * as table from 'cli-table3';
 
@@ -12,12 +10,14 @@ import { currentLogin, CurrentLogin, Token, listAuthTokens } from '../cli/auth';
 import { getCurrentCommandConfig } from '../cli/commands';
 import { logger } from '../../logger';
 
-const LOGIN_ITEM_TYPE = 'CurrentLogin';
+// Constants
+const ACCOUNT_ITEM_TYPE = 'Accounts';
 const TOKEN_ITEM_TYPE = 'Tokens';
 
 /**
  * The AccountNode is the default base class for any node in the account explorer
  *
+ * @export
  * @class AccountNode
  * @extends {vscode.TreeItem}
  */
@@ -29,59 +29,7 @@ export abstract class AccountNode extends vscode.TreeItem {
         this.type = type;
     }
 
-    abstract printDetails(): void;
-}
-
-/**
- * The CurrentLoginNode represents an item of the account of the current logged in user
- * to Akka Serverless
- *
- * @class CurrentLoginNode
- * @extends {AccountNode}
- */
-class CurrentLoginNode extends AccountNode {
-    constructor(
-        public readonly label: string,
-        public readonly description: string,
-        public readonly codicon: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    ) {
-        super(label, collapsibleState, LOGIN_ITEM_TYPE);
-    }
-
-    iconPath = new vscode.ThemeIcon(this.codicon);
-    tooltip = this.description;
-    printDetails(): void {};
-}
-
-/**
- * The currentUserDetails command gets the details of the current logged in user.
- *
- * @return {*}  {(Promise<CurrentLoginNode[] | undefined>)}
- */
-async function currentUserDetails(): Promise<CurrentLoginNode[] | undefined> {
-    const currUser = await currentLogin(getCurrentCommandConfig());
-
-    if (currUser === undefined) {
-        return undefined;
-    }
-
-    const user = currUser.response as CurrentLogin;
-
-    const items: CurrentLoginNode[] = [];
-    items.push(new CurrentLoginNode('user', user.user.fullName, 'account', vscode.TreeItemCollapsibleState.None));
-    items.push(new CurrentLoginNode('email', user.user.email, 'mail', vscode.TreeItemCollapsibleState.None));
-    items.push(new CurrentLoginNode('verified', `${user.user.email_verified}`, 'pass', vscode.TreeItemCollapsibleState.None));
-    return items;
-}
-
-/**
- * The getDefaultCurrentLoginNode command gets the top level node for the current logged in user.
- *
- * @return {*}  {CurrentLoginNode}
- */
-function getDefaultCurrentLoginNode(): CurrentLoginNode {
-    return new CurrentLoginNode('User', '', 'account', vscode.TreeItemCollapsibleState.Collapsed);
+    abstract print(): void;
 }
 
 /**
@@ -104,11 +52,11 @@ export class AuthTokenNode extends AccountNode {
     }
 
     getName(): string {
-        return this._tokenElements[this._tokenElements.length-1];
+        return this._tokenElements[this._tokenElements.length - 1];
     }
 
     getType(): string {
-        return this._tokenElements[this._tokenElements.length-2];
+        return this._tokenElements[this._tokenElements.length - 2];
     }
 
     description = this.token.description;
@@ -119,7 +67,7 @@ export class AuthTokenNode extends AccountNode {
 
     contextValue = TOKEN_ITEM_TYPE;
 
-    printDetails(): void {
+    print(): void {
         if (this.label !== TOKEN_ITEM_TYPE) {
             const printTable = new table({});
             printTable.push(['Name', this.getName()]);
@@ -129,42 +77,6 @@ export class AuthTokenNode extends AccountNode {
             logger.log(printTable.toString());
         }
     }
-}
-
-/**
- * The getAuthTokens command returns all authentication tokens for the current logged in
- * user.
- *
- * @return {*}  {(Promise<AuthTokenNode[] | undefined>)}
- */
-async function getAuthTokens(): Promise<AuthTokenNode[] | undefined> {
-    const items: AuthTokenNode[] = [];
-
-    const result = await listAuthTokens(getCurrentCommandConfig());
-
-    if (result === undefined) {
-        return undefined;
-    }
-
-    const tokenList = result.response as Token[];
-
-    for (const token of tokenList) {
-        const nameElements = token.name.split('/');
-        items.push(new AuthTokenNode(nameElements[nameElements.length-1], token, vscode.TreeItemCollapsibleState.None));
-    }
-
-    return items;
-}
-
-/**
- * The getDefaultAuthTokenItem command gets the top level node for the authentication
- * tokens of the current logged in user.
- *
- * @return {*}  {AuthTokenNode}
- */
-function getDefaultAuthTokenItem(): AuthTokenNode {
-    // eslint-disable-next-line camelcase
-    return new AuthTokenNode(TOKEN_ITEM_TYPE, { name: TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1}, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
 }
 
 /**
@@ -190,8 +102,8 @@ export class AccountExplorer implements vscode.TreeDataProvider<AccountNode> {
             switch (element.type) {
                 case TOKEN_ITEM_TYPE:
                     return Promise.resolve(getAuthTokens());
-                case LOGIN_ITEM_TYPE:
-                    return Promise.resolve(currentUserDetails());
+                case ACCOUNT_ITEM_TYPE:
+                    return Promise.resolve(userDetails());
                 default:
                     break;
             }
@@ -204,12 +116,100 @@ export class AccountExplorer implements vscode.TreeDataProvider<AccountNode> {
 
     getDefaultCredentialItems(): Promise<AccountNode[]> {
         const defaultTreeItems: AccountNode[] = [];
-        defaultTreeItems.push(getDefaultAuthTokenItem());
-        defaultTreeItems.push(getDefaultCurrentLoginNode());
+        defaultTreeItems.push(getToplevelAuthTokenNode());
+        defaultTreeItems.push(getToplevelAccountNode());
         return Promise.resolve(defaultTreeItems);
     }
 
-    async printTreeItemDetails(base: AccountNode): Promise<void> {
-        base.printDetails();
+    async print(base: AccountNode): Promise<void> {
+        base.print();
     }
+}
+
+/**
+ * The CurrentAccountNode represents an item of the account of the current logged in user
+ * to Akka Serverless
+ *
+ * @class CurrentAccountNode
+ * @extends {AccountNode}
+ */
+class CurrentAccountNode extends AccountNode {
+    constructor(
+        public readonly label: string,
+        public readonly description: string,
+        public readonly codicon: string,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    ) {
+        super(label, collapsibleState, ACCOUNT_ITEM_TYPE);
+    }
+
+    iconPath = new vscode.ThemeIcon(this.codicon);
+    tooltip = this.description;
+    print(): void { };
+}
+
+/**
+ * The userDetails command gets the details of the current logged in user.
+ *
+ * @return {*}  {(Promise<CurrentLoginNode[] | undefined>)}
+ */
+async function userDetails(): Promise<CurrentAccountNode[] | undefined> {
+    const account = await currentLogin(getCurrentCommandConfig());
+
+    if (account === undefined) {
+        return undefined;
+    }
+
+    const user = account.response as CurrentLogin;
+
+    const items: CurrentAccountNode[] = [];
+    items.push(new CurrentAccountNode('user', user.user.fullName, 'account', vscode.TreeItemCollapsibleState.None));
+    items.push(new CurrentAccountNode('email', user.user.email, 'mail', vscode.TreeItemCollapsibleState.None));
+    items.push(new CurrentAccountNode('verified', `${user.user.email_verified}`, 'pass', vscode.TreeItemCollapsibleState.None));
+    return items;
+}
+
+/**
+ * The getToplevelAccountNode command gets the top level node for the current logged in user.
+ *
+ * @return {*}  {CurrentAccountNode}
+ */
+function getToplevelAccountNode(): CurrentAccountNode {
+    return new CurrentAccountNode('Account', '', 'account', vscode.TreeItemCollapsibleState.Collapsed);
+}
+
+/**
+ * The getAuthTokens command returns all authentication tokens for the current logged in
+ * user.
+ *
+ * @return {*}  {(Promise<AuthTokenNode[] | undefined>)}
+ */
+async function getAuthTokens(): Promise<AuthTokenNode[] | undefined> {
+    const items: AuthTokenNode[] = [];
+
+    const result = await listAuthTokens(getCurrentCommandConfig());
+
+    if (result === undefined) {
+        return undefined;
+    }
+
+    const tokenList = result.response as Token[];
+
+    for (const token of tokenList) {
+        const nameElements = token.name.split('/');
+        items.push(new AuthTokenNode(nameElements[nameElements.length - 1], token, vscode.TreeItemCollapsibleState.None));
+    }
+
+    return items;
+}
+
+/**
+ * The getDefaultAuthTokenItem command gets the top level node for the authentication
+ * tokens of the current logged in user.
+ *
+ * @return {*}  {AuthTokenNode}
+ */
+function getToplevelAuthTokenNode(): AuthTokenNode {
+    // eslint-disable-next-line camelcase
+    return new AuthTokenNode(TOKEN_ITEM_TYPE, { name: TOKEN_ITEM_TYPE, description: '', created_time: { seconds: 1 }, scopes: [1] }, vscode.TreeItemCollapsibleState.Collapsed);
 }

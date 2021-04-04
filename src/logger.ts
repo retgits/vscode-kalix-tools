@@ -3,61 +3,34 @@
 import * as vscode from 'vscode';
 
 /**
- * Log Level in order from least verbose to most
+ * The Logger class implements all log capabilities
+ *
+ * @export
+ * @class Logger
  */
-export enum LogLevel {
-    /** Only log error messages */
-    ERROR = 1,
-    /** Only log warnings and error messages */
-    WARN = 2,
-    /** Only log info, warnings and error messages */
-    INFO = 3,
-    /** Log everything */
-    DEBUG = 4
-}
-
 export class Logger {
-    /**
-     * Logging level for service. Specified by 'verbose' or 'v' flag in Serverless Options.
-     * Defaults to 'info'
-     */
-    private _logLevel: LogLevel;
-    private _channel: vscode.OutputChannel;
-
-    constructor(channelName: string) {
-        this._channel = vscode.window.createOutputChannel(channelName);
-        this._logLevel = LogLevel.INFO;
-    }
+    private readonly _channel: vscode.OutputChannel = vscode.window.createOutputChannel("Akka Serverless");
 
     /**
-     * Logs any message with a level (error, warn, info, debug) less than or equal
-     * to the logging level set in the constructor (defaults to info)
+     * Logs any message
      * @param message Message to log
-     * @param logLevel Log Level
+     * @param title optional title
      */
-    public log(message: string, logLevel: LogLevel = LogLevel.INFO): void {
-        if (logLevel <= this._logLevel) {
-            this._channel.appendLine(message.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, ''));
-            this._channel.show(true);
+    public log(message: string, title?: string): void {
+        if (title) {
+            const simplifiedTime = (new Date()).toISOString().replace(/z|t/gi, ' ').trim(); // YYYY-MM-DD HH:mm:ss.sss
+            const hightlightingTitle = `[${title} ${simplifiedTime}]`;
+            this._channel.appendLine(hightlightingTitle);
         }
+        this._channel.appendLine(message);
+        this._channel.show();
     }
 
-    public error(message: string): void {
-        this.log(`[ERROR] ${message}`, LogLevel.ERROR);
-    }
-
-    public warn(message: string): void {
-        this.log(`[WARN] ${message}`, LogLevel.WARN);
-    }
-
-    public info(message: string): void {
-        this.log(`[INFO] ${message}`, LogLevel.INFO);
-    }
-
-    public debug(message: string): void {
-        this.log(`[DEBUG] ${message}`, LogLevel.DEBUG);
-    }
-
+    /**
+     * The dispose command hides, clears, and disposes of the output channel
+     *
+     * @memberof Logger
+     */
     dispose(): void {
         this._channel.hide();
         this._channel.clear();
@@ -65,4 +38,7 @@ export class Logger {
     }
 }
 
-export const logger: Logger = new Logger('akkasls');
+/**
+ * logger is an instance of the Logger class
+ */
+export const logger: Logger = new Logger();

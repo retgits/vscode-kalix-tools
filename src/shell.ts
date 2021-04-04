@@ -21,6 +21,8 @@ enum OS {
 /**
  * The interface ShellResult encapsulates the result returned by the external command.
  * Both the standard output and standard error as well as the result code are returned.
+ *
+ * @export
  */
 export interface ShellResult {
     readonly code: number;
@@ -48,6 +50,8 @@ interface Shell {
 
 /**
  * The shell is the main entry point for all commands that need to be executed
+ *
+ *  @export
  */
 export const shell: Shell = {
     isWindows: isWindows,
