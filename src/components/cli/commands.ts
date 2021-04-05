@@ -13,7 +13,7 @@ export const config = {
     auth: {
         currentLogin: 'akkasls auth current-login -o json',
         listAuthTokens: 'akkasls auth tokens list -o json',
-        login: 'akkasls auth login --no-launch-browser',
+        login: 'akkasls auth login',
         logout: 'akkasls auth logout',
         revokeAuthToken: 'akkasls auth tokens revoke',
         createAuthToken: 'akkasls auth tokens create'

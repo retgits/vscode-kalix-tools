@@ -96,7 +96,7 @@ export async function listAuthTokens(cc: commandConfig): Promise<ShellResult | u
 }
 
 /**
- * The login command will run the login procedure. This command uses `--no-launch-browser` to display the URL rather than try to launch the browser itself.
+ * The login command will run the login procedure.
  *
  * @param {CommandInput} { dryrun, silent, configFile, context }
  * @return {*}  {Promise<ShellResult>}

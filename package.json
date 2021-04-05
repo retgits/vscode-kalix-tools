@@ -20,6 +20,7 @@
 	],
 	"icon": "resources/icon.png",
 	"activationEvents": [
+		"onCommand:as.commandpalette.auth.login",
 		"onCommand:as.commandpalette.browser.console",
 		"onCommand:as.commandpalette.browser.documentation",
 		"onCommand:as.commandpalette.browser.forum",
@@ -252,6 +253,12 @@
 		},
 		"commands": [
 			{
+				"command": "as.commandpalette.auth.login",
+				"title": "Log in",
+				"category": "Akka Serverless",
+				"description": "Open the Akka Serverless Console to log in and authenticate the CLI"
+			},
+			{
 				"command": "as.commandpalette.browser.console",
 				"title": "Open console",
 				"category": "Akka Serverless",
@@ -425,8 +432,8 @@
 		"test-compile": "tsc -p ./",
 		"test-watch": "tsc -watch -p ./",
 		"utils:depcheck": "npx depcheck",
-		"utils:installer": "tsc ./utils/generateInstaller.ts && node ./utils/generateInstaller.js",
-		"utils:readme": "tsc ./utils/generateReadMe.ts && node ./utils/generateReadMe.js",
+		"utils:installer": "ts-node ./utils/generateInstaller.ts",
+		"utils:readme": "ts-node ./utils/generateReadMe.ts",
 		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
 		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
 	},
@@ -440,6 +447,7 @@
 		"eslint": "^7.9.0",
 		"standard-version": "^9.0.0",
 		"ts-loader": "^8.0.11",
+		"ts-node": "^9.1.1",
 		"typescript": "^4.0.2",
 		"webpack": "4.44.2",
 		"webpack-cli": "^4.6.0"

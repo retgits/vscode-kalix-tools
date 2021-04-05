@@ -17,9 +17,12 @@ import { openBrowser } from './browser';
 import { logger } from './logger';
 import { npx, npm } from './components/codegeneration/javascript';
 import { maven } from './components/codegeneration/java';
+import { login } from './components/cli/auth';
+import { getCurrentCommandConfig } from './components/cli/commands';
 
 export function activate(context: vscode.ExtensionContext): void {
 	// Menu Items
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.auth.login', async () => { login(getCurrentCommandConfig()); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.console', async () => { openBrowser(config.urls.console); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.documentation', async () => { openBrowser(config.urls.documentation); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.forum', async () => { openBrowser(config.urls.forum); }));

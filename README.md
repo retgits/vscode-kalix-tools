@@ -1,10 +1,6 @@
 # Visual Studio Code Akka Serverless Tools
 
-An extension for developers building stateful serverless applications on [Akka Serverless](https://docs.cloudstate.com).
-
-![image](utils/image.png)
-
-*[Illustration by Freepik Stories](https://stories.freepik.com/technology)*
+An extension for developers building stateful serverless applications on [Akka Serverless](https://akkaserverless.com).
 
 Features include:
 
@@ -27,122 +23,61 @@ Features include:
 
 The Akka Serverless extension may need to invoke the following command line tools, depending on which features you use. You will need `akkasls` at minimum, and `docker` if you plan to use the extension to build applications rather than only browse.
 
-### Configuration settings to run services locally
-
-If you want to use the `Akka Serverless: Run local` and `Akka Serverless: Stop local` commands, you'll need to configure a user and repository for your container images. Under `Settings > Extension > Akka Serverless` you need to set `akkaserverless.dockerImageUser` to something like `docker.io/retgits`.
-
-Other configuration details are read from a `serverless.yml` file which must be in the same folder as your service. The `serverless.yml` file has the following parameters:
-
-```yaml
-frameworkVersion: '2'
-
-custom:
-  akkaServerlessProject: acme-sunglasses
-
-service: ${self:custom.akkaServerlessProject}
-
-provider:
-  name: akkaserverless
-  docker:
-    imageUser: docker.io/retgits
-
-functions:
-  orders:
-    handler: dockerfile
-    context: ./orders
-    tag: '1.0.0'
-    skipBuild: false
-    proxyHostPort: 9001
-  warehouse:
-    handler: dockerfile
-    context: ./warehouse
-    tag: '1.0.0'
-    skipBuild: false
-    proxyHostPort: 9002
-  users:
-    handler: dockerfile
-    context: ./users
-    tag: '1.0.0'
-    skipBuild: false
-    proxyHostPort: 9003
-
-plugins:
-  - '@retgits/akkasls-serverless-framework'
-```
-
-You can specify the location of the `.akkaserverless.yaml` file in a few different ways:
-
-* Select the file through the VS Code context menu (right-click on a `.akkaserverless.yaml` file);
-* Run the command while the current active text editor window in VS Code has the `.akkaserverless.yaml` file open;
-* Have a `.akkaserverless.yaml` file in the current open workspace;
-* Have a `.akkaserverless.yaml` file in the current open folder;
-* If no file can be found, an error is displayed on your screen.
-
 ## Commands and features
 
 `vscode-akkasls-tools` supports a number of commands for interacting with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and may be bound to keys in the normal way.
 
 ### General commands
 
-* `Akka Serverless: Add credentials` - Add Docker registry credentials to an Akka Serverless project
-* `Akka Serverless: Delete credentials` - Remove Docker registry credentials from an Akka Serverless project
-* `Akka Serverless: Delete invite` - Removes the invitation of a user for a project
-* `Akka Serverless: Deploy` - Deploy a service to Akka Serverless
-* `Akka Serverless: Expose` - Expose a service for inbound traffic
-* `Akka Serverless: Login` - Logs in to Akka Serverless by printing the login URL in the akkasls output window
-* `Akka Serverless: Logout` - Logs out from Akka Serverless
-* `Akka Serverless: New project` - Create a new project on Akka Serverless
-* `Akka Serverless: Revoke token` - Revokes a previously issues Akka Serverless authentication token
-* `Akka Serverless: Run local` - Runs a selected service and Cloudstate proxy on your machine to test your code (requires docker)
-* `Akka Serverless: Send invite` - Invite a new user to a project on Akka Serverless
-* `Akka Serverless: Stop local` - Stops the selected service and Cloudstate proxy
-* `Akka Serverless: Template Wizard` - Start the wizard to generate a project based on existing templates
-* `Akka Serverless: Undeploy` - Remove a service from Akka Serverless
-* `Akka Serverless: Unexpose` - Removes a service route from a service
-* `Akka Serverless: View Status` - Open the Akka Serverless status page in your browser
+* `Log in`: Open the Akka Serverless Console to log in and authenticate the CLI
+* `Open console`: Open the Akka Serverless Console in a browser window
+* `Open docs`: Open the Akka Serverless documentation in a browser window
+* `Open forum`: Open the Akka Serverless forum in a browser window
+* `Open ideas portal`: Open the Akka Serverless ideas portal in a browser window
+* `Open status page`: Open the Akka Serverless status page in a browser window
+* `Generate new Javascript service (npx) - experimental`: Generate a new Javascript based service using npx
+* `Generate new Javascript service (npm) - experimental`: Generate a new Javascript based service using npm
+* `Generate new Java service (Maven) - experimental`: Generate a new Java based service using Maven
 
 ### Projects
 
-* `Add credentials`: Add new Docker credentials to your project
-* `Delete credentials`: Remove Docker credentials from your project
-* `Delete invite`: Removes the invitation of a user
-* `Deploy`: Deploy a service to Akka Serverless
-* `Expose`: Expose a service for inbound traffic
-* `Open in browser`: Opens the selected resource in the Akka Serverless Web UI
-* `Refresh`: Refresh the project explorer view
-* `Send invite`: Invite a new user to your project on Akka Serverless
-* `Undeploy`: Remove a service from Akka Serverless
-* `Unexpose`: Removes a service route from a service
-* `View details`: Print the details of Docker credentials (doesn't log the password), project members, projects, services, or invites to the akkasls output window
+* `Refresh`: Refresh the project explorer
+* `Show details`: Show the details of the current selected item
+* `Logs`: Show the logs of a service based on selected parameters
+* `Create a new project`: Create a new project
+* `Deploy service`: Deploy a new service
+* `Delete service`: Delete an existing service
+* `Expose service`: Expose an existing service to the Internet
+* `Unexpose service`: Remove a hostname from a service
+* `Add registry credentials`: Add new credentials for a container registry
+* `Delete registry credentials`: Remove credentials for a container registry
+* `Invite user`: Invite a new user to your project
+* `Delete invitation`: Delete a previously sent invitation
 
-### Tokens
+### Accounts & Tokens
 
-* `Refresh`: Refresh the tokens explorer view
-* `Revoke`: Revoke a token
-* `View details`: Print the details of a token to the akkasls output window
+* `Refresh`: Refresh the account explorer
+* `Show details`: Show the details of the authentication token
+* `Revoke`: Revoke a selected authentication token
+* `Create a new token`: Create a new authentication token
 
 ### Status
 
+* `Refresh`: Refresh the status explorer
 * `Get info`: Open the Akka Serverless status page in your browser
-* `Refresh`: Refresh the status explorer view
 
 ### Tools
 
-* `Get info`: Open a webpage with detailed information about the selected tool
-* `Refresh`: Refresh the tools explorer view
+* `Refresh`: Refresh the tools explorer
+* `Get info`: Open the info page for a tool in a browser window
 
 ## Extension Settings
 
-* `akkaserverless` - Parent for Akka Serverless-related extension settings
-    * `akkaserverless.dryrun`: If true will print the commands in the log rather than execute them
-    * `akkaserverless.logOutput`: If true will log output from the Akka Serverless CLI in the akkasls output window
-    * `akkaserverless.dockerImageUser`: Image prefix for docker images ie 'docker.io/retgits'
-    * `akkaserverless.configFile`: Location of the config file if you want to override it
-    * `akkaserverless.context`: The context to use
-
-## Known issues
-
-* Using substitution parameters in `serverless.yml` does not work correctly
+* `akkaserverless.dryrun`: Whether commands will be printed in the logs rather than execute them
+* `akkaserverless.logOutput`: Whether the result of the akkasls command is shown in the logs
+* `akkaserverless.configFile`: Location of the config file to use (default ~/.akkaserverless/config.yaml)
+* `akkaserverless.context`: The context to use
+* `akkaserverless.enableExperimentalFeatures`: Whether experimental features should be enabled
 
 ## Release notes
 
