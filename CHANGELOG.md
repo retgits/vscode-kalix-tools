@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/retgits/vscode-akkasls-tools/compare/v0.2.0...v0.2.1) (2021-04-05)
+
+
+### Bug Fixes
+
+* fix a bug for windows unzip codegen artifacts ([b29285c](https://github.com/retgits/vscode-akkasls-tools/commit/b29285ca698eff28599376903b2319a3a26d54ba))
+
 ## [0.2.0](https://github.com/retgits/vscode-akkasls-tools/compare/v0.1.0...v0.2.0) (2021-04-05)
 
 
