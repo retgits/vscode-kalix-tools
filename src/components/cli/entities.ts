@@ -32,14 +32,14 @@ export async function generateNpmJs(outputFile: string, name: string, cc: comman
 /**
  * The generateNpxJs command generate an initial Akka Serverless Javascript codebase using npx in the current folder
  *
- * @param {string} outputFile The name of the zipfile to create
  * @param {string} name The name of the new project
+ * @param {string} workingDir The directory to store the new files in
  * @param {CommandInput} { dryrun, silent, configFile, context }
  * @return {*}  {Promise<ShellResult>}
  */
-export async function generateNpxJs(name: string, cc: commandConfig): Promise<ShellResult | undefined> {
+export async function generateNpxJs(name: string, workingDir: string, cc: commandConfig): Promise<ShellResult | undefined> {
     // Create the command
-    const command = new Command(config.entities.generateNpxJs);
+    const command = new Command(config.entities.generateNpxJs, workingDir);
     command.addParameter({ name: 'name', value: name, addNameToCommand: false });
 
     // Set parameters

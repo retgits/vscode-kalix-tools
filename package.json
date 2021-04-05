@@ -25,6 +25,9 @@
 		"onCommand:as.commandpalette.browser.forum",
 		"onCommand:as.commandpalette.browser.ideas",
 		"onCommand:as.commandpalette.browser.statuspage",
+		"onCommand:as.commandpalette.entities.generateNpx",
+		"onCommand:as.commandpalette.entities.generateNpm",
+		"onCommand:as.commandpalette.entities.generateMaven",
 		"onView:as.toolsExplorer",
 		"onView:as.statusExplorer",
 		"onView:as.accountExplorer",
@@ -54,6 +57,11 @@
 					"type": "string",
 					"default": null,
 					"description": "The context to use"
+				},
+				"akkaserverless.enableExperimentalFeatures": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether experimental features should be enabled"
 				}
 			}
 		},
@@ -104,20 +112,20 @@
 					"group": "navigation"
 				},
 				{
-                    "command": "as.accountExplorer.tokenCreate",
+					"command": "as.accountExplorer.tokenCreate",
 					"when": "view == as.accountExplorer",
-                    "group": "0"
-                },
+					"group": "0"
+				},
 				{
 					"command": "as.projectExplorer.refresh",
 					"when": "view == as.projectExplorer",
 					"group": "navigation"
 				},
 				{
-                    "command": "as.projectExplorer.projectCreate",
+					"command": "as.projectExplorer.projectCreate",
 					"when": "view == as.projectExplorer",
-                    "group": "0"
-                }
+					"group": "0"
+				}
 			],
 			"view/item/context": [
 				{
@@ -274,6 +282,24 @@
 				"description": "Open the Akka Serverless status page in a browser window"
 			},
 			{
+				"command": "as.commandpalette.entities.generateNpx",
+				"title": "Generate new Javascript service (npx) - experimental",
+				"category": "Akka Serverless",
+				"description": "Generate a new Javascript based service using npx"
+			},
+			{
+				"command": "as.commandpalette.entities.generateNpm",
+				"title": "Generate new Javascript service (npm) - experimental",
+				"category": "Akka Serverless",
+				"description": "Generate a new Javascript based service using npm"
+			},
+			{
+				"command": "as.commandpalette.entities.generateMaven",
+				"title": "Generate new Java service (Maven) - experimental",
+				"category": "Akka Serverless",
+				"description": "Generate a new Java based service using Maven"
+			},
+			{
 				"command": "as.toolsExplorer.refresh",
 				"title": "Refresh",
 				"icon": {
@@ -406,6 +432,7 @@
 	},
 	"devDependencies": {
 		"@types/shelljs": "^0.8.8",
+		"@types/tmp": "^0.2.0",
 		"@types/vscode": "^1.51.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/eslint-plugin-tslint": "^4.20.0",
@@ -425,6 +452,7 @@
 	"dependencies": {
 		"axios": "^0.21.1",
 		"cli-table3": "^0.6.0",
-		"shelljs": "^0.8.4"
+		"shelljs": "^0.8.4",
+		"tmp": "^0.2.1"
 	}
 }

@@ -15,6 +15,8 @@ import { addRegistryCredentials, deleteRegistryCredentials } from './components/
 import { sendInvitation, deleteInvitation } from './components/projectexplorer/inviteshandler';
 import { openBrowser } from './browser';
 import { logger } from './logger';
+import { npx, npm } from './components/codegeneration/javascript';
+import { maven } from './components/codegeneration/java';
 
 export function activate(context: vscode.ExtensionContext): void {
 	// Menu Items
@@ -23,6 +25,9 @@ export function activate(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.forum', async () => { openBrowser(config.urls.forum); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.ideas', async () => { openBrowser(config.urls.ideas); }));
 	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.browser.statuspage', async () => { openBrowser(config.urls.statuspage); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.entities.generateNpx', async () => { npx(); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.entities.generateNpm', async () => { npm(); }));
+	context.subscriptions.push(vscode.commands.registerCommand('as.commandpalette.entities.generateMaven', async () => { maven(); }));
 
 	// Tools Explorer
 	const toolsExplorer = new ToolsExplorer();
