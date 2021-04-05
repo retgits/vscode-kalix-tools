@@ -50,8 +50,11 @@ export async function npm() {
         logger.log(result!.stderr);
         if (shell.isUnix()) {
             await shell.exec(`unzip ${outputFile} -d ${folder[0].fsPath}`);
-            tempFolder.removeCallback();
         }
+        if (shell.isWindows()) {
+            await shell.exec(`powershell Expand-Archive -Path ${outputFile} -DestinationPath ${folder[0].fsPath}`);
+        }
+        tempFolder.removeCallback();
         return result;
     } catch (ex) {
         vscode.window.showErrorMessage(ex);
