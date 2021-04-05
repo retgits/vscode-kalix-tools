@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.1...v0.2.2) (2021-04-05)
+
+
+### Bug Fixes
+
+* remove prefix from status ([c2b2e2f](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/c2b2e2f3ed84b4d80a43da7e039a1b8324fe6704))
+* update after transfer ([24dbf15](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/24dbf15f25846059609a1e757315fc9f81af9433))
+
 ### [0.2.1](https://github.com/retgits/vscode-akkasls-tools/compare/v0.2.0...v0.2.1) (2021-04-05)
 
 
