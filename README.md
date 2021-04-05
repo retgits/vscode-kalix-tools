@@ -17,7 +17,7 @@ Features include:
 
 ### Install
 
-[Download the latest available release](https://github.com/retgits/vscode-akkasls-tools/releases)
+[Download the latest available release](https://github.com/lightbend-labs/vscode-akkasls-tools/releases)
 
 ### Dependencies
 
