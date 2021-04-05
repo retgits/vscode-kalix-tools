@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/retgits/vscode-akkasls-tools/compare/v0.1.0...v0.2.0) (2021-04-05)
+
+
+### Features
+
+* add capability to follow logs ([495562d](https://github.com/retgits/vscode-akkasls-tools/commit/495562d352764b74b8d1034ef1350c902f789ea2))
+* add codegen ([dfb25c3](https://github.com/retgits/vscode-akkasls-tools/commit/dfb25c324b3fad706bf9a5f1fe89caf3a544ba38))
+* add new project handler ([765c01a](https://github.com/retgits/vscode-akkasls-tools/commit/765c01a39197f46f2405c27a03103a7ce1b943f8))
+* add service capabilities ([75b8893](https://github.com/retgits/vscode-akkasls-tools/commit/75b88936ef1ddfb4c8139ed4811b3621c53b1c84))
+* add token creation ([5e227f0](https://github.com/retgits/vscode-akkasls-tools/commit/5e227f0448e951a5e517a8adbb15d0a58fbacc62))
+* projects in the projectlist are now sorted ([b9f27f4](https://github.com/retgits/vscode-akkasls-tools/commit/b9f27f49c7277beb57c0cfd4610bffc2406342aa))
+* updated tools and status explorers ([d0ae0b7](https://github.com/retgits/vscode-akkasls-tools/commit/d0ae0b7f596f22f41c4ed916dac9571ae498e807))
+
+
+### Bug Fixes
+
+* update account explorer ([53d80a9](https://github.com/retgits/vscode-akkasls-tools/commit/53d80a9d57b4e025bc930e57beff84de9abe143e))
+* update browser commands ([b116e37](https://github.com/retgits/vscode-akkasls-tools/commit/b116e37ca905e30911c2cf15a2cce2efd5c514f2))
+* update codicon for statusexplorer ([d2ce278](https://github.com/retgits/vscode-akkasls-tools/commit/d2ce2780266e0cb576a9927bd45d80932c563a36))
+* update comments and redundant code ([ee3c003](https://github.com/retgits/vscode-akkasls-tools/commit/ee3c0033cf69405082a3321355fec9aaaa864163))
+* update configuration ([fc1b424](https://github.com/retgits/vscode-akkasls-tools/commit/fc1b4246485bb1c81ff08a122aac84e76f625e8e))
+* update configuration settings ([85ecab4](https://github.com/retgits/vscode-akkasls-tools/commit/85ecab464212b5ba4783cfb262ecee043a0a0221))
+* update logger ([8f00740](https://github.com/retgits/vscode-akkasls-tools/commit/8f007400ee3d35070eaf697abb67725149da3c54))
+* update prints ([82488f9](https://github.com/retgits/vscode-akkasls-tools/commit/82488f9bfe4bab6c4f16fdabe53c7cdcea5baf46))
+* update template wizard with entity command ([2d1d407](https://github.com/retgits/vscode-akkasls-tools/commit/2d1d407899fe859282d382cacfc9db0a8716baa3))
+* update utils ([82f72dc](https://github.com/retgits/vscode-akkasls-tools/commit/82f72dc5cec98b2c5e1b1e75e03652f78a523ebe))
+* updated the project explorer ([2f9c787](https://github.com/retgits/vscode-akkasls-tools/commit/2f9c787ce933a5932ebf164f6fef24b6b873cc1e))
+
 ## [0.1.0](https://github.com/retgits/vscode-akkasls-tools/compare/v0.0.11...v0.1.0) (2020-12-21)
 
 
