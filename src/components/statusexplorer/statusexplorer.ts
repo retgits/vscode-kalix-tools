@@ -54,7 +54,7 @@ export class StatusExplorer implements vscode.TreeDataProvider<StatusNode> {
     }
 
     openStatusInfoPage(): void {
-        openBrowser(config.urls.statusapi);
+        openBrowser(config.urls.statuspage);
     }
 }
 
@@ -71,7 +71,7 @@ async function getServiceStatus(): Promise<StatusNode[]> {
 
     for (const service of services.data.services) {
         const codicon = getStatusIcon(service.current_incident_type);
-        items.push(new StatusNode(service.name, codicon, vscode.TreeItemCollapsibleState.None));
+        items.push(new StatusNode(service.name.replace('Akkaserverless ', '').replace('Lightbend ', ''), codicon, vscode.TreeItemCollapsibleState.None));
     }
 
     return Promise.resolve(items);
