@@ -1,15 +1,18 @@
 # Visual Studio Code Akka Serverless Tools
 
-An extension for developers building stateful serverless applications on [Akka Serverless](https://akkaserverless.com).
+Manage the stateful serverless applications you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE!
 
-Features include:
+With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
 
-* View your projects in an explorer tree view, and drill into services, members, invites, and Docker credentials.
-* Create new Akka Serverless projects.
-* Deploy, undeploy, expose, and unexpose services.
-* Invite users to your project or remove outstanding invites.
-* Add and remove Docker credentials to your projects to work with private registries.
-* Login to Akka Serverless.
+## Key features
+
+### Insight into your projects
+
+From the projects explorer you can see all the projects that you have access to and you can drill into services, members, and container registry credentials. You can find the ones you need to edit, you can add new ones, or even remove entries you no longer need with a few clicks rather than typing commands. Invite developers to your project? just click... Deploy a service to Akka Serverless? just click... Add a new HTTP route to your service? just click!
+
+### Easier deployments
+
+Through the extension you can deploy services to Akka Serverless, following the same type of wizard as in the [Akka Serverless Console](https://console.akkaserverless.com). From the same plugin, you can also get the logs of your service and tail them as you try out your service.
 
 **What's new in this version?**  See the [change log](CHANGELOG.md) to find out!
 
