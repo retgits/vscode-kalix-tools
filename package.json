@@ -442,17 +442,17 @@
 	"devDependencies": {
 		"@types/shelljs": "^0.8.8",
 		"@types/tmp": "^0.2.0",
-		"@types/vscode": "^1.51.0",
-		"@typescript-eslint/eslint-plugin": "^4.1.1",
-		"@typescript-eslint/eslint-plugin-tslint": "^4.20.0",
-		"@typescript-eslint/parser": "^4.1.1",
-		"eslint": "^7.9.0",
-		"standard-version": "^9.0.0",
-		"ts-loader": "^8.0.11",
-		"ts-node": "^9.1.1",
-		"typescript": "^4.0.2",
-		"webpack": "4.44.2",
-		"webpack-cli": "^4.6.0"
+		"@types/vscode": "^1.56.0",
+		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/eslint-plugin-tslint": "^4.26.0",
+		"@typescript-eslint/parser": "^4.26.0",
+		"eslint": "^7.27.0",
+		"standard-version": "^9.3.0",
+		"ts-loader": "^9.2.2",
+		"ts-node": "^10.0.0",
+		"typescript": "^4.3.2",
+		"webpack": "5.38.1",
+		"webpack-cli": "^4.7.0"
 	},
 	"homepage": "https://github.com/lightbend-labs/vscode-akkasls-tools",
 	"repository": {
