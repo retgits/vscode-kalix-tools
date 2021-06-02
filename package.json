@@ -16,7 +16,9 @@
 		"akka",
 		"serverless",
 		"akka serverless",
-		"lightbend"
+		"lightbend",
+		"java",
+		"javascript"
 	],
 	"icon": "resources/icon.png",
 	"activationEvents": [
