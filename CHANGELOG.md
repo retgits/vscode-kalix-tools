@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.2...v0.2.3) (2021-08-04)
+
+
+### Bug Fixes
+
+* add keywords ([d4aa66d](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/d4aa66d73548221e52b752f7bfa57be86f93ab3c))
+* add region flag for new version of akkasls ([318ef2b](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/318ef2b331e2a7e18e0e6f81e7ed93a53d759837))
+* update dev dependencies ([16ce045](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/16ce0450b79c46207da8d2be50539b56213003ab))
+* update outdated package ([8f2d04f](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/8f2d04fbd45d272fc3dc688c0ef1b28dd9207e53))
+* update publisher ID ([471d688](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/471d688124a38e956b1876406dd956be882c0816))
+* update README key features ([b989f73](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/b989f7312894d27231e70ecf2099b1e05375fe2d))
+
 ### [0.2.2](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.1...v0.2.2) (2021-04-05)
 
 
