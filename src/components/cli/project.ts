@@ -71,6 +71,7 @@ export async function newProject(name: string, description: string, cc: commandC
     const command = new Command('akkasls projects new');
     command.addParameter({name: 'name', value: name, addNameToCommand: false});
     command.addParameter({name: 'description', value: `"${description}"`, addNameToCommand: false});
+    command.addParameter({name: 'region', value: 'us-east1', addNameToCommand: true});
 
     // Set parameters
     command.setSilent(cc.silent);
