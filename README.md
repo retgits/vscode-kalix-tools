@@ -1,6 +1,6 @@
 # Akka Serverless Tools for VSCode
 
-[![version](https://img.shields.io/badge/version-0.2.4-brightgreen)](https://img.shields.io/badge/version-0.2.4-brightgreen)
+[![license](https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools)](https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools) ![GitHub package.json version](https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools)
 
 > Develop, deploy, and manage Akka Serverless apps
 
