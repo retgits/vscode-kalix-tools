@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.4...v0.3.0) (2021-09-24)
+
+
+### Features
+
+* add quickstarts and new views ([01793c2](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/01793c27b8299ab30a5f3ee6ee982e860e0bb9d0))
+
+
+### Bug Fixes
+
+* update package json ([6c308eb](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/6c308eb5e7b177418b70f26d921e3715dabd0dd8))
+* update readme ([c73d1c7](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/c73d1c7901e395b3d5fa54d9d2ca95981365cc7e))
+
 ### [0.2.4](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.3...v0.2.4) (2021-08-04)
 
 
