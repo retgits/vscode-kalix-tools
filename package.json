@@ -521,7 +521,7 @@
 		"installer": "vsce package && zip vscode-akkasls-tools-$npm_package_version.zip vscode-akkasls-tools-$npm_package_version.vsix README.md",
 		"readme": "ts-node utils/readme.ts",
 		"depcheck": "npx depcheck",
-		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
+		"release": "standard-version && npm run installer && git push --follow-tags origin main"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.2.22",
