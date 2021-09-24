@@ -1,8 +1,10 @@
-# Visual Studio Code Akka Serverless Tools
+# Akka Serverless Tools for VSCode
 
-Manage the stateful serverless applications you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE!
+[![version](https://img.shields.io/badge/version-0.2.4-brightgreen)](https://img.shields.io/badge/version-0.2.4-brightgreen)
 
-With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
+> Develop, deploy, and manage Akka Serverless apps
+
+Manage the stateful serverless applications you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
 
 ## Key features
 
@@ -20,7 +22,7 @@ Through the extension you can deploy services to Akka Serverless, following the 
 
 ### Install
 
-[Download the latest available release](https://github.com/lightbend-labs/vscode-akkasls-tools/releases)
+Download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools)
 
 ### Dependencies
 
@@ -28,60 +30,48 @@ The Akka Serverless extension may need to invoke the following command line tool
 
 ## Commands and features
 
-`vscode-akkasls-tools` supports a number of commands for interacting with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and may be bound to keys in the normal way.
-
-### General commands
-
-* `Log in`: Open the Akka Serverless Console to log in and authenticate the CLI
-* `Open console`: Open the Akka Serverless Console in a browser window
-* `Open docs`: Open the Akka Serverless documentation in a browser window
-* `Open forum`: Open the Akka Serverless forum in a browser window
-* `Open ideas portal`: Open the Akka Serverless ideas portal in a browser window
-* `Open status page`: Open the Akka Serverless status page in a browser window
-* `Generate new Javascript service (npx) - experimental`: Generate a new Javascript based service using npx
-* `Generate new Javascript service (npm) - experimental`: Generate a new Javascript based service using npm
-* `Generate new Java service (Maven) - experimental`: Generate a new Java based service using Maven
+`vscode-akkasls-tools` supports a number of commands to interact with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and the views that are contributed by the extension.
 
 ### Projects
 
-* `Refresh`: Refresh the project explorer
-* `Show details`: Show the details of the current selected item
-* `Logs`: Show the logs of a service based on selected parameters
-* `Create a new project`: Create a new project
-* `Deploy service`: Deploy a new service
-* `Delete service`: Delete an existing service
-* `Expose service`: Expose an existing service to the Internet
-* `Unexpose service`: Remove a hostname from a service
-* `Add registry credentials`: Add new credentials for a container registry
-* `Delete registry credentials`: Remove credentials for a container registry
-* `Invite user`: Invite a new user to your project
-* `Delete invitation`: Delete a previously sent invitation
+This view controls all your projects, services, invites and members, and container registries. It is your one-stop-shop to manage and control your projects
 
-### Accounts & Tokens
+### Account
 
-* `Refresh`: Refresh the account explorer
-* `Show details`: Show the details of the authentication token
-* `Revoke`: Revoke a selected authentication token
-* `Create a new token`: Create a new authentication token
+This view shows the account data for the user that is currently logged in
+
+### Tokens
+
+This view shows all tokens that are currently active for the user
 
 ### Status
 
-* `Refresh`: Refresh the status explorer
-* `Get info`: Open the Akka Serverless status page in your browser
+This view shows tatus information on the Akka Serverless platform
 
 ### Tools
 
-* `Refresh`: Refresh the tools explorer
-* `Get info`: Open the info page for a tool in a browser window
+This view goves an overview of the tools needed to build and deploy apps for Akka Serverless
 
-## Extension Settings
+## Configuration
 
-* `akkaserverless.dryrun`: Whether commands will be printed in the logs rather than execute them
-* `akkaserverless.logOutput`: Whether the result of the akkasls command is shown in the logs
-* `akkaserverless.configFile`: Location of the config file to use (default ~/.akkaserverless/config.yaml)
-* `akkaserverless.context`: The context to use
-* `akkaserverless.enableExperimentalFeatures`: Whether experimental features should be enabled
+- `akkaserverless.dryrun`: Whether commands will be printed in the logs rather than execute them
+- `akkaserverless.silent`: Whether commands executed should write to stdout
+- `akkaserverless.configFile`: Location of the config file to use (default ~/.akkaserverless/config.yaml)
+- `akkaserverless.context`: The context to use
+- `akkaserverless.enableExperimentalFeatures`: Whether experimental features should be enabled
 
 ## Release notes
 
 See the [change log](CHANGELOG.md).
+
+## Contributing
+
+We welcome all contributions! [Pull requests](https://github.com/lightbend-labs/vscode-akkasls-tools/pulls) are the preferred way to share your contributions. For major changes, please open [an issue](https://github.com/lightbend-labs/vscode-akkasls-tools/issues) first to discuss what you would like to change.
+
+## Support
+
+This project is provided on an as-is basis and is not covered by the Lightbend Support policy.
+
+## License
+
+See the [LICENSE](./LICENSE).

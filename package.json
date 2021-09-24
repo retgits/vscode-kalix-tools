@@ -4,8 +4,13 @@
 	"description": "Develop, deploy, and manage Akka Serverless apps",
 	"version": "0.2.4",
 	"publisher": "lightbend-labs",
+	"homepage": "https://github.com/lightbend-labs/vscode-akkasls-tools",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lightbend-labs/vscode-akkasls-tools"
+	},
 	"engines": {
-		"vscode": "^1.56.0"
+		"vscode": "^1.60.0"
 	},
 	"license": "MIT",
 	"categories": [
@@ -22,21 +27,20 @@
 	],
 	"icon": "resources/icon.png",
 	"activationEvents": [
+		"onView:as.toolsExplorer",
+		"onView:as.statusExplorer",
+		"onView:as.accountExplorer",
+		"onView:as.tokenExplorer",
+		"onView:as.projectExplorer",
 		"onCommand:as.commandpalette.auth.login",
 		"onCommand:as.commandpalette.browser.console",
 		"onCommand:as.commandpalette.browser.documentation",
 		"onCommand:as.commandpalette.browser.forum",
 		"onCommand:as.commandpalette.browser.ideas",
 		"onCommand:as.commandpalette.browser.statuspage",
-		"onCommand:as.commandpalette.entities.generateNpx",
-		"onCommand:as.commandpalette.entities.generateNpm",
-		"onCommand:as.commandpalette.entities.generateMaven",
-		"onView:as.toolsExplorer",
-		"onView:as.statusExplorer",
-		"onView:as.accountExplorer",
-		"onView:as.projectExplorer"
+		"onCommand:as.commandpalette.quickstart"
 	],
-	"main": "./dist/extension.js",
+	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
 			"title": "Akka Serverless",
@@ -46,10 +50,10 @@
 					"default": false,
 					"description": "Whether commands will be printed in the logs rather than execute them"
 				},
-				"akkaserverless.logOutput": {
+				"akkaserverless.silent": {
 					"type": "boolean",
 					"default": false,
-					"description": "Whether the result of the akkasls command is shown in the logs"
+					"description": "Whether commands executed should write to stdout"
 				},
 				"akkaserverless.configFile": {
 					"type": "string",
@@ -68,26 +72,6 @@
 				}
 			}
 		},
-		"views": {
-			"as": [
-				{
-					"id": "as.projectExplorer",
-					"name": "Projects"
-				},
-				{
-					"id": "as.accountExplorer",
-					"name": "Account & Tokens"
-				},
-				{
-					"id": "as.statusExplorer",
-					"name": "Status"
-				},
-				{
-					"id": "as.toolsExplorer",
-					"name": "Tools"
-				}
-			]
-		},
 		"viewsContainers": {
 			"activitybar": [
 				{
@@ -97,16 +81,45 @@
 				}
 			]
 		},
+		"views": {
+			"as": [
+				{
+					"id": "as.projectExplorer",
+					"name": "Projects",
+					"description": "This view controls all your projects, services, invites and members, and container registries. It is your one-stop-shop to manage and control your projects"
+				},
+				{
+					"id": "as.accountExplorer",
+					"name": "Account",
+					"description": "This view shows the account data for the user that is currently logged in"
+				},
+				{
+					"id": "as.tokenExplorer",
+					"name": "Tokens",
+					"description": "This view shows all tokens that are currently active for the user"
+				},
+				{
+					"id": "as.statusExplorer",
+					"name": "Status",
+					"description": "This view shows tatus information on the Akka Serverless platform"
+				},
+				{
+					"id": "as.toolsExplorer",
+					"name": "Tools",
+					"description": "This view goves an overview of the tools needed to build and deploy apps for Akka Serverless"
+				}
+			]
+		},
 		"menus": {
 			"view/title": [
 				{
-					"command": "as.toolsExplorer.refresh",
-					"when": "view == as.toolsExplorer",
+					"command": "as.projectExplorer.refresh",
+					"when": "view == as.projectExplorer",
 					"group": "navigation"
 				},
 				{
-					"command": "as.statusExplorer.refresh",
-					"when": "view == as.statusExplorer",
+					"command": "as.projectExplorer.addProject",
+					"when": "view == as.projectExplorer",
 					"group": "navigation"
 				},
 				{
@@ -115,100 +128,144 @@
 					"group": "navigation"
 				},
 				{
-					"command": "as.accountExplorer.tokenCreate",
-					"when": "view == as.accountExplorer",
-					"group": "0"
-				},
-				{
-					"command": "as.projectExplorer.refresh",
-					"when": "view == as.projectExplorer",
+					"command": "as.tokenExplorer.refresh",
+					"when": "view == as.tokenExplorer",
 					"group": "navigation"
 				},
 				{
-					"command": "as.projectExplorer.projectCreate",
-					"when": "view == as.projectExplorer",
-					"group": "0"
+					"command": "as.tokenExplorer.add",
+					"when": "view == as.tokenExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "as.statusExplorer.refresh",
+					"when": "view == as.statusExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "as.toolsExplorer.refresh",
+					"when": "view == as.toolsExplorer",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "as.toolsExplorer.info",
-					"when": "view == as.toolsExplorer && viewItem == Tools"
+					"command": "as.projectExplorer.addRegistryCredentials",
+					"when": "view == as.projectExplorer && viewItem == Credentials"
+				},
+				{
+					"command": "as.projectExplorer.deleteRegistryCredentials",
+					"when": "view == as.projectExplorer && viewItem == Credentials"
+				},
+				{
+					"command": "as.projectExplorer.credentialsInfo",
+					"when": "view == as.projectExplorer && viewItem == Credentials"
+				},
+				{
+					"command": "as.projectExplorer.addInvite",
+					"when": "view == as.projectExplorer && viewItem == Invites"
+				},
+				{
+					"command": "as.projectExplorer.deleteInvite",
+					"when": "view == as.projectExplorer && viewItem == Invites"
+				},
+				{
+					"command": "as.projectExplorer.inviteInfo",
+					"when": "view == as.projectExplorer && viewItem == Invites"
+				},
+				{
+					"command": "as.projectExplorer.deployService",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.deleteService",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.unexposeService",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.exposeService",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.serviceLogs",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.serviceInfo",
+					"when": "view == as.projectExplorer && viewItem == Services"
+				},
+				{
+					"command": "as.projectExplorer.deleteProject",
+					"when": "view == as.projectExplorer && viewItem == Projects"
+				},
+				{
+					"command": "as.projectExplorer.projectInfo",
+					"when": "view == as.projectExplorer && viewItem == Projects"
+				},
+				{
+					"command": "as.projectExplorer.memberInfo",
+					"when": "view == as.projectExplorer && viewItem == Members"
+				},
+				{
+					"command": "as.tokenExplorer.info",
+					"when": "view == as.tokenExplorer"
+				},
+				{
+					"command": "as.tokenExplorer.revoke",
+					"when": "view == as.tokenExplorer",
+					"group": "1"
 				},
 				{
 					"command": "as.statusExplorer.info",
 					"when": "view == as.statusExplorer"
 				},
 				{
-					"command": "as.accountExplorer.tokenInfo",
-					"when": "view == as.accountExplorer && viewItem == Tokens",
-					"group": "0"
-				},
-				{
-					"command": "as.accountExplorer.tokenRevoke",
-					"when": "view == as.accountExplorer && viewItem == Tokens",
-					"group": "1"
-				},
-				{
-					"command": "as.projectExplorer.info",
-					"when": "view == as.projectExplorer"
-				},
-				{
-					"command": "as.projectExplorer.serviceLogs",
-					"when": "view == as.projectExplorer && viewItem == Services"
-				},
-				{
-					"command": "as.projectExplorer.serviceCreate",
-					"when": "view == as.projectExplorer && viewItem != Credentials && viewItem != Invites && viewItem != Members"
-				},
-				{
-					"command": "as.projectExplorer.serviceDelete",
-					"when": "view == as.projectExplorer && viewItem == Services"
-				},
-				{
-					"command": "as.projectExplorer.serviceExpose",
-					"when": "view == as.projectExplorer && viewItem == Services"
-				},
-				{
-					"command": "as.projectExplorer.serviceUnexpose",
-					"when": "view == as.projectExplorer && viewItem == Services"
-				},
-				{
-					"command": "as.projectExplorer.registryCredentialsCreate",
-					"when": "view == as.projectExplorer && viewItem != Services && viewItem != Invites && viewItem != Members"
-				},
-				{
-					"command": "as.projectExplorer.registryCredentialsDelete",
-					"when": "view == as.projectExplorer && viewItem == Credentials"
-				},
-				{
-					"command": "as.projectExplorer.inviteCreate",
-					"when": "view == as.projectExplorer && viewItem != Services && viewItem != Credentials && viewItem != Members"
-				},
-				{
-					"command": "as.projectExplorer.inviteDelete",
-					"when": "view == as.projectExplorer && viewItem == Invites"
+					"command": "as.toolsExplorer.info",
+					"when": "view == as.toolsExplorer"
 				}
 			],
 			"commandPalette": [
 				{
-					"command": "as.toolsExplorer.info",
-					"when": "view == as.toolsExplorer"
+					"command": "as.projectExplorer.addRegistryCredentials",
+					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.accountExplorer.tokenInfo",
-					"when": "view == as.accountExplorer"
+					"command": "as.projectExplorer.deleteRegistryCredentials",
+					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.accountExplorer.tokenRevoke",
-					"when": "view == as.accountExplorer"
+					"command": "as.projectExplorer.credentialsInfo",
+					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.accountExplorer.tokenCreate",
-					"when": "view == as.accountExplorer"
+					"command": "as.projectExplorer.addInvite",
+					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.info",
+					"command": "as.projectExplorer.deleteInvite",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.inviteInfo",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.deployService",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.deleteService",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.unexposeService",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.exposeService",
 					"when": "view == as.projectExplorer"
 				},
 				{
@@ -216,44 +273,198 @@
 					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.projectCreate",
+					"command": "as.projectExplorer.serviceInfo",
 					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.serviceCreate",
+					"command": "as.projectExplorer.deleteProject",
 					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.serviceDelete",
+					"command": "as.projectExplorer.projectInfo",
 					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.serviceExpose",
+					"command": "as.projectExplorer.memberInfo",
 					"when": "view == as.projectExplorer"
 				},
 				{
-					"command": "as.projectExplorer.serviceUnexpose",
-					"when": "view == as.projectExplorer"
+					"command": "as.tokenExplorer.info",
+					"when": "view == as.tokenExplorer"
 				},
 				{
-					"command": "as.projectExplorer.registryCredentialsCreate",
-					"when": "view == as.projectExplorer"
+					"command": "as.tokenExplorer.revoke",
+					"when": "view == as.tokenExplorer"
 				},
 				{
-					"command": "as.projectExplorer.registryCredentialsDelete",
-					"when": "view == as.projectExplorer"
+					"command": "as.statusExplorer.info",
+					"when": "view == as.statusExplorer"
 				},
 				{
-					"command": "as.projectExplorer.inviteCreate",
-					"when": "view == as.projectExplorer"
-				},
-				{
-					"command": "as.projectExplorer.inviteDelete",
-					"when": "view == as.projectExplorer"
+					"command": "as.toolsExplorer.info",
+					"when": "view == as.toolsExplorer"
 				}
 			]
 		},
 		"commands": [
+			{
+				"command": "as.projectExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the project explorer"
+			},
+			{
+				"command": "as.projectExplorer.addRegistryCredentials",
+				"title": "Add registry credentials",
+				"description": "Add new credentials for a container registry"
+			},
+			{
+				"command": "as.projectExplorer.deleteRegistryCredentials",
+				"title": "Remove registry credentials",
+				"description": "Remove credentials for a container registry"
+			},
+			{
+				"command": "as.projectExplorer.credentialsInfo",
+				"title": "Show details",
+				"description": "Show registry credential details"
+			},
+			{
+				"command": "as.projectExplorer.addInvite",
+				"title": "Invite user",
+				"description": "Invite a new user to your project"
+			},
+			{
+				"command": "as.projectExplorer.deleteInvite",
+				"title": "Delete invite",
+				"description": "Delete a previously sent invite"
+			},
+			{
+				"command": "as.projectExplorer.inviteInfo",
+				"title": "Show details",
+				"description": "Show invite details"
+			},
+			{
+				"command": "as.projectExplorer.addProject",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"description": "Add a new project"
+			},
+			{
+				"command": "as.projectExplorer.deployService",
+				"title": "Deploy service",
+				"description": "Deploy a new service"
+			},
+			{
+				"command": "as.projectExplorer.deleteService",
+				"title": "Delete service",
+				"description": "Delete a service"
+			},
+			{
+				"command": "as.projectExplorer.exposeService",
+				"title": "Expose service",
+				"description": "Add an HTTP endpoint to your service"
+			},
+			{
+				"command": "as.projectExplorer.unexposeService",
+				"title": "Unexpose service",
+				"description": "Remove an HTTP endpoint from your service"
+			},
+			{
+				"command": "as.projectExplorer.serviceLogs",
+				"title": "Logs",
+				"description": "Show the logs of a service based on selected parameters"
+			},
+			{
+				"command": "as.projectExplorer.serviceInfo",
+				"title": "Show details",
+				"description": "Show service details"
+			},
+			{
+				"command": "as.projectExplorer.deleteProject",
+				"title": "Delete project",
+				"description": "Delete a project and all related data"
+			},
+			{
+				"command": "as.projectExplorer.projectInfo",
+				"title": "Show details",
+				"description": "Show project details"
+			},
+			{
+				"command": "as.projectExplorer.memberInfo",
+				"title": "Show details",
+				"description": "Show the details of a project member"
+			},
+			{
+				"command": "as.accountExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the account explorer"
+			},
+			{
+				"command": "as.tokenExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the token explorer"
+			},
+			{
+				"command": "as.tokenExplorer.info",
+				"title": "Show token details",
+				"description": "Print the details of an authentication token"
+			},
+			{
+				"command": "as.tokenExplorer.revoke",
+				"title": "Revoke",
+				"description": "Revoke a selected authentication token"
+			},
+			{
+				"command": "as.tokenExplorer.add",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				},
+				"description": "Add a new token"
+			},
+			{
+				"command": "as.statusExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the status explorer"
+			},
+			{
+				"command": "as.statusExplorer.info",
+				"title": "Open status page",
+				"description": "Open the Akka Serverless status page in your browser"
+			},
+			{
+				"command": "as.toolsExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				},
+				"description": "Refresh the status explorer"
+			},
+			{
+				"command": "as.toolsExplorer.info",
+				"title": "Get info",
+				"description": "Open the info page for a tool in a browser window"
+			},
 			{
 				"command": "as.commandpalette.auth.login",
 				"title": "Log in",
@@ -291,178 +502,49 @@
 				"description": "Open the Akka Serverless status page in a browser window"
 			},
 			{
-				"command": "as.commandpalette.entities.generateNpx",
-				"title": "Generate new Javascript service (npx) - experimental",
+				"command": "as.commandpalette.quickstart",
+				"title": "Download Quickstart",
 				"category": "Akka Serverless",
-				"description": "Generate a new Javascript based service using npx"
-			},
-			{
-				"command": "as.commandpalette.entities.generateNpm",
-				"title": "Generate new Javascript service (npm) - experimental",
-				"category": "Akka Serverless",
-				"description": "Generate a new Javascript based service using npm"
-			},
-			{
-				"command": "as.commandpalette.entities.generateMaven",
-				"title": "Generate new Java service (Maven) - experimental",
-				"category": "Akka Serverless",
-				"description": "Generate a new Java based service using Maven"
-			},
-			{
-				"command": "as.toolsExplorer.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the tools explorer"
-			},
-			{
-				"command": "as.toolsExplorer.info",
-				"title": "Get info",
-				"description": "Open the info page for a tool in a browser window"
-			},
-			{
-				"command": "as.statusExplorer.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the status explorer"
-			},
-			{
-				"command": "as.statusExplorer.info",
-				"title": "Get info",
-				"description": "Open the Akka Serverless status page in your browser"
-			},
-			{
-				"command": "as.accountExplorer.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the account explorer"
-			},
-			{
-				"command": "as.accountExplorer.tokenInfo",
-				"title": "Show details",
-				"description": "Show the details of the authentication token"
-			},
-			{
-				"command": "as.accountExplorer.tokenRevoke",
-				"title": "Revoke",
-				"description": "Revoke a selected authentication token"
-			},
-			{
-				"command": "as.accountExplorer.tokenCreate",
-				"title": "Create a new token",
-				"description": "Create a new authentication token"
-			},
-			{
-				"command": "as.projectExplorer.refresh",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				},
-				"description": "Refresh the project explorer"
-			},
-			{
-				"command": "as.projectExplorer.info",
-				"title": "Show details",
-				"description": "Show the details of the current selected item"
-			},
-			{
-				"command": "as.projectExplorer.serviceLogs",
-				"title": "Logs",
-				"description": "Show the logs of a service based on selected parameters"
-			},
-			{
-				"command": "as.projectExplorer.projectCreate",
-				"title": "Create a new project",
-				"description": "Create a new project"
-			},
-			{
-				"command": "as.projectExplorer.serviceCreate",
-				"title": "Deploy service",
-				"description": "Deploy a new service"
-			},
-			{
-				"command": "as.projectExplorer.serviceDelete",
-				"title": "Delete service",
-				"description": "Delete an existing service"
-			},
-			{
-				"command": "as.projectExplorer.serviceExpose",
-				"title": "Expose service",
-				"description": "Expose an existing service to the Internet"
-			},
-			{
-				"command": "as.projectExplorer.serviceUnexpose",
-				"title": "Unexpose service",
-				"description": "Remove a hostname from a service"
-			},
-			{
-				"command": "as.projectExplorer.registryCredentialsCreate",
-				"title": "Add registry credentials",
-				"description": "Add new credentials for a container registry"
-			},
-			{
-				"command": "as.projectExplorer.registryCredentialsDelete",
-				"title": "Delete registry credentials",
-				"description": "Remove credentials for a container registry"
-			},
-			{
-				"command": "as.projectExplorer.inviteCreate",
-				"title": "Invite user",
-				"description": "Invite a new user to your project"
-			},
-			{
-				"command": "as.projectExplorer.inviteDelete",
-				"title": "Delete invitation",
-				"description": "Delete a previously sent invitation"
+				"description": "Download an Akka Serverless quickstart"
 			}
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "webpack --mode production --config ./utils/webpack.build.config.js",
-		"compile": "webpack --devtool nosources-source-map --config ./utils/webpack.build.config.js",
-		"lint": "eslint src --ext ts",
-		"pretest": "npm run test-compile && npm run lint",
+		"vscode:prepublish": "npm run esbuild-base -- --minify",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
 		"test-compile": "tsc -p ./",
-		"test-watch": "tsc -watch -p ./",
-		"utils:depcheck": "npx depcheck",
-		"utils:installer": "ts-node ./utils/generateInstaller.ts",
-		"utils:readme": "ts-node ./utils/generateReadMe.ts",
-		"watch": "webpack --watch --devtool nosources-source-map --config ./utils/webpack.build.config.js",
+		"build": "npm run -S esbuild-base -- --sourcemap",
+		"watch": "npm run -S esbuild-base -- --sourcemap --watch",
+		"pretest": "npm run test-compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js",
+		"installer": "vsce package && zip vscode-akkasls-tools-$npm_package_version.zip vscode-akkasls-tools-$npm_package_version.vsix README.md",
+		"readme": "ts-node utils/readme.ts",
+		"depcheck": "npx depcheck",
 		"release": "standard-version && npm run utils:installer && git push --follow-tags origin main"
 	},
 	"devDependencies": {
-		"@types/shelljs": "^0.8.8",
-		"@types/tmp": "^0.2.0",
-		"@types/vscode": "^1.56.0",
+		"@types/chai": "^4.2.22",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.2.2",
+		"@types/node": "14.x",
+		"@types/vscode": "^1.60.0",
 		"@typescript-eslint/eslint-plugin": "^4.26.0",
-		"@typescript-eslint/eslint-plugin-tslint": "^4.26.0",
 		"@typescript-eslint/parser": "^4.26.0",
+		"chai": "^4.3.4",
+		"esbuild": "^0.13.2",
 		"eslint": "^7.27.0",
-		"standard-version": "^9.3.0",
-		"ts-loader": "^9.2.2",
-		"ts-node": "^10.0.0",
+		"glob": "^7.1.7",
+		"mocha": "^8.4.0",
+		"standard-version": "^9.3.1",
+		"ts-loader": "^9.2.6",
+		"ts-node": "^10.2.1",
 		"typescript": "^4.3.2",
-		"webpack": "5.38.1",
-		"webpack-cli": "^4.7.0"
-	},
-	"homepage": "https://github.com/lightbend-labs/vscode-akkasls-tools",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/lightbend-labs/vscode-akkasls-tools"
+		"vscode-test": "^1.5.2"
 	},
 	"dependencies": {
-		"axios": "^0.21.1",
-		"cli-table3": "^0.6.0",
-		"shelljs": "^0.8.4",
-		"tmp": "^0.2.1"
+		"exec-sh": "^0.4.0",
+		"got": "^11.8.2",
+		"table": "^6.7.1"
 	}
 }
