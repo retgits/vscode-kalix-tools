@@ -1,6 +1,6 @@
 site:
   title: "Akka Serverless Tools for VSCode Documentation"
-  url: https://docs.akkaserverless.dev
+  url: https://lightbend-labs.github.io/vscode-akkasls-tools/
 
 content:
   sources:
