@@ -14,6 +14,7 @@ jobs:
         run: |
           npm i -g @antora/cli @antora/site-generator-default  
           cd docs && make html
+          touch build/site/.nojekyll
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
