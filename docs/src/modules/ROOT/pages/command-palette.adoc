@@ -1,0 +1,13 @@
+= Command Palette
+
+include::ROOT:partial$include.adoc[]
+
+VSCode allows you to access all available commands from the command palette. This extension adds an `Akka Serverless` category with the below commands:
+
+- **Log in**: Open the Akka Serverless Console to log in and authenticate the CLI
+- **Open console**: Open the Akka Serverless Console in a browser window
+- **Open docs**: Open the Akka Serverless documentation in a browser window
+- **Open forum**: Open the Akka Serverless forum in a browser window
+- **Open ideas portal**: Open the Akka Serverless ideas portal in a browser window
+- **Open status page**: Open the Akka Serverless status page in a browser window
+- **Download Quickstart**: Download an Akka Serverless quickstart

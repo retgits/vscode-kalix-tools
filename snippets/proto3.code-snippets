@@ -1,0 +1,142 @@
+{
+    "proto.package": {
+        "prefix": "proto.package",
+        "body": [
+            "syntax = \"proto3\";",
+            "",
+            "package $1;",
+            "",
+            "import \"akkaserverless/annotations.proto\";",
+            ""
+        ],
+        "description": "This snippet adds the basic structure of a proto file"
+    },
+    "proto.imports": {
+        "prefix": "proto.imports",
+        "body": [
+            "import \"google/api/annotations.proto\";",
+            "import \"google/protobuf/empty.proto\";",
+        ],
+        "description": "This snippet adds common protobuf imports"
+    },
+    "proto.message": {
+        "prefix": "proto.message",
+        "body": [
+            "message $1 {",
+            "// Add message fields and add [(akkaserverless.field).entity_key = true] for the entity key",
+            "}",
+        ],
+        "description": "This snippet adds a message definition"
+    },
+    "proto.service": {
+        "prefix": "proto.service",
+        "body": [
+            "service $1 {",
+            "",
+            "}",
+        ],
+        "description": "This snippet adds a service definition"
+    },
+    "proto.method": {
+        "prefix": "proto.method",
+        "body": [
+            "rpc $1($2) returns ($3) {",
+            "",
+            "}",
+        ],
+        "description": "This snippet adds a service definition"
+    },
+    "proto.http": {
+        "prefix": "proto.http",
+        "body": [
+            "option (google.api.http) = {",
+            "    $1: \"<url>\"",
+            "}",
+        ],
+        "description": "This snippet adds the HTTP annotation for a service"
+    },
+    "proto.view": {
+        "prefix": "proto.view",
+        "body": [
+            "rpc $1($2) returns ($3) {",
+            "    option (akkaserverless.method).eventing.in = {",
+            "        value_entity: \"\"",
+            "    };",
+            "    option (akkaserverless.method).view.update = {",
+            "        table: \"\"",
+            "    };",
+            "}",
+        ],
+        "description": "This snippet adds the View annotation for a service"
+    },
+    "proto.query": {
+        "prefix": "proto.query",
+        "body": [
+            "option (akkaserverless.method).view.query = {",
+            "    query: \"SELECT * FROM\"",
+            "};",
+        ],
+        "description": "This snippet adds the Query annotation for a service"
+    },
+    "proto.helloworld": {
+        "prefix": "proto.helloworld",
+        "body": [
+            "syntax = \"proto3\";",
+            "",
+            "package valueentity;",
+            "",
+            "import \"akkaserverless/annotations.proto\";",
+            "import \"google/api/annotations.proto\";",
+            "",
+            "message HelloWorldState {",
+            "    string name = 1 [(akkaserverless.field).entity_key = true];",
+            "    string message = 2;",
+            "    int32 count = 3;",
+            "}",
+            "",
+            "message HelloWorldRequest {",
+            "    string name = 1 [(akkaserverless.field).entity_key = true];",
+            "    string greeting = 2;",
+            "}",
+            "",
+            "message HelloWorldResponse {",
+            "    string message = 1;",
+            "}",
+            "",
+            "service valueEntityService {",
+            "    rpc SayHello(HelloWorldRequest) returns (HelloWorldResponse) {",
+            "        option (google.api.http) = {",
+            "            post: \"/sayhello/{name}\",",
+            "            body: \"*\"",
+            "        };",
+            "    }",
+            "}",
+            "",
+            "message ByMessageRequest {",
+            "    string message = 1;",
+            "}",
+            "",
+            "service viewService {",
+            "    rpc UpdateView(HelloWorldState) returns (HelloWorldState) {",
+            "        option (akkaserverless.method).eventing.in = {",
+            "            value_entity: \"valueentities\"",
+            "        };",
+            "        option (akkaserverless.method).view.update = {",
+            "            table: \"valueentities\"",
+            "        };",
+            "    }",
+            "",
+            "    rpc GetByMessage(ByMessageRequest) returns (stream HelloWorldState) {",
+            "        option (akkaserverless.method).view.query = {",
+            "            query: \"SELECT * FROM valueentities WHERE message = :message\"",
+            "        };",
+            "        option (google.api.http) = {",
+            "            post: \"/view\",",
+            "            body: \"*\"",
+            "        };",
+            "    }",
+            "}",
+        ],
+        "description": "This snippet adds a complete hello world example"
+    }
+}

@@ -1,0 +1,7 @@
+* xref:index.adoc[Akka Serverless Tools for VSCode]
+** xref:install.adoc[]
+** xref:configuration.adoc[]
+** xref:command-palette.adoc[]
+** xref:quickstarts.adoc[]
+** xref:views.adoc[]
+** xref:snippets.adoc[]

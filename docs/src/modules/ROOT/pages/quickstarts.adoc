@@ -1,0 +1,5 @@
+= Quickstarts
+
+include::ROOT:partial$include.adoc[]
+
+The `Download Quickstart` command from the command palette allows you to download and extract Akka Serverless quickstarts in the folder of your choice. To download a new quickstart, simply open the command palette and type `Download Quickstart`. This will start a wizard to download the quickstart you want to a folder you choose!

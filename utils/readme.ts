@@ -73,7 +73,7 @@ let readmeContent: string = `# ${extensionData.displayName}
 
 > ${extensionData.description}
 
-Manage the stateful serverless applications you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
+Manage the stateful serverless services you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
 
 ## Key features
 
@@ -89,37 +89,8 @@ Through the extension you can deploy services to Akka Serverless, following the 
 
 ## Getting started with the extension
 
-### Install
+To get started, download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools). You'll also need \`akkasls\` and \`docker\` (if you plan to use the extension to build applications rather than only browse).
 
-Download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools)
-
-### Dependencies
-
-The Akka Serverless extension may need to invoke the following command line tools, depending on which features you use. You will need \`akkasls\` at minimum, and \`docker\` if you plan to use the extension to build applications rather than only browse.
-
-## Commands and features
-
-\`${extensionData.name}\` supports a number of commands to interact with Akka Serverless; these are accessible via the command menu (\`Ctrl+Shift+P\`) and the views that are contributed by the extension.
-
-`;
-
-for (let index = 0; index < extensionData.contributes.views.as.length; index++) {
-    const element = extensionData.contributes.views.as[index];
-    readmeContent += `### ${element.name}
-
-${element.description}
-
-`;
-}
-
-readmeContent += '## Configuration\n\n';
-
-for (let index = 0; index < Object.keys(extensionData.contributes.configuration.properties).length; index++) {
-    const element = extensionData.contributes.configuration.properties[Object.keys(extensionData.contributes.configuration.properties)[index]];
-    readmeContent += `- \`${Object.keys(extensionData.contributes.configuration.properties)[index]}\`: ${element.description}\n`;
-}
-
-readmeContent += `
 ## Release notes
 
 See the [change log](CHANGELOG.md).
@@ -130,7 +101,7 @@ We welcome all contributions! [Pull requests](https://github.com/lightbend-labs/
 
 ## Support
 
-This project is provided on an as-is basis and is not covered by the Lightbend Support policy.
+This project is an [incubating project](https://developer.lightbend.com/docs/introduction/getting-help/support-terminology.html).
 
 ## License
 

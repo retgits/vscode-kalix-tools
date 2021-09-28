@@ -1,0 +1,62 @@
+= Views
+
+include::ROOT:partial$include.adoc[]
+
+Akka Serverless Tools for VSCode includes five views that help you control all aspects of your development lifecycle:
+
+- xref:views.adoc#_projects[]
+- xref:views.adoc#_account[]
+- xref:views.adoc#_tokens[]
+- xref:views.adoc#_status[]
+- xref:views.adoc#_tools[]
+
+To see these views, select the Akka Serverless icon from your side bar.
+
+image::iconbar.png[width=75%]
+
+== Projects
+
+This view controls all your projects, services, invites and members, and container registries. It is your one-stop-shop to manage and control your projects.
+
+image::projects.png[width=75%]
+
+- You can create new projects by clicking on the `+` symbol. A wizard will ask you to provide a name and a description to create your project.
+- Right-clicking on an existing project will give you the option to delete the project (and all data associated with it) or show the project details.
+
+The project has four subcategories:
+
+- Services: Right-clicking on a service allows you to deploy, delete, expose, unexpose a service, view logs, and view service details. Each of these commands will start a wizard to get the required details.
+- Credentials: Right-clicking on a container registry credential allows you to add new container registry credentials or remove them from your project. Showing the credentials will never show you the password.
+- Members: Right-clicking on a member allows you to see the details of a member in your project.
+- Invites: Right-clicking on an invite allows you to invite new members and delete previously created invites.
+
+== Account
+
+This view shows the account data for the user that is currently logged in.
+
+image::account.png[width=75%]
+
+== Tokens
+
+This view shows all tokens that are currently active for the user. Tokens are used to control access to Akka Serverless, from the Akka Serverless Console, the CLI, or CI/CD systems. 
+
+image::tokens.png[width=75%]
+
+- You can create new tokens by clicking on the `+` symbol. A wizard will ask you to provide a type, scope, and a description to create your token.
+- Right-clicking on an existing token will give you the option to revoke the token or show the token details.
+
+== Status
+
+This view shows tatus information on the Akka Serverless platform
+
+image::status.png[width=75%]
+
+Right-clicking on an element will give you the option to open the status page of Akka Serverless in your browser.
+
+== Tools
+
+This view gives an overview of the tools needed to build and deploy apps for Akka Serverless
+
+image::tools.png[width=75%]
+
+Right-clicking on an element will give you the option to open the download page of the tool in your browser.

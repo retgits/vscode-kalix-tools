@@ -1,0 +1,99 @@
+= Snippets
+
+include::ROOT:partial$include.adoc[]
+
+Akka Serverless Tools for VSCode includes snippets for JavaScript, TypeScript, and Protobuf to make developing stateful serverless services even easier. To add the snippets, create a `.proto`, `.ts`, or `.js` file and type the "_prefix_"
+
+== Protobuf
+
+[width="95%", cols="a,a", options="header"]
+|===
+^| Prefix
+^| Description
+
+| `proto.package`
+| This snippet adds the basic structure of a proto file (syntax, package, and import statement for the Akka Serverless annotations)
+
+| `proto.imports`
+| This snippet adds the common protobuf imports for HTTP-based APIs and empty responses
+
+| `proto.message`
+| This snippet adds a message definition
+
+| `proto.service`
+| This snippet adds a service definition
+
+| `proto.method`
+| This snippet adds a service definition
+
+| `proto.http`
+| This snippet adds the HTTP annotation for a service
+
+| `proto.view`
+| This snippet adds the View annotation for a service based on a Value Entity
+
+| `proto.query`
+| This snippet adds the Query annotation for a service
+
+| `proto.helloworld`
+| This snippet adds a complete hello world example, showing all of the above options
+
+|===
+
+== TypeScript
+
+[width="95%", cols="a,a", options="header"]
+|===
+^| Prefix
+^| Description
+
+| `ts.import`
+| This snippet adds the Akka Serverless TypeScript SDK import
+
+| `ts.valueentity`
+| This snippet adds a Value Entity definition
+
+| `ts.view`
+| This snippet adds a View definition
+
+| `ts.index`
+| This snippet adds default statements for an index.ts file
+
+| `ts.helloworld.valueentity`
+| This snippet adds a complete hello world Value Entity example based on the API definition from `proto.helloworld`
+
+| `ts.helloworld.view`
+| This snippet adds a complete hello world View example based on the API definition from `proto.helloworld`
+
+| `ts.helloworld.index`
+| This snippet adds a complete hello world index.ts example based on the Value Entity and View.
+|===
+
+== JavaScript
+
+[width="95%", cols="a,a", options="header"]
+|===
+^| Prefix
+^| Description
+
+| `js.import`
+| This snippet adds the Akka Serverless JavaScript SDK import
+
+| `js.valueentity`
+| This snippet adds a Value Entity definition
+
+| `js.view`
+| This snippet adds a View definition
+
+| `js.index`
+| This snippet adds default statements for an index.js file
+
+| `js.helloworld.valueentity`
+| This snippet adds a complete hello world Value Entity example based on the API definition from `proto.helloworld`
+
+| `js.helloworld.view`
+| This snippet adds a complete hello world View example based on the API definition from `proto.helloworld`
+
+| `js.helloworld.index`
+| This snippet adds a complete hello world index.js example based on the Value Entity and View.
+|===

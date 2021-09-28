@@ -77,7 +77,7 @@ async function createService(p: ProjectExplorerNode): Promise<ShellResult> {
     });
 
     if (name === undefined) {
-        return { code: -1, stderr: 'no name provided' };
+        return { code: '-1', stderr: 'no name provided' };
     }
 
     const image = await showInputBox({
@@ -86,7 +86,7 @@ async function createService(p: ProjectExplorerNode): Promise<ShellResult> {
     });
 
     if (image === undefined) {
-        return { code: -1, stderr: 'no image URL provided' };
+        return { code: '-1', stderr: 'no image URL provided' };
     }
 
     const vars = await showInputBox({
@@ -112,7 +112,7 @@ async function createService(p: ProjectExplorerNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -128,7 +128,7 @@ async function serviceDelete(s: ServiceNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -143,7 +143,7 @@ async function serviceExpose(s: ServiceNode): Promise<ShellResult> {
     });
 
     if (flags === undefined) {
-        return { code: -1, stderr: 'no flags provided' };
+        return { code: '-1', stderr: 'no flags provided' };
     }
 
     let result: ShellResult;
@@ -153,7 +153,7 @@ async function serviceExpose(s: ServiceNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -165,7 +165,7 @@ async function serviceUnexpose(s: ServiceNode): Promise<ShellResult> {
     let p = await getProject(s.parentProjectID, getConfiguration());
 
     if (p.code !== undefined) {
-        return { code: -1, stderr: p.stderr };
+        return { code: '-1', stderr: p.stderr };
     }
 
     let project = Convert.toProjectDetails(p.stdout!);
@@ -182,7 +182,7 @@ async function serviceUnexpose(s: ServiceNode): Promise<ShellResult> {
     });
 
     if (host === undefined) {
-        return { code: -1, stderr: 'no hostname provided' };
+        return { code: '-1', stderr: 'no hostname provided' };
     }
 
     let result: ShellResult;
@@ -192,7 +192,7 @@ async function serviceUnexpose(s: ServiceNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }

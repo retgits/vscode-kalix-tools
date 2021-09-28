@@ -44,7 +44,7 @@ async function revokeAuthToken(tkn: TokenNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -65,7 +65,7 @@ async function addAuthToken(): Promise<ShellResult> {
     });
 
     if (tokenType === undefined) {
-        return { code: -1, stderr: 'no token type provided' };
+        return { code: '-1', stderr: 'no token type provided' };
     }
 
     const tokenScope = await showSingleQuickPick({
@@ -75,7 +75,7 @@ async function addAuthToken(): Promise<ShellResult> {
     });
 
     if (tokenScope === undefined) {
-        return { code: -1, stderr: 'no token scope provided' };
+        return { code: '-1', stderr: 'no token scope provided' };
     }
 
     const tokenDescription = await showInputBox({
@@ -84,7 +84,7 @@ async function addAuthToken(): Promise<ShellResult> {
     });
 
     if (tokenDescription === undefined) {
-        return { code: -1, stderr: 'no token description provided' };
+        return { code: '-1', stderr: 'no token description provided' };
     }
 
     let result: ShellResult;
@@ -94,7 +94,7 @@ async function addAuthToken(): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }

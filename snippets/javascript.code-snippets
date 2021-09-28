@@ -1,0 +1,110 @@
+{
+    "js.import": {
+        "prefix": "js.import",
+        "body": "import as from '@lightbend/akkaserverless-javascript-sdk';",
+        "description": "This snippet adds the Akka Serverless JavaScript SDK import"
+    },
+    "js.valueentity": {
+        "prefix": "js.valueentity",
+        "body": [
+            "export const entity = new as.ValueEntity(",
+            "    ['$1',],",
+            "    '$2',",
+            "    '$3'",
+            ");",
+            "",
+            "entity.setInitial(entitykey => {});",
+            "",
+            "entity.setCommandHandlers({});"
+        ],
+        "description": "This snippet adds a Value Entity definition"
+    },
+    "js.view": {
+        "prefix": "js.view",
+        "body": [
+            "export const view = new as.View(",
+            "    ['$1',],",
+            "    '$2',",
+            "    {",
+            "        viewId: '$3'",
+            "    }",
+            ");",
+        ],
+        "description": "This snippet adds a View definition"
+    },
+    "js.index": {
+        "prefix": "js.index",
+        "body": [
+            "import as from '@lightbend/akkaserverless-javascript-sdk';",
+            "",
+            "const server = new as.AkkaServerless();",
+            "server.addComponent();",
+            "server.start({address: '0.0.0.0', port: '8080'});"
+        ],
+        "description": "This snippet adds a default index.js file"
+    },
+    "js.helloworld.valueentity": {
+        "prefix": "js.helloworld.valueentity",
+        "body": [
+            "import as from '@lightbend/akkaserverless-javascript-sdk';",
+            "",
+            "export const entity = new as.ValueEntity(",
+            "    ['valueentity.proto',],",
+            "    'valueentity.valueEntityService',",
+            "    'valueentities'",
+            ");",
+            "",
+            "const state = entity.lookupType('valueentity.HelloWorldState')",
+            "",
+            "entity.setInitial(name => state.create({",
+            "    name: name,",
+            "    greeting: '',",
+            "    count: 0",
+            "}));",
+            "",
+            "entity.commandHandlers = {",
+            "    SayHello: sayHelloWorld,",
+            "}",
+            "",
+            "function sayHelloWorld(request, current, context) {",
+            "    context.updateState(state.create({",
+            "        name: context.entityId,",
+            "        message: `${request.greeting}, ${request.name}!`,",
+            "        count: current.count + 1",
+            "    }))",
+            "",
+            "    return { message: `${request.greeting}, ${request.name}!` };",
+            "}"
+        ],
+        "description": "This snippet adds a complete hello world Value Entity example"
+    },
+    "js.helloworld.view": {
+        "prefix": "js.helloworld.view",
+        "body": [
+            "import as from '@lightbend/akkaserverless-javascript-sdk';",
+            "",
+            "export const view = new as.View(",
+            "    ['valueentity.proto'],",
+            "    'valueentity.viewService',",
+            "    {",
+            "        viewId: 'myview'",
+            "    }",
+            ");"
+        ],
+        "description": "This snippet adds a complete hello world View example"
+    },
+    "js.helloworld.index": {
+        "prefix": "js.helloworld.index",
+        "body": [
+            "import as from '@lightbend/akkaserverless-javascript-sdk';",
+            "import entity from './valueentity.js';",
+            "import view from './view.js';",
+            "",
+            "const server = new as.AkkaServerless();",
+            "server.addComponent(entity);",
+            "server.addComponent(view);",
+            "server.start({address: '0.0.0.0', port: '8080'});"
+        ],
+        "description": "This snippet adds a complete hello world index.js example"
+    }
+}

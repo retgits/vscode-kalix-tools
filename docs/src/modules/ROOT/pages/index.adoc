@@ -1,0 +1,26 @@
+= Akka Serverless Tools for VSCode
+
+include::ROOT:partial$include.adoc[]
+
+image:https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools[link=https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools] image:https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools[link=https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools]
+
+> Develop, deploy, and manage Akka Serverless apps
+
+Manage the stateful serverless applications you build on https://akkaserverless.com[Akka Serverless], without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
+
+== Insight into your projects
+
+From the projects explorer you can see all the projects that you have access to and you can drill into services, members, and container registry credentials. You can find the ones you need to edit, you can add new ones, or even remove entries you no longer need with a few clicks rather than typing commands. Invite developers to your project? just click... Deploy a service to Akka Serverless? just click... Add a new HTTP route to your service? just click!
+
+== Easier deployments
+
+Through the extension you can deploy services to Akka Serverless, following the same type of wizard as in the https://console.akkaserverless.com[Akka Serverless Console]. From the same plugin, you can also get the logs of your service and tail them as you try out your service.
+
+[NOTE]
+====
+We welcome all contributions! https://github.com/lightbend-labs/vscode-akkasls-tools/pulls[Pull requests] are the preferred way to share your contributions. For major changes, please open https://github.com/lightbend-labs/vscode-akkasls-tools/issues[an issue] first to discuss what you would like to change.
+====
+
+== Support
+
+This project is an https://developer.lightbend.com/docs/introduction/getting-help/support-terminology.html[incubating project].

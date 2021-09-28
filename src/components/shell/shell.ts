@@ -118,7 +118,7 @@ function execOpts(): any {
  *
  * @param {string} cmd The command to execute
  * @param {*} [opts] The execution options to pass in (if none are provided, the default is used)
- * @return {*}  {Promise<ShellResult>} A ShellResult (with code -1 when an error occurs)
+ * @return {*}  {Promise<ShellResult>} A ShellResult (with code '-1' when an error occurs)
  */
 async function exec(cmd: string, opts?: any): Promise<ShellResult> {
     try {
@@ -139,7 +139,7 @@ async function exec(cmd: string, opts?: any): Promise<ShellResult> {
  *
  * @param {string} cmd The command to execute
  * @param {(proc: ChildProcess) => void} callback The function that handles data from the executed process
- * @return {*}  {Promise<ShellResult>} A ShellResult (with code -1 when an error occurs)
+ * @return {*}  {Promise<ShellResult>} A ShellResult (with code '-1' when an error occurs)
  */
 async function execStreaming(cmd: string, callback: (proc: ChildProcess) => void, opts?: any): Promise<ShellResult> {
     console.log(cmd);

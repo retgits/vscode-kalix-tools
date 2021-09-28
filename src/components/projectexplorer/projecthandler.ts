@@ -36,7 +36,7 @@ async function createProject(): Promise<ShellResult> {
     });
 
     if (name === undefined) {
-        return { code: -1, stderr: 'no name provided' };
+        return { code: '-1', stderr: 'no name provided' };
     }
 
     const description = await showInputBox({
@@ -45,7 +45,7 @@ async function createProject(): Promise<ShellResult> {
     });
 
     if (description === undefined) {
-        return { code: -1, stderr: 'no description provided' };
+        return { code: '-1', stderr: 'no description provided' };
     }
 
     let result: ShellResult;
@@ -55,7 +55,7 @@ async function createProject(): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -71,7 +71,7 @@ async function removeProject(p: ProjectNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }

@@ -43,7 +43,7 @@ async function sendInvitation(p: ProjectExplorerNode): Promise<ShellResult> {
     });
 
     if (email === undefined) {
-        return { code: -1, stderr: 'no email address provided' };
+        return { code: '-1', stderr: 'no email address provided' };
     }
 
     let result: ShellResult;
@@ -53,7 +53,7 @@ async function sendInvitation(p: ProjectExplorerNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -69,7 +69,7 @@ async function deleteInvitation(i: InviteNode): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }

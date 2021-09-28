@@ -1,0 +1,16 @@
+= Configuration
+
+include::ROOT:partial$include.adoc[]
+
+Akka Serverless Tools for VSCode includes five configuration settings that control how the Akka Serverless CLI is invoked. To open your user and workspace settings, use the following VS Code menu command:
+
+- On Windows/Linux - `File > Preferences > Settings`
+- On macOS - `Code > Preferences > Settings`
+
+== Settings
+
+- `akkaserverless.dryrun`: Whether commands will be printed in the logs rather than execute them
+- `akkaserverless.silent`: Whether commands executed should write to stdout
+- `akkaserverless.configFile`: Location of the config file to use (default ~/.akkaserverless/config.yaml)
+- `akkaserverless.context`: The context to use
+- `akkaserverless.enableExperimentalFeatures`: Whether experimental features should be enabled

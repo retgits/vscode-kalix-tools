@@ -1,0 +1,118 @@
+{
+    "ts.import": {
+        "prefix": "ts.import",
+        "body": "import {} from '@lightbend/akkaserverless-javascript-sdk';",
+        "description": "This snippet adds the Akka Serverless TypeScript SDK import"
+    },
+    "ts.valueentity": {
+        "prefix": "ts.valueentity",
+        "body": [
+            "export const Entity = new ValueEntity(",
+            "    ['$1',],",
+            "    '$2',",
+            "    '$3'",
+            ");",
+            "",
+            "Entity.setInitial(entitykey => {});",
+            "",
+            "Entity.setCommandHandlers({});"
+        ],
+        "description": "This snippet adds a Value Entity definition"
+    },
+    "ts.view": {
+        "prefix": "ts.view",
+        "body": [
+            "export const view = new View(",
+            "    ['$1',],",
+            "    '$2',",
+            "    {",
+            "        viewId: '$3'",
+            "    }",
+            ");",
+        ],
+        "description": "This snippet adds a View definition"
+    },
+    "ts.index": {
+        "prefix": "ts.index",
+        "body": [
+            "import { AkkaServerless } from '@lightbend/akkaserverless-javascript-sdk';",
+            "",
+            "new AkkaServerless()",
+            "    .addComponent()",
+            "    .start({address: '0.0.0.0', port: '8080'});"
+        ],
+        "description": "This snippet adds a default index.ts file"
+    },
+    "ts.helloworld.valueentity": {
+        "prefix": "ts.helloworld.valueentity",
+        "body": [
+            "import { ValueEntity, replies } from '@lightbend/akkaserverless-javascript-sdk';",
+            "import * as proto from '../lib/generated/app';",
+            "",
+            "// Type definitions",
+            "type Context = ValueEntity.ValueEntityCommandContext;",
+            "type Request = proto.valueentity.HelloWorldRequest",
+            "type State = proto.valueentity.HelloWorldState;",
+            "",
+            "export const Entity = new ValueEntity(",
+            "    ['app.proto'],",
+            "    'valueentity.valueEntityService',",
+            "    'valueentities'",
+            ");",
+            "",
+            "const EntityState = Entity.lookupType('valueentity.HelloWorldState');",
+            "",
+            "Entity.setInitial(name => EntityState.create({",
+            "    name: name,",
+            "    greeting: '',",
+            "    count: 0",
+            "}));",
+            "",
+            "Entity.setCommandHandlers({",
+            "    SayHello: sayHelloWorld",
+            "});",
+            "",
+            "function sayHelloWorld(req: Request, curr: State, ctx: Context) {",
+            "    ctx.updateState(EntityState.create({",
+            "        name: ctx.entityId,",
+            "        message: `${req.greeting}, ${req.name}`,",
+            "        count: curr.count + 1",
+            "    }));",
+            "",
+            "    return replies.message({ message: `${req.greeting}, ${req.name}` });",
+            "}"
+        ],
+        "description": "This snippet adds a complete hello world Value Entity example"
+    },
+    "ts.helloworld.view": {
+        "prefix": "ts.helloworld.view",
+        "body": [
+            "import { View } from '@lightbend/akkaserverless-javascript-sdk';",
+            "",
+            "export const MyView = new View(",
+            "    ['app.proto'],",
+            "    'valueentity.viewService',",
+            "    {",
+            "        viewId: 'myview'",
+            "    }",
+            ");"
+        ],
+        "description": "This snippet adds a complete hello world View example"
+    },
+    "ts.helloworld.index": {
+        "prefix": "ts.helloworld.index",
+        "body": [
+            "import { AkkaServerless } from '@lightbend/akkaserverless-javascript-sdk';",
+            "import { Entity } from './valueentity';",
+            "import { MyView } from './view';",
+            "",
+            "console.log('starting now...')",
+            "",
+            "new AkkaServerless()",
+            "    .addComponent(Entity)",
+            "    .addComponent(MyView)",
+            "    .start();"
+        ],
+        "description": "This snippet adds a complete hello world index.ts example"
+    }
+}

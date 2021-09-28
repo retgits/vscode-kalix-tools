@@ -43,7 +43,7 @@ async function addRegistryCredentials(p: ProjectExplorerNode): Promise<ShellResu
     });
 
     if (creds === undefined) {
-        return { code: -1, stderr: 'no credentials provided' };
+        return { code: '-1', stderr: 'no credentials provided' };
     }
 
     let result: ShellResult;
@@ -53,7 +53,7 @@ async function addRegistryCredentials(p: ProjectExplorerNode): Promise<ShellResu
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
@@ -69,7 +69,7 @@ async function deleteRegistryCredentials(c: ContainerRegistryCredentialNode): Pr
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }

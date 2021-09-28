@@ -1,0 +1,32 @@
+= Installation
+
+include::ROOT:partial$include.adoc[]
+
+== Prerequisites 
+
+The Akka Serverless extension may need to invoke the following command line tools, depending on which features you use. You will need https://developer.lightbend.com/docs/akka-serverless/akkasls/install-akkasls.html[`akkasls`] at minimum, and `docker` if you plan to use the extension to build applications rather than only browse.
+
+NOTE: This extension has been tested with version {akkasls-support-version} and higher
+
+== VSCode Marketplace
+
+The easiest way to get started with Akka Serverless Tools for VSCode is to download the extension from the https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools[VSCode Marketplace {tab-icon}, window="new"] or from the `Extensions` tab in VSCode itself.
+
+After installation, you can use the xref:command-palette.adoc[] or xref:views.adoc[] to get started.
+
+== Build from source
+
+To build the extension from source, run
+
+[source,bash]
+----
+## clone the git repository
+git clone https://github.com/lightbend-labs/vscode-akkasls-tools
+
+## change directories
+cd vscode-akkasls-tools
+
+## install dependencies and create the installer package
+npm install
+npm run installer
+----

@@ -2,9 +2,9 @@
 
 [![license](https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools)](https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools) ![GitHub package.json version](https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools)
 
-> Develop, deploy, and manage Akka Serverless apps
+> Develop, deploy, and manage Akka Serverless services
 
-Manage the stateful serverless applications you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
+Manage the stateful serverless services you build on [Akka Serverless](https://akkaserverless.com), without leaving your favorite IDE! With this VS Code extension you don't have to remember all the flags to deploy services, add docker credentials, remove that one hostname from your service because you can do it all through VS Code.
 
 ## Key features
 
@@ -20,45 +20,7 @@ Through the extension you can deploy services to Akka Serverless, following the 
 
 ## Getting started with the extension
 
-### Install
-
-Download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools)
-
-### Dependencies
-
-The Akka Serverless extension may need to invoke the following command line tools, depending on which features you use. You will need `akkasls` at minimum, and `docker` if you plan to use the extension to build applications rather than only browse.
-
-## Commands and features
-
-`vscode-akkasls-tools` supports a number of commands to interact with Akka Serverless; these are accessible via the command menu (`Ctrl+Shift+P`) and the views that are contributed by the extension.
-
-### Projects
-
-This view controls all your projects, services, invites and members, and container registries. It is your one-stop-shop to manage and control your projects
-
-### Account
-
-This view shows the account data for the user that is currently logged in
-
-### Tokens
-
-This view shows all tokens that are currently active for the user
-
-### Status
-
-This view shows tatus information on the Akka Serverless platform
-
-### Tools
-
-This view goves an overview of the tools needed to build and deploy apps for Akka Serverless
-
-## Configuration
-
-- `akkaserverless.dryrun`: Whether commands will be printed in the logs rather than execute them
-- `akkaserverless.silent`: Whether commands executed should write to stdout
-- `akkaserverless.configFile`: Location of the config file to use (default ~/.akkaserverless/config.yaml)
-- `akkaserverless.context`: The context to use
-- `akkaserverless.enableExperimentalFeatures`: Whether experimental features should be enabled
+To get started, download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools). You'll also need `akkasls` and `docker` (if you plan to use the extension to build applications rather than only browse).
 
 ## Release notes
 
@@ -70,7 +32,7 @@ We welcome all contributions! [Pull requests](https://github.com/lightbend-labs/
 
 ## Support
 
-This project is provided on an as-is basis and is not covered by the Lightbend Support policy.
+This project is an [incubating project](https://developer.lightbend.com/docs/introduction/getting-help/support-terminology.html).
 
 ## License
 

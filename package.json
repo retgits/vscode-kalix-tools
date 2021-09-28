@@ -1,7 +1,7 @@
 {
 	"name": "vscode-akkasls-tools",
 	"displayName": "Akka Serverless Tools for VSCode",
-	"description": "Develop, deploy, and manage Akka Serverless apps",
+	"description": "Develop, deploy, and manage Akka Serverless services",
 	"version": "0.3.0",
 	"publisher": "lightbend-labs",
 	"homepage": "https://github.com/lightbend-labs/vscode-akkasls-tools",
@@ -506,6 +506,20 @@
 				"title": "Download Quickstart",
 				"category": "Akka Serverless",
 				"description": "Download an Akka Serverless quickstart"
+			}
+		],
+		"snippets": [
+			{
+				"language": "proto3",
+				"path": "./snippets/proto3.code-snippets"
+			},
+			{
+				"language": "javascript",
+				"path": "./snippets/javascript.code-snippets"
+			},
+			{
+				"language": "typescript",
+				"path": "./snippets/typescript.code-snippets"
 			}
 		]
 	},

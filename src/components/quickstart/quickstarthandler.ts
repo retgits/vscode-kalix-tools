@@ -21,7 +21,7 @@ async function dlQuickstart(): Promise<ShellResult> {
     let res = await listQuickstarts(getConfiguration());
 
     if (res.code !== undefined) {
-        return { code: -1, stderr: res.stderr };
+        return { code: '-1', stderr: res.stderr };
     }
 
     let qs = [];
@@ -40,7 +40,7 @@ async function dlQuickstart(): Promise<ShellResult> {
     });
 
     if (quickstart === undefined) {
-        return { code: -1, stderr: 'no quickstart selected' };
+        return { code: '-1', stderr: 'no quickstart selected' };
     }
 
     const folder = await showOpenDialog({
@@ -51,7 +51,7 @@ async function dlQuickstart(): Promise<ShellResult> {
     });
 
     if (folder === undefined) {
-        return { code: -1, stderr: 'no folder selected' };
+        return { code: '-1', stderr: 'no folder selected' };
     }
 
     let result: ShellResult;
@@ -61,7 +61,7 @@ async function dlQuickstart(): Promise<ShellResult> {
     }
     catch (ex: any) {
         result = {
-            code: -1,
+            code: '-1',
             stderr: ex
         };
     }
