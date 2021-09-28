@@ -4,20 +4,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
-
-      - name: Install and Build 🔧
-        run: |
-          npm i -g @antora/cli @antora/site-generator-default  
-          cd docs && make html
-          touch build/site/.nojekyll
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Antora
+        uses: kameshsampath/antora-site-action@v0.2.4
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/site # The folder the action should deploy.
+          antora_playbook: antora-playbook.yml
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/site
