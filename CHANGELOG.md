@@ -1,5 +1,19 @@
 # Changelog
 
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.4.0](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.3.0...v0.4.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* fix nojekyll ([a745543](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/a74554362f8281bd23079e93ff70adb5b7ce85ee))
+* fix workflow ([ba67fa0](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/ba67fa0d315786e9f3feb4062cf53fcca25fbdb5))
+* fix workflow ([59075ee](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/59075eef71a7a8eed6cc4b3b6c5600df5f633a9f))
+* update workflow ([85be905](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/85be905828b98c1bee4f49f42ce2cb32167d7aec))
+* update workflow ([cf4f821](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/cf4f82139c75505fd1e9c67f45e10702b12f7885))
+* update yaml ([4066d02](https://github.com/lightbend-labs/vscode-akkasls-tools/commit/4066d02a917f38af0e1943ede4a6b77155b72528))
+
 ## [0.3.0](https://github.com/lightbend-labs/vscode-akkasls-tools/compare/v0.2.4...v0.3.0) (2021-09-24)
 
 
