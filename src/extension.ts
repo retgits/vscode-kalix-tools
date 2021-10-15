@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// Project Explorer
 	const projectExplorer = new ProjectExplorer();
 	vscode.window.registerTreeDataProvider('as.projectExplorer', projectExplorer);
-	vscode.commands.registerCommand('as.projectExplorer.refresh', () => toolsExplorer.refresh());
+	vscode.commands.registerCommand('as.projectExplorer.refresh', () => projectExplorer.refresh());
 	vscode.commands.registerCommand('as.projectExplorer.addRegistryCredentials', async (item: ProjectExplorerNode) => { await handleAddRegistryCredentials(item, projectExplorer); });
 	vscode.commands.registerCommand('as.projectExplorer.deleteRegistryCredentials', async (item: ContainerRegistryCredentialNode) => { await handleDeleteRegistryCredentials(item, projectExplorer); });
 	vscode.commands.registerCommand('as.projectExplorer.addInvite', async (item: ProjectExplorerNode) => { await handleSendInvitation(item, projectExplorer); });
