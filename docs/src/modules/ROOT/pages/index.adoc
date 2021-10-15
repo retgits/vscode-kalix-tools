@@ -2,7 +2,7 @@
 
 include::ROOT:partial$include.adoc[]
 
-image:https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools[link=https://img.shields.io/github/license/lightbend-labs/vscode-akkasls-tools] image:https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools[link=https://img.shields.io/github/package-json/v/lightbend-labs/vscode-akkasls-tools]
+image:https://img.shields.io/github/license/lightbend/vscode-akkasls-tools[link=https://img.shields.io/github/license/lightbend/vscode-akkasls-tools] image:https://img.shields.io/github/package-json/v/lightbend/vscode-akkasls-tools[link=https://img.shields.io/github/package-json/v/lightbend/vscode-akkasls-tools]
 
 > Develop, deploy, and manage Akka Serverless apps
 
@@ -18,7 +18,7 @@ Through the extension you can deploy services to Akka Serverless, following the 
 
 [NOTE]
 ====
-We welcome all contributions! https://github.com/lightbend-labs/vscode-akkasls-tools/pulls[Pull requests] are the preferred way to share your contributions. For major changes, please open https://github.com/lightbend-labs/vscode-akkasls-tools/issues[an issue] first to discuss what you would like to change.
+We welcome all contributions! https://github.com/lightbend/vscode-akkasls-tools/pulls[Pull requests] are the preferred way to share your contributions. For major changes, please open https://github.com/lightbend/vscode-akkasls-tools/issues[an issue] first to discuss what you would like to change.
 ====
 
 == Support

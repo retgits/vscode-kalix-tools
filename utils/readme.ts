@@ -89,7 +89,7 @@ Through the extension you can deploy services to Akka Serverless, following the 
 
 ## Getting started with the extension
 
-To get started, download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools). You'll also need \`akkasls\` and \`docker\` (if you plan to use the extension to build applications rather than only browse).
+To get started, download the latest release from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-akkasls-tools). You'll also need \`akkasls\` and \`docker\` (if you plan to use the extension to build applications rather than only browse).
 
 ## Release notes
 
@@ -97,7 +97,7 @@ See the [change log](CHANGELOG.md).
 
 ## Contributing
 
-We welcome all contributions! [Pull requests](https://github.com/lightbend-labs/vscode-akkasls-tools/pulls) are the preferred way to share your contributions. For major changes, please open [an issue](https://github.com/lightbend-labs/vscode-akkasls-tools/issues) first to discuss what you would like to change.
+We welcome all contributions! [Pull requests](https://github.com/lightbend/vscode-akkasls-tools/pulls) are the preferred way to share your contributions. For major changes, please open [an issue](https://github.com/lightbend/vscode-akkasls-tools/issues) first to discuss what you would like to change.
 
 ## Support
 

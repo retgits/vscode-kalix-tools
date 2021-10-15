@@ -4,10 +4,10 @@
 	"description": "Develop, deploy, and manage Akka Serverless services",
 	"version": "0.4.0",
 	"publisher": "lightbend-labs",
-	"homepage": "https://github.com/lightbend-labs/vscode-akkasls-tools",
+	"homepage": "https://github.com/lightbend/vscode-akkasls-tools",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/lightbend-labs/vscode-akkasls-tools"
+		"url": "https://github.com/lightbend/vscode-akkasls-tools"
 	},
 	"engines": {
 		"vscode": "^1.60.0"

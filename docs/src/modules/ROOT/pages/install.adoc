@@ -10,7 +10,7 @@ NOTE: This extension has been tested with version {akkasls-support-version} and 
 
 == VSCode Marketplace
 
-The easiest way to get started with Akka Serverless Tools for VSCode is to download the extension from the https://marketplace.visualstudio.com/items?itemName=lightbend-labs.vscode-akkasls-tools[VSCode Marketplace {tab-icon}, window="new"] or from the `Extensions` tab in VSCode itself.
+The easiest way to get started with Akka Serverless Tools for VSCode is to download the extension from the https://marketplace.visualstudio.com/items?itemName=lightbend.vscode-akkasls-tools[VSCode Marketplace {tab-icon}, window="new"] or from the `Extensions` tab in VSCode itself.
 
 After installation, you can use the xref:command-palette.adoc[] or xref:views.adoc[] to get started.
 
@@ -21,7 +21,7 @@ To build the extension from source, run
 [source,bash]
 ----
 ## clone the git repository
-git clone https://github.com/lightbend-labs/vscode-akkasls-tools
+git clone https://github.com/lightbend/vscode-akkasls-tools
 
 ## change directories
 cd vscode-akkasls-tools
