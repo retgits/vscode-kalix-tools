@@ -62,6 +62,15 @@ export interface EnvVars {
 }
 
 /**
+ * LiteralSecret represent secret data in `akkasls secrets` commands by defining key/value pairs
+ * @export
+ * @interface LiteralSecret
+ */
+export interface LiteralSecret {
+    [command: string]: string
+}
+
+/**
  * Command encapsulates all the commands that need to be run
  *
  * @export
@@ -160,6 +169,8 @@ export class Command {
         if (this._context.length > 1) {
             str += ` --context ${this._context}`;
         }
+
+        str += ' --disable-prompt';
 
         return str;
     }

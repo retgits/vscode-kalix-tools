@@ -2,4 +2,4 @@
 
 // constant to add icon for opening link in a new page
 :tab-icon: image:ROOT:new-tab.svg[width=12]
-:akkasls-support-version: 0.0.42
+:akkasls-support-version: 0.1.7
