@@ -1,12 +1,13 @@
 /*global Thenable*/
 import { ProjectExplorerNode } from './projectexplorernode';
 import * as vscode from 'vscode';
-import { INVITE_ITEM_TYPE, MEMBER_ITEM_TYPE, PROJECT_ITEM_TYPE, REGISTRY_CREDENTIALS_ITEM_TYPE, SERVICE_ITEM_TYPE } from '../../utils/constants';
+import { INVITE_ITEM_TYPE, MEMBER_ITEM_TYPE, PROJECT_ITEM_TYPE, REGISTRY_CREDENTIALS_ITEM_TYPE, SECRET_ITEM_TYPE, SERVICE_ITEM_TYPE } from '../../utils/constants';
 import { getServicePlaceholder, getServices } from './servicenode';
 import { getContainerRegistryCredentialPlaceholder, getContainerRegistryCredentials } from './containerregistrycredentialnode';
 import { getMemberPlaceholder, getMembers } from './membernode';
 import { getInvitePlaceholder, getInvites } from './invitenode';
 import { getProjects } from './projectnode';
+import { getSecrets, getSecretsPlaceholder } from './secretnode';
 
 /**
  * The ProjectExplorer represents a tree of projects and related items that can be shown
@@ -41,6 +42,8 @@ export class ProjectExplorer implements vscode.TreeDataProvider<ProjectExplorerN
                     return Promise.resolve(getInvites(element.parentProjectID));
                 case REGISTRY_CREDENTIALS_ITEM_TYPE:
                     return Promise.resolve(getContainerRegistryCredentials(element.parentProjectID));
+                case SECRET_ITEM_TYPE:
+                    return Promise.resolve(getSecrets(element.parentProjectID));
                 default:
                     break;
             }
@@ -57,6 +60,7 @@ export class ProjectExplorer implements vscode.TreeDataProvider<ProjectExplorerN
         defaultTreeItems.push(getContainerRegistryCredentialPlaceholder(parentProjectID));
         defaultTreeItems.push(getMemberPlaceholder(parentProjectID));
         defaultTreeItems.push(getInvitePlaceholder(parentProjectID));
+        defaultTreeItems.push(getSecretsPlaceholder(parentProjectID));
         return Promise.resolve(defaultTreeItems);
     }
 

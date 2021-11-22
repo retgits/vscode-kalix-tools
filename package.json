@@ -158,6 +158,18 @@
 					"when": "view == as.projectExplorer && viewItem == Credentials"
 				},
 				{
+					"command": "as.projectExplorer.addSecret",
+					"when": "view == as.projectExplorer && viewItem == Secrets"
+				},
+				{
+					"command": "as.projectExplorer.deleteSecret",
+					"when": "view == as.projectExplorer && viewItem == Secrets"
+				},
+				{
+					"command": "as.projectExplorer.secretInfo",
+					"when": "view == as.projectExplorer && viewItem == Secrets"
+				},
+				{
 					"command": "as.projectExplorer.credentialsInfo",
 					"when": "view == as.projectExplorer && viewItem == Credentials"
 				},
@@ -234,6 +246,18 @@
 				},
 				{
 					"command": "as.projectExplorer.deleteRegistryCredentials",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.addSecret",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.deleteSecret",
+					"when": "view == as.projectExplorer"
+				},
+				{
+					"command": "as.projectExplorer.secretInfo",
 					"when": "view == as.projectExplorer"
 				},
 				{
@@ -325,6 +349,21 @@
 				"command": "as.projectExplorer.deleteRegistryCredentials",
 				"title": "Remove registry credentials",
 				"description": "Remove credentials for a container registry"
+			},
+			{
+				"command": "as.projectExplorer.addSecret",
+				"title": "Add new secret",
+				"description": "Add new environment variable secret"
+			},
+			{
+				"command": "as.projectExplorer.deleteSecret",
+				"title": "Remove secret",
+				"description": "Remove an environment variable secret"
+			},
+			{
+				"command": "as.projectExplorer.secretInfo",
+				"title": "Show details",
+				"description": "Show secret details"
 			},
 			{
 				"command": "as.projectExplorer.credentialsInfo",

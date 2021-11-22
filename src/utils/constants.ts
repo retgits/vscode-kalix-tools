@@ -40,3 +40,4 @@ export const INVITE_ITEM_TYPE = 'Invites';
 export const MEMBER_ITEM_TYPE = 'Members';
 export const PROJECT_ITEM_TYPE = 'Projects';
 export const SERVICE_ITEM_TYPE = 'Services';
+export const SECRET_ITEM_TYPE = 'Secrets';

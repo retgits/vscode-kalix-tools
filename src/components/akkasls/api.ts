@@ -167,9 +167,11 @@ export interface FStatus {
 }
 
 export interface Spec {
-    containers:  Container[];
-    replicas:    number;
-    storeConfig: StoreConfig;
+    containers?:  Container[];
+    replicas?:    number;
+    storeConfig?: StoreConfig;
+    type?: string;
+    data?: Data;
 }
 
 export interface Container {
@@ -196,9 +198,20 @@ export interface Status {
 export interface Condition {
     type:               string;
     status:             string;
+    observedGeneration?: number;
     lastTransitionTime: Date;
     reason:             string;
     message:            string;
+}
+
+export interface Secret {
+    metadata: Metadata;
+    spec?:     Spec;
+    status?:   Status;
+}
+
+export interface Data {
+    [command: string]: string
 }
 
 // Converts JSON strings to/from your types
@@ -232,6 +245,14 @@ export class Convert {
     }
 
     public static toRegistryCredential(json: string): RegistryCredential[] {
+        return JSON.parse(json);
+    }
+
+    public static toSecret(json: string): Secret {
+        return JSON.parse(json);
+    }
+
+    public static toSecretList(json: string): Secret[] {
         return JSON.parse(json);
     }
 

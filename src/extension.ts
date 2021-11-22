@@ -24,6 +24,8 @@ import { ServiceNode } from './components/projectexplorer/servicenode';
 import { showServiceLogs } from './components/projectexplorer/logshandler';
 import { handleDownloadQuickstart } from './components/quickstart/quickstarthandler';
 import { MemberNode } from './components/projectexplorer/membernode';
+import { handleCreateSecret, handleDeleteSecret } from './components/projectexplorer/secrethandler';
+import { SecretNode } from './components/projectexplorer/secretnode';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -47,6 +49,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('as.projectExplorer.serviceLogs', async (item: ServiceNode) => { await showServiceLogs(item); });
 	vscode.commands.registerCommand('as.projectExplorer.serviceInfo', async (item: ServiceNode) => { await item.print(); });
 	vscode.commands.registerCommand('as.projectExplorer.memberInfo', async (item: MemberNode) => { await item.print(); });
+	vscode.commands.registerCommand('as.projectExplorer.addSecret', async (item: ProjectExplorerNode) => { await handleCreateSecret(item, projectExplorer); });
+	vscode.commands.registerCommand('as.projectExplorer.deleteSecret', async (item: SecretNode) => { await handleDeleteSecret(item, projectExplorer); });
+	vscode.commands.registerCommand('as.projectExplorer.secretInfo', async (item: SecretNode) => { await item.print(); });
 
 	// Tools Explorer
 	const toolsExplorer = new ToolsExplorer();
